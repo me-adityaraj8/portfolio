@@ -12,6 +12,8 @@ import { getWork } from '../lib/work';
 import { site } from '../data/site';
 import github from '../data/github.json';
 import { usesTool } from '../lib/skills';
+import { Image } from 'astro:assets';
+import { shot } from '../lib/shots';
 
 const { featured, more } = await getWork();
 const gh = github.profile;
@@ -67,7 +69,7 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
             <HoverCard>
               <a href={e.href} rel="noopener" target="_blank" class="tl-org">{e.org}</a>
               <span slot="card" class="pc pc--media">
-                <img src={e.shot} alt="" width="1440" height="900" loading="lazy" />
+                <Image src={shot(e.shot)} widths={[320, 640]} sizes="320px" alt="" loading="lazy" />
                 <span class="pc-body"><strong>{e.org}</strong><span class="pc-sub">{e.role} · {e.years}</span><span class="pc-text">{e.points[0]}</span></span>
               </span>
             </HoverCard>

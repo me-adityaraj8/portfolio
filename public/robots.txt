@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://me-adityaraj8.vercel.app/sitemap-index.xml

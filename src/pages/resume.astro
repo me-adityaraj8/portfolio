@@ -9,6 +9,7 @@ import { getCollection } from 'astro:content';
 import { site } from '../data/site';
 import cp from '../data/cp.json';
 import contrib from '../data/contrib.json';
+import { absoluteUrl } from '../lib/seo';
 
 const projects = (await getCollection('projects', (p) => p.data.order !== undefined && p.data.kind === 'project')).sort((a, b) => a.data.order! - b.data.order!);
 const host = new URL(site.linkedin).host.replace('www.', '');
@@ -32,6 +33,11 @@ const month = (d: string) => `${MONTHS[Number(d.slice(5, 7)) - 1]} ${d.slice(0, 
     <title>{`${site.name}, resume`}</title>
     <meta name="description" content={`Resume of ${site.name}, software engineer.`} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href={absoluteUrl('/resume', Astro.site)} />
+    <meta property="og:title" content={`${site.name}, resume`} />
+    <meta property="og:description" content={`Resume of ${site.name}, software engineer.`} />
+    <meta property="og:image" content={absoluteUrl('/og/home.png', Astro.site)} />
+    <meta name="twitter:card" content="summary_large_image" />
     <style is:global>
       @page { size: A4; margin: 14mm 15mm; }
       * { box-sizing: border-box; }

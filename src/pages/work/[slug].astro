@@ -14,7 +14,7 @@ const { project } = Astro.props;
 const d = project.data;
 const { Content } = await render(project);
 ---
-<Base title={`${d.title}, by ${site.name}`} description={d.summary} page="case">
+<Base title={`${d.title}, by ${site.name}`} description={d.summary} page="case" image={`/og/${project.id}.png`}>
   <main class="case-page" id="main" tabindex="-1">
     <article class="case">
       <p class="kicker">{monthYear(d.date)}{d.role ? ` · ${d.role}` : ''}</p>

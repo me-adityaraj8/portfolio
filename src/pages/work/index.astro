@@ -6,7 +6,7 @@ import { site } from '../../data/site';
 
 const projects = (await getCollection('projects')).sort((a, b) => b.data.date.localeCompare(a.data.date));
 ---
-<Base title={`Index of work, ${site.name}`} page="index">
+<Base title={`Index of work, ${site.name}`} description={`Every project by ${site.name}, newest first.`} page="index" image="/og/work.png">
   <main class="index-page" id="main" tabindex="-1">
     <h1>Index of work</h1>
     <p class="lede">Everything on the map, newest first. The map places each one by when I started it.</p>

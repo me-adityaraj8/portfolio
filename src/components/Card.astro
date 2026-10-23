@@ -1,5 +1,7 @@
 ---
 import QRCode from 'qrcode';
+import { Picture } from 'astro:assets';
+import { shot } from '../lib/shots';
 import type { Project } from '../lib/work';
 
 interface Props { project: Project }
@@ -12,7 +14,7 @@ const action = d.demo ? 'Try it live' : 'Read the case study';
 <article class="card spot" style={`--a:${a};--b:${b}`} data-stack={d.stack.join('|')}>
   <a class="card-hit" href={`/work/${project.id}`} data-open={project.id} data-demo={d.demo ?? ''} data-live={d.links.live ?? ''} data-title={d.title} aria-label={`${d.title}: ${action}`}></a>
   <div class="preview" aria-hidden="true">
-    {d.shot && <img src={d.shot} alt="" loading="lazy" decoding="async" width="1440" height="900" />}
+    {d.shot && <Picture src={shot(d.shot)} formats={['avif', 'webp']} widths={[480, 960, 1440]} sizes="(max-width: 899px) 86vw, 480px" alt="" loading="lazy" decoding="async" />}
     {d.demo === 'qr' && (
       <div class="mock mock--qr"><div class="qr" set:html={qr} /><p>github.com/me-adityaraj8/qrgen</p></div>
     )}

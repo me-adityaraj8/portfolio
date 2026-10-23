@@ -21,7 +21,7 @@ const projects = defineCollection({
     order: z.number().int().optional(),
     /** Two colours for the card's backdrop gradient. */
     accent: z.tuple([z.string(), z.string()]).optional(),
-    /** Screenshot of the live app, in /public. */
+    /** Screenshot of the live app, in src/assets/shots. */
     shot: z.string().optional(),
     /** What opens when the card is clicked: the live site, or an in-page demo. */
     demo: z.enum(['site', 'qr']).optional(),

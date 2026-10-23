@@ -9,9 +9,17 @@ import '@fontsource/barlow-condensed/500.css';
 import '@fontsource/barlow-condensed/600.css';
 import '../styles/global.css';
 import { site } from '../data/site';
+import cp from '../data/cp.json';
+import { absoluteUrl, personJsonLd, profileLinks } from '../lib/seo';
 
-interface Props { title?: string; description?: string; page?: string }
-const { title = `${site.name}, ${site.role.toLowerCase()}`, description = site.line, page = 'map' } = Astro.props;
+interface Props { title?: string; description?: string; page?: string; image?: string }
+const { title = `${site.name}, ${site.role.toLowerCase()}`, description = site.line, page = 'map', image = '/og/home.png' } = Astro.props;
+const canonical = absoluteUrl(Astro.url.pathname, Astro.site);
+const ogImage = absoluteUrl(image, Astro.site);
+const person = personJsonLd({
+  name: site.name, url: absoluteUrl('/', Astro.site), email: site.email, jobTitle: site.role,
+  school: site.education[0].full, sameAs: [site.github, site.linkedin, ...profileLinks(cp.handles)],
+});
 ---
 <!doctype html>
 <html lang="en" class="no-js" data-page={page}>
@@ -20,8 +28,22 @@ const { title = `${site.name}, ${site.role.toLowerCase()}`, description = site.l
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content={page === 'case' ? 'article' : 'website'} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:url" content={canonical} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={title} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    {page === 'map' && <script type="application/ld+json" set:html={JSON.stringify(person)} />}
     <meta name="theme-color" content="#07060f" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#f6f5fb" media="(prefers-color-scheme: light)" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
