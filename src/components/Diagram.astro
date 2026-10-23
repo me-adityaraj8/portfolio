@@ -1,0 +1,40 @@
+---
+/**
+ * An architecture diagram from a project's frontmatter. Boxes sit on a small grid
+ * (col, row), and arrows join them; the SVG scales to its container.
+ */
+interface Node { id: string; label: string; sub?: string; col: number; row: number; tone?: 'client' | 'server' | 'data' | 'ext' }
+interface Props { nodes: Node[]; edges: Array<[string, string, string?]>; title: string }
+const { nodes, edges, title } = Astro.props;
+const W = 190, H = 64, GX = 256, GY = 104, PAD = 12;
+const cols = Math.max(...nodes.map((n) => n.col)) + 1, rows = Math.max(...nodes.map((n) => n.row)) + 1;
+const vw = (cols - 1) * GX + W + PAD * 2, vh = (rows - 1) * GY + H + PAD * 2;
+const at = (n: Node) => ({ x: PAD + n.col * GX, y: PAD + n.row * GY });
+const byId = Object.fromEntries(nodes.map((n) => [n.id, n]));
+const path = (a: Node, b: Node) => {
+  const p = at(a), q = at(b);
+  if (a.row === b.row) {
+    const [x1, x2] = p.x < q.x ? [p.x + W, q.x] : [p.x, q.x + W];
+    return { d: `M${x1} ${p.y + H / 2}H${x2}`, mx: (x1 + x2) / 2, my: p.y + H / 2 - 8 };
+  }
+  const [y1, y2] = p.y < q.y ? [p.y + H, q.y] : [p.y, q.y + H];
+  const x1 = p.x + W / 2, x2 = q.x + W / 2, ym = (y1 + y2) / 2;
+  return { d: `M${x1} ${y1}V${ym}H${x2}V${y2}`, mx: (x1 + x2) / 2 + 6, my: ym - 6 };
+};
+---
+<figure class="diagram">
+  <svg viewBox={`0 0 ${vw} ${vh}`} role="img" aria-label={`${title} architecture: ${edges.map(([a, b]) => `${byId[a].label} to ${byId[b].label}`).join(', ')}`}>
+    <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" class="dg-head" /></marker></defs>
+    {edges.map(([a, b, label]) => { const e = path(byId[a], byId[b]); return (
+      <g class="dg-edge"><path d={e.d} marker-end="url(#arrow)" />{label && <text x={e.mx} y={e.my} text-anchor="middle">{label}</text>}</g>
+    ); })}
+    {nodes.map((n) => { const p = at(n); return (
+      <g class={`dg-node dg-${n.tone ?? 'server'}`}>
+        <rect x={p.x} y={p.y} width={W} height={H} rx="12" />
+        <text x={p.x + W / 2} y={p.y + (n.sub ? 27 : 37)} text-anchor="middle" class="dg-label">{n.label}</text>
+        {n.sub && <text x={p.x + W / 2} y={p.y + 46} text-anchor="middle" class="dg-sub">{n.sub}</text>}
+      </g>
+    ); })}
+  </svg>
+  <figcaption>How {title} fits together</figcaption>
+</figure>

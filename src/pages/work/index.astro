@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { monthYear } from '../../lib/work';
+import { site } from '../../data/site';
+
+const projects = (await getCollection('projects')).sort((a, b) => b.data.date.localeCompare(a.data.date));
+---
+<Base title={`Index of work, ${site.name}`} page="index">
+  <main class="index-page" id="main" tabindex="-1">
+    <h1>Index of work</h1>
+    <p class="lede">Everything on the map, newest first. The map places each one by when I started it.</p>
+    <table class="index-table">
+      <thead><tr><th scope="col">Started</th><th scope="col">Project</th><th scope="col">What it is</th><th scope="col">Links</th></tr></thead>
+      <tbody>
+        {projects.map((p) => (
+          <tr class={p.data.kind === 'early' ? 'early' : undefined}>
+            <td>{monthYear(p.data.date)}</td>
+            <th scope="row">{p.data.kind === 'early' ? p.data.title : <a href={`/work/${p.id}`} style={`view-transition-name: title-${p.id}`}>{p.data.title}</a>}</th>
+            <td>{p.data.summary}</td>
+            <td><span class="links">
+              {p.data.links.live && <a href={p.data.links.live} rel="noopener">Live</a>}
+              {p.data.links.code && <a href={p.data.links.code} rel="noopener">Code</a>}
+              {!p.data.links.code && p.data.private && <span class="muted">Private</span>}
+            </span></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <p class="back"><a href="/">Back to the map</a></p>
+  </main>
+</Base>

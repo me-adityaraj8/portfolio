@@ -1,0 +1,9 @@
+---
+/** A link or label that lifts a rich preview card into view on hover or keyboard focus. */
+interface Props { align?: 'start' | 'center' }
+const { align = 'start' } = Astro.props;
+---
+<span class={`hc hc--${align}`}>
+  <slot />
+  <span class="hc-card" role="tooltip"><slot name="card" /></span>
+</span>

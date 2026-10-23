@@ -1,0 +1,107 @@
+---
+/**
+ * The resume, built from the same data as the site, so it can never fall behind.
+ * `npm run resume:pdf` prints this page to public/resume.pdf.
+ */
+import '@fontsource/barlow/400.css';
+import '@fontsource/barlow/600.css';
+import { getCollection } from 'astro:content';
+import { site } from '../data/site';
+import cp from '../data/cp.json';
+import contrib from '../data/contrib.json';
+
+const projects = (await getCollection('projects', (p) => p.data.order !== undefined && p.data.kind === 'project')).sort((a, b) => a.data.order! - b.data.order!);
+const host = new URL(site.linkedin).host.replace('www.', '');
+// Grouped from the stack list, so the resume never claims a tool the site doesn't.
+const groups: Record<string, string[]> = {
+  Languages: ['TypeScript', 'JavaScript', 'C++'],
+  Databases: ['PostgreSQL', 'MongoDB', 'Prisma'],
+  Tools: ['Git', 'Vercel', 'Vitest'],
+};
+const tools = site.stack.map((t) => t.name);
+const grouped = new Set(Object.values(groups).flat());
+const skills = { ...Object.fromEntries(Object.entries(groups).map(([k, v]) => [k, v.filter((n) => tools.includes(n))])), 'Frameworks and libraries': tools.filter((n) => !grouped.has(n)) };
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const month = (d: string) => `${MONTHS[Number(d.slice(5, 7)) - 1]} ${d.slice(0, 4)}`;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{`${site.name}, resume`}</title>
+    <meta name="description" content={`Resume of ${site.name}, software engineer.`} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <style is:global>
+      @page { size: A4; margin: 14mm 15mm; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: #eceaf3; color: #16141f; font: 400 10.5pt/1.42 'Barlow', system-ui, sans-serif; }
+      .bar { display: flex; justify-content: center; gap: 12px; padding: 18px; font: 500 14px 'Barlow', sans-serif; }
+      .bar a, .bar button { padding: 9px 16px; border-radius: 999px; border: 1px solid #c9c5dc; background: #fff; color: #16141f; text-decoration: none; cursor: pointer; font: inherit; }
+      .bar .primary { background: #16141f; color: #fff; border-color: #16141f; }
+      .page { width: 210mm; min-height: 297mm; margin: 0 auto 40px; padding: 14mm 15mm; background: #fff; box-shadow: 0 10px 40px rgb(0 0 0 / 0.12); }
+      h1 { margin: 0; font-size: 22pt; font-weight: 600; letter-spacing: -0.01em; }
+      .contact { margin: 4px 0 0; color: #4a4760; font-size: 9.5pt; }
+      .contact a { color: inherit; }
+      .cap { text-transform: capitalize; }
+      h2 { margin: 13px 0 6px; padding-bottom: 3px; border-bottom: 1px solid #16141f; font-size: 10.5pt; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+      .row { display: flex; justify-content: space-between; gap: 12px; }
+      .row b { font-weight: 600; }
+      .muted { color: #5b5874; }
+      ul { margin: 3px 0 7px; padding-left: 16px; }
+      li { margin: 1px 0; }
+      .item + .item { margin-top: 6px; }
+      a { color: #16141f; }
+      @media print { body { background: #fff; } .bar { display: none; } .page { margin: 0; padding: 0; width: auto; min-height: 0; box-shadow: none; } }
+    </style>
+  </head>
+  <body>
+    <nav class="bar" aria-label="Resume actions">
+      <a href="/">Back to the site</a>
+      <a class="primary" href="/resume.pdf" download>Download PDF</a>
+      <button type="button" onclick="window.print()">Print</button>
+    </nav>
+    <main class="page">
+      <h1>{site.name}</h1>
+      <p class="contact">{site.role} · <a href={`mailto:${site.email}`}>{site.email}</a> · <a href={site.linkedin}>{host}{new URL(site.linkedin).pathname.replace(/\/$/, '')}</a> · <a href={site.github}>github.com/{site.github.split('/').pop()}</a></p>
+
+      <h2>Education</h2>
+      {site.education.map((e) => (
+        <div class="item">
+          <div class="row"><b>{e.full}</b><span>{e.years}</span></div>
+          <div class="row muted"><span>{e.detail}</span><span>{e.place}</span></div>
+        </div>
+      ))}
+
+      <h2>Experience</h2>
+      {site.experience.map((x) => (
+        <div class="item">
+          <div class="row"><b>{x.role}, {x.org}</b><span>{x.years}</span></div>
+          <ul>{x.points.map((pt) => <li>{pt}</li>)}</ul>
+        </div>
+      ))}
+
+      <h2>Projects</h2>
+      {projects.map((p) => (
+        <div class="item">
+          <div class="row"><b>{p.data.title} <span class="muted">· {p.data.stack.slice(0, 5).join(', ')}</span></b><span>{month(p.data.date)}</span></div>
+          <ul>
+            <li>{p.data.summary}</li>
+            {p.data.facts.slice(0, 2).map((f) => <li>{f}.</li>)}
+            {(p.data.links.live || p.data.links.code) && <li class="muted">{[p.data.links.live, p.data.links.code].filter(Boolean).map((l) => l!.replace(/^https:\/\//, '')).join(' · ')}</li>}
+          </ul>
+        </div>
+      ))}
+
+      <h2>Problem solving</h2>
+      <ul>
+        <li>{cp.codolio.solved} problems solved across Codeforces and LeetCode, {cp.codolio.contests} rated contests, {cp.codolio.maxStreak}-day best streak.</li>
+        <li>Codeforces {cp.codeforces.rating}, peak {cp.codeforces.maxRating} (<span class="cap">{cp.codeforces.maxRank}</span>) · LeetCode {cp.leetcode.rating}, top {cp.leetcode.top}%.</li>
+        <li>{contrib.total} GitHub contributions in the last year.</li>
+      </ul>
+
+      <h2>Skills</h2>
+      {Object.entries(skills).map(([k, v]) => <div><b>{k}:</b> {v.join(', ')}</div>)}
+    </main>
+  </body>
+</html>

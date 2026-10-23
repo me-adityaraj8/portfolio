@@ -1,0 +1,327 @@
+---
+import Base from '../layouts/Base.astro';
+import Card from '../components/Card.astro';
+import HoverCard from '../components/HoverCard.astro';
+import Icon from '../components/Icon.astro';
+import ProblemSolving from '../components/ProblemSolving.astro';
+import Building from '../components/Building.astro';
+import Snippet from '../components/Snippet.astro';
+import cp from '../data/cp.json';
+import contrib from '../data/contrib.json';
+import { getWork } from '../lib/work';
+import { site } from '../data/site';
+import github from '../data/github.json';
+import { usesTool } from '../lib/skills';
+
+const { featured, more } = await getWork();
+const gh = github.profile;
+
+// Which projects use each tool, worked out from the case studies rather than typed by hand.
+const usedIn = (tool: string) => featured.filter((p) => usesTool(p.data.stack, tool)).map((p) => p.data.title);
+const extra: Record<string, string[]> = { Astro: ['this site'], Vitest: ['this site'], Git: ['everything'], Vercel: ['every live demo'], 'C++': ['Codeforces, 388 problems'], JavaScript: ['early projects'] };
+const stack = site.stack.map((s) => ({ ...s, cards: usedIn(s.name).length, used: [...usedIn(s.name), ...(extra[s.name] ?? [])] }));
+// The sign-off, letter by letter: each letter knows its place, so the gradient runs once, end to end.
+const thanks = ['Thank you', 'for visiting'];
+const letterCount = thanks.join('').length;
+let letterAt = 0;
+const thanksLines = thanks.map((line) => [...line].map((ch) => ({ ch: ch === ' ' ? '\u00a0' : ch, i: letterAt, p: (letterAt++ / (letterCount - 1)) * 100 })));
+const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).map((w) => w[0]).join('').slice(0, 3);
+---
+<Base>
+  <main id="main" tabindex="-1">
+  <section class="hero" id="top">
+    <canvas class="field" id="field" aria-hidden="true"></canvas>
+    <div class="hero-inner">
+      <p class="kicker">Software engineer · Founder · Tech enthusiast</p>
+      <h1>Aditya<br />Raj</h1>
+      <p class="lede">{site.line}</p>
+      <p class="meta">B.Tech CSE at IIIT Bhagalpur</p>
+      <p class="actions">
+        <a href="#work" class="button">See the work</a>
+        <a href={site.resume}>Resume</a>
+        <a href={site.github} rel="noopener">GitHub</a>
+        <a href={`mailto:${site.email}`}>Email</a>
+      </p>
+    </div>
+    <p class="scroll-cue" aria-hidden="true">Every project below runs live. Click one to try it.</p>
+    <a class="scroll-down" id="scroll-down" href="#work">
+      <span>Scroll down</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6" /></svg>
+    </a>
+  </section>
+
+  <section class="section" data-reveal id="work" aria-labelledby="work-title">
+    <h2 id="work-title" class="section-title">Proof of work</h2>
+    <p class="filter-bar" id="filter-bar" role="status" hidden><span>Showing work that uses <b id="filter-name"></b></span><button type="button" id="filter-clear">Show all</button></p>
+    <div class="grid">
+      {featured.map((p) => <Card project={p} />)}
+    </div>
+  </section>
+
+  <section class="section" data-reveal id="experience" aria-labelledby="exp-title">
+    <h2 id="exp-title" class="section-title">Professional experience</h2>
+    <ol class="timeline">
+      {site.experience.map((e) => (
+        <li>
+          <div class="tl-head">
+            <HoverCard>
+              <a href={e.href} rel="noopener" target="_blank" class="tl-org">{e.org}</a>
+              <span slot="card" class="pc pc--media">
+                <img src={e.shot} alt="" width="1440" height="900" loading="lazy" />
+                <span class="pc-body"><strong>{e.org}</strong><span class="pc-sub">{e.role} · {e.years}</span><span class="pc-text">{e.points[0]}</span></span>
+              </span>
+            </HoverCard>
+            <span class="tl-when">{e.years}</span>
+          </div>
+          <p class="tl-role">{e.role} · {e.place}</p>
+          <ul class="facts">{e.points.map((pt) => <li>{pt}</li>)}</ul>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="section" data-reveal id="education" aria-labelledby="edu-title">
+    <h2 id="edu-title" class="section-title">Education</h2>
+    <ol class="timeline">
+      {site.education.map((ed) => (
+        <li>
+          <div class="tl-head">
+            <HoverCard>
+              <span class="tl-org" tabindex="0">{ed.school}</span>
+              <span slot="card" class="pc">
+                <span class="pc-row">{ed.logo ? <img class="pc-logo" src={ed.logo} alt="" width="56" height="56" /> : <span class="pc-mono">{initials(ed.full)}</span>}<span><strong>{ed.full}</strong><span class="pc-sub">{ed.place}</span></span></span>
+                <span class="pc-text">{ed.detail} · {ed.years}</span>
+                {ed.note && <span class="pc-text pc-muted">{ed.note}</span>}
+              </span>
+            </HoverCard>
+            <span class="tl-when">{ed.years}</span>
+          </div>
+          <p class="tl-role">{ed.detail} · {ed.place}</p>
+          {ed.courses.length > 0 && (
+            <ul class="courses" aria-label="Courses">
+              {ed.courses.map((c) => (
+                <li>
+                  <HoverCard align="center">
+                    <span class={`course${c.now ? ' course--now' : ''}`} tabindex="0">{c.now && <span class="course-dot"></span>}{c.name}</span>
+                    <span slot="card" class="pc pc--small"><strong>{c.name}</strong><span class="pc-sub">{c.now ? 'This semester' : c.code ? `Course ${c.code}` : 'Completed'}</span></span>
+                  </HoverCard>
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="section" data-reveal id="stack" aria-labelledby="stack-title">
+    <h2 id="stack-title" class="section-title">Stack</h2>
+    <ul class="stack">
+      {stack.map((s) => (
+        <li>
+          <HoverCard align="center">
+            {s.cards > 0
+              ? <button type="button" class="chip chip--filter" data-tool={s.name} aria-pressed="false"><Icon name={s.icon} size={18} brand /> {s.name}</button>
+              : <span class="chip" tabindex="0"><Icon name={s.icon} size={18} brand /> {s.name}</span>}
+            <span slot="card" class="pc pc--small"><strong>{s.name}</strong><span class="pc-sub">{s.used.length ? `Used in ${s.used.join(', ')}` : 'Comfortable with it'}</span>{s.cards > 0 && <span class="pc-hint">Click to see {s.cards === 1 ? 'it' : 'them'}</span>}</span>
+          </HoverCard>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <ProblemSolving />
+
+  <Building />
+
+  <Snippet />
+
+  <section class="section now" data-reveal id="now" aria-labelledby="now-title">
+    <h2 id="now-title" class="section-title">Now</h2>
+    <div class="now-grid">
+      <div>
+        <p class="lede">{site.status}. Third-year B.Tech CSE at IIIT Bhagalpur.</p>
+        <p class="now-text">I pick things up fast and learn by shipping. This year alone I built a React and Express workspace, a Next.js and Prisma app, a Chrome extension and this site, while climbing to 1398 on Codeforces. Give me an unfamiliar stack and a real problem, and I'll have something working, tested and live.</p>
+        <p class="now-text now-small">Also co-founder of Kalaa SkillTech, backed by ₹10 lakh in Startup Bihar seed funding.</p>
+      </div>
+      <div class="played" id="played" hidden data-user={site.lastfm.user} data-key={site.lastfm.apiKey} data-songs={JSON.stringify(site.songs)}>
+        <img class="played-art" id="played-art" alt="" width="88" height="88" />
+        <div class="played-text">
+          <p class="played-label">
+            <span class="played-services" aria-hidden="true"><Icon name="siSpotify" size={14} brand /><Icon name="siYoutubemusic" size={14} brand /><Icon name="siApplemusic" size={14} brand /></span>
+            <span id="played-when">Last played</span>
+          </p>
+          <p class="played-title" id="played-title"></p>
+          <p class="played-artist" id="played-artist"></p>
+        </div>
+        <button type="button" class="played-btn" id="played-btn" aria-label="Play a preview" hidden>
+          <svg class="ring" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" /><circle id="played-ring" cx="22" cy="22" r="20" /></svg>
+          <svg class="glyph" viewBox="0 0 24 24" aria-hidden="true"><path id="played-glyph" d="M8 5.5v13l11-6.5-11-6.5Z" /></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-reveal id="more" aria-labelledby="more-title">
+    <h2 id="more-title" class="section-title">More on GitHub</h2>
+    <ul class="more">
+      {more.map((m) => (
+        <li><a href={m.href} rel="noopener" target="_blank"><span class="more-year">{m.year}</span><span class="more-name">{m.title}</span><span class="more-sum">{m.summary}</span><span class="arrow" aria-hidden="true">↗</span></a></li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="section guestbook" id="guestbook" aria-labelledby="gb-title" hidden>
+    <div class="gb-head">
+      <h2 id="gb-title" class="section-title">Guestbook</h2>
+      <p class="gb-sub">Leave a note. Sign in with GitHub so I know who stopped by.</p>
+    </div>
+    <form class="gb-form" id="gb-form">
+      <button type="button" class="button" id="gb-signin">Sign in with GitHub</button>
+      <div class="gb-write" id="gb-write" hidden>
+        <img id="gb-me" alt="" width="36" height="36" />
+        <input id="gb-input" maxlength="140" placeholder="Say something nice, in 140 characters" autocomplete="off" />
+        <button type="submit" class="button">Sign</button>
+      </div>
+      <p class="gb-msg" id="gb-msg" role="status"></p>
+    </form>
+    <ul class="gb-list" id="gb-list"></ul>
+  </section>
+  </main>
+
+  <footer class="section connect" data-reveal id="contact" aria-labelledby="contact-title">
+    <h2 id="contact-title" class="connect-title">Let's connect</h2>
+    <p class="connect-sub">Find me on these platforms</p>
+    <ul class="pills">
+      <li>
+        <HoverCard>
+          <a class="pill" href={site.github} rel="noopener" target="_blank"><Icon name="siGithub" /> GitHub</a>
+          <span slot="card" class="pc">
+            <span class="pc-row"><img class="pc-avatar" src={gh.avatar} alt="" width="56" height="56" loading="lazy" /><span><strong>{gh.name ?? site.name}</strong><span class="pc-sub">@{gh.login}</span></span></span>
+            <span class="pc-text">{gh.bio ?? site.status}</span>
+            <span class="pc-stats"><b>{gh.repos}</b> public repos · <b>{gh.followers}</b> followers · <b>{gh.following}</b> following</span>
+          </span>
+        </HoverCard>
+      </li>
+      <li>
+        <HoverCard>
+          <a class="pill" href={site.linkedin} rel="noopener" target="_blank"><Icon name="linkedin" /> LinkedIn</a>
+          <span slot="card" class="li">
+            <span class="li-banner"></span>
+            <img class="li-avatar" src={site.photo || gh.avatar} alt="" width="84" height="84" loading="lazy" />
+            <span class="li-body">
+              <span class="li-main">
+                <strong>{site.linkedinCard.name}</strong>
+                <span class="li-head">{site.linkedinCard.headline}</span>
+                <span class="li-loc">{site.linkedinCard.location} · <span class="li-link">Contact info</span></span>
+              </span>
+              <span class="li-orgs">
+                <span><span class="li-org-k">K</span>Kalaa SkillTech</span>
+                <span><img src="/logos/iiit-bhagalpur.png" alt="" width="20" height="20" />IIIT Bhagalpur</span>
+              </span>
+            </span>
+          </span>
+        </HoverCard>
+      </li>
+      <li>
+        <HoverCard>
+          <a class="pill" href={`mailto:${site.email}`} data-copy={site.email}><Icon name="mail" /> Mail</a>
+          <span slot="card" class="pc pc--small"><strong>{site.email}</strong><span class="pc-sub" data-copy-hint>Click to write, or hold Shift and click to copy</span></span>
+        </HoverCard>
+      </li>
+      <li>
+        <HoverCard>
+          <a class="pill" href={site.resume}><Icon name="resume" /> Resume</a>
+          <span slot="card" class="pc pc--small"><strong>Resume</strong><span class="pc-sub">One page, PDF</span></span>
+        </HoverCard>
+      </li>
+    </ul>
+    <p class="thanks" aria-label="Thank you for visiting">
+      {thanksLines.map((line) => (
+        <span class="thanks-line" aria-hidden="true">{line.map((l) => <span style={`--i:${l.i};--p:${l.p.toFixed(1)}%`}>{l.ch}</span>)}</span>
+      ))}
+    </p>
+    <div class="foot">
+      <span class="foot-left">© {new Date().getFullYear()} {site.name}.<span class="live-stats" id="live-stats" data-backend={site.live.backend} data-counter={site.live.counter} data-key={site.live.counterKey}><span id="visits"></span><span id="here" hidden><i></i><b id="here-n"></b> here now</span><span id="perf" class="perf" hidden></span></span></span>
+      <div class="wx" id="wx" data-place={site.weather.place} data-lat={site.weather.lat} data-lon={site.weather.lon} hidden>
+        <span class="wx-icon" id="wx-icon" aria-hidden="true"></span>
+        <span class="wx-text">
+          <span class="wx-top"><b id="wx-temp"></b><span id="wx-label"></span></span>
+          <span class="wx-sub" id="wx-sub"></span>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <dialog class="demo" id="demo" aria-labelledby="demo-title">
+    <header class="demo-bar">
+      <p id="demo-title" class="demo-title"></p>
+      <nav class="demo-links">
+        <a id="demo-case" href="#">Case study</a>
+        <a id="demo-newtab" href="#" target="_blank" rel="noopener">Open in a new tab ↗</a>
+        <button type="button" id="demo-close" aria-label="Close">Close</button>
+      </nav>
+    </header>
+    <div class="demo-body" id="demo-body" tabindex="-1"></div>
+  </dialog>
+
+  <dialog class="recruit" id="recruit" aria-labelledby="recruit-title">
+    <button type="button" class="recruit-close" id="recruit-close" aria-label="Close">Close</button>
+    <p class="kicker">The 30-second version</p>
+    <h2 id="recruit-title">{site.name}</h2>
+    <p class="recruit-lede">{site.status}. Third-year B.Tech CSE at IIIT Bhagalpur. Builds full-stack products end to end, and ships them.</p>
+    <dl class="recruit-nums">
+      <div><dt>Codeforces</dt><dd>{cp.codeforces.rating}</dd><span>peak {cp.codeforces.maxRating}, Specialist</span></div>
+      <div><dt>LeetCode</dt><dd>{cp.leetcode.rating}</dd><span>top {cp.leetcode.top}%</span></div>
+      <div><dt>Problems solved</dt><dd>{cp.codolio.solved}</dd><span>{cp.codolio.contests} rated contests</span></div>
+      <div><dt>Contributions</dt><dd>{contrib.total}</dd><span>in the last year</span></div>
+    </dl>
+    <p class="demo-kicker">Best work</p>
+    <ul class="recruit-work">
+      {featured.slice(0, 3).map((p) => (
+        <li><b>{p.data.title}</b><span>{p.data.summary}</span>{p.data.links.live && <a href={p.data.links.live} rel="noopener" target="_blank">Live ↗</a>}</li>
+      ))}
+    </ul>
+    <p class="demo-kicker">Experience</p>
+    <p class="recruit-exp"><b>Co-founder, Kalaa SkillTech</b> · Mar 2025 – present · picked from 10,000+ applicants for ₹10 lakh Startup Bihar seed funding.</p>
+    <p class="recruit-stack">{site.stack.slice(0, 10).map((t) => t.name).join(' · ')}</p>
+    <p class="actions">
+      <a class="button button--email" href={`mailto:${site.email}`}>{site.email}</a>
+      <a href={site.resume}>Resume</a>
+      <a href={site.linkedin} rel="noopener" target="_blank">LinkedIn</a>
+      <a href={site.github} rel="noopener" target="_blank">GitHub</a>
+    </p>
+  </dialog>
+
+  <dialog class="palette" id="palette" aria-label="Command menu">
+    <input id="palette-input" type="text" placeholder="Search sections, projects and links" autocomplete="off" spellcheck="false" aria-controls="palette-list" />
+    <ul id="palette-list" role="listbox"></ul>
+    <p class="sr-only" id="palette-status" aria-live="polite"></p>
+    <p class="palette-foot"><span><kbd>↑</kbd><kbd>↓</kbd> to move</span><span><kbd>↵</kbd> to open</span><span><kbd>esc</kbd> to close</span></p>
+  </dialog>
+
+  <dialog class="keys" id="keys" aria-labelledby="keys-title">
+    <h2 id="keys-title">Keyboard shortcuts</h2>
+    <dl>
+      <div><dt><kbd>⌘</kbd><kbd>K</kbd></dt><dd>Search sections, projects and links</dd></div>
+      <div><dt><kbd>T</kbd></dt><dd>Switch light and dark</dd></div>
+      <div><dt><kbd>V</kbd></dt><dd>The 30-second view</dd></div>
+      <div><dt><kbd>?</kbd></dt><dd>This list</dd></div>
+      <div><dt><kbd>esc</kbd></dt><dd>Close whatever is open</dd></div>
+    </dl>
+    <p class="keys-foot">There's one more. It's a word.</p>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden>
+    <p>Glad you asked. <b>{site.email}</b></p>
+    <button type="button" id="toast-copy" data-email={site.email}>Copy</button>
+    <a href={`mailto:${site.email}`}>Write</a>
+  </div>
+
+  <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-ring"></span><span class="cursor-dot"></span><span class="cursor-label"></span></div>
+
+  <script>
+    import { start } from '../lib/home';
+    start();
+  </script>
+</Base>

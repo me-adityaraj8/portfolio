@@ -1,0 +1,85 @@
+---
+import cp from '../data/cp.json';
+import Icon from './Icon.astro';
+import HoverCard from './HoverCard.astro';
+import { cfRank, sparkline } from '../lib/cp';
+
+const c = cp.codolio, cf = cp.codeforces, lc = cp.leetcode;
+const n = (v: number) => v.toLocaleString('en-IN');
+const now = cfRank(cf.rating), peak = cfRank(cf.maxRating);
+const W = 320, H = 72;
+const line = sparkline(cf.history.map((h) => h.rating), W, H);
+const area = `${line.d}L${W} ${H}L0 ${H}Z`;
+const lastPt = line.points.at(-1)!;
+const best = cf.history.reduce((a, h) => (h.rank < a.rank ? h : a));
+const latest = cf.history.at(-1)!;
+const delta = latest.rating - (cf.history.at(-2)?.rating ?? 0);
+const lcSolved = lc.solved;
+const pct = (k: 'easy' | 'medium' | 'hard') => (lcSolved[k] / lcSolved.all) * 100;
+const topMax = c.topics[0][1] as number;
+const when = (ms: number) => new Date(ms).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+---
+<section class="section ps" data-reveal id="problem-solving" aria-labelledby="ps-title">
+  <div class="ps-head">
+    <h2 id="ps-title" class="section-title">Problem solving</h2>
+    <span class="ps-actions">
+    <span class="contest" id="contest" hidden><span class="contest-label">Next Codeforces round</span> <b id="contest-time"></b> <span id="contest-name" class="contest-name"></span></span>
+    <a href={`https://codolio.com/profile/${cp.handles.codolio}`} rel="noopener" target="_blank" class="ps-link"><span class="ps-link-dot"></span>Full profile on Codolio <span aria-hidden="true">↗</span></a>
+    </span>
+  </div>
+
+  <dl class="ps-totals">
+    <div><dt>questions solved</dt><dd>{n(c.solved)}</dd></div>
+    <div><dt>active days</dt><dd>{n(c.activeDays)}</dd></div>
+    <div><dt>day best streak</dt><dd>{c.maxStreak}</dd></div>
+    <div><dt>rated contests</dt><dd>{c.contests}</dd></div>
+    <div><dt>global rank on Codolio</dt><dd>#{n(c.globalRank)}</dd></div>
+  </dl>
+
+  <div class="ps-cards">
+    <a class="plat spot" href={`https://codeforces.com/profile/${cp.handles.codeforces}`} rel="noopener" target="_blank" style={`--rank:${now.color}`}>
+      <span class="plat-top">
+        <span class="plat-name"><Icon name="siCodeforces" size={22} brand /> Codeforces</span>
+        <span class="plat-handle">@{cp.handles.codeforces}</span>
+      </span>
+      <span class="plat-rating"><b style={`color:${now.color === '#008000' ? '#3ddc84' : now.color}`}>{cf.rating}</b> <span>{now.title}</span></span>
+      <span class="plat-sub">Peaked at {cf.maxRating}, <b style={`color:${peak.color}`}>{peak.title}</b> · {cf.contests} contests · best rank {n(best.rank)}</span>
+      <svg class="spark" viewBox={`0 -6 ${W} ${H + 12}`} preserveAspectRatio="none" aria-label={`Rating over ${cf.contests} contests, from ${cf.history[0].rating} to ${cf.rating}`} role="img">
+        <defs><linearGradient id="spark-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee" stop-opacity="0.35" /><stop offset="1" stop-color="#22d3ee" stop-opacity="0" /></linearGradient></defs>
+        <path d={area} fill="url(#spark-fill)" />
+        <path d={line.d} fill="none" stroke="#22d3ee" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" />
+        <circle cx={lastPt[0]} cy={lastPt[1]} r="4" fill="#fff" vector-effect="non-scaling-stroke" />
+      </svg>
+      <span class="plat-foot">Latest: {latest.contest}, rank {n(latest.rank)}, {delta >= 0 ? '+' : ''}{delta} · {when(latest.at)}</span>
+    </a>
+
+    <a class="plat spot" href={`https://leetcode.com/u/${cp.handles.leetcode}`} rel="noopener" target="_blank">
+      <span class="plat-top">
+        <span class="plat-name"><Icon name="siLeetcode" size={22} brand /> LeetCode</span>
+        <span class="plat-handle">@{cp.handles.leetcode}</span>
+      </span>
+      <span class="plat-rating"><b style="color:#ffa116">{lc.rating}</b> <span>contest rating</span></span>
+      <span class="plat-sub">Top {lc.top}% of contestants · {lc.contests} contests</span>
+      <span class="lc-solved"><b>{lcSolved.all}</b> solved</span>
+      <span class="lc-bar" aria-hidden="true">
+        <span style={`width:${pct('easy')}%;background:#1cbaba`}></span><span style={`width:${pct('medium')}%;background:#ffb700`}></span><span style={`width:${pct('hard')}%;background:#f63737`}></span>
+      </span>
+      <span class="lc-legend"><span><i style="background:#1cbaba"></i>Easy {lcSolved.easy}</span><span><i style="background:#ffb700"></i>Medium {lcSolved.medium}</span><span><i style="background:#f63737"></i>Hard {lcSolved.hard}</span></span>
+    </a>
+  </div>
+
+  <div class="topics">
+    <p class="demo-kicker">Most practised topics</p>
+    <ol>
+      {c.topics.map(([name, count]) => (
+        <li>
+          <HoverCard>
+            <span class="topic" tabindex="0"><span class="topic-name">{name}</span><span class="topic-bar"><span style={`width:${((count as number) / topMax) * 100}%`}></span></span><span class="topic-n">{count}</span></span>
+            <span slot="card" class="pc pc--small"><strong>{name}</strong><span class="pc-sub">{count} problems, {Math.round(((count as number) / c.solved) * 100)}% of everything solved</span></span>
+          </HoverCard>
+        </li>
+      ))}
+    </ol>
+    <p class="ps-note">Totals and topics from Codolio as of {when(Date.parse(c.asOf))}. Ratings are pulled live from Codeforces and LeetCode when the site is built.</p>
+  </div>
+</section>

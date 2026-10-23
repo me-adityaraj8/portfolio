@@ -1,0 +1,68 @@
+---
+import contrib from '../data/contrib.json';
+import HoverCard from './HoverCard.astro';
+import { site } from '../data/site';
+import github from '../data/github.json';
+import { languageShare } from '../lib/skills';
+
+// GitHub's calendar: one column per week, Sunday at the top.
+const days = contrib.days;
+const first = new Date(days[0].date + 'T00:00:00Z').getUTCDay();
+const cells = [...Array(first).fill(null), ...days];
+const weeks: Array<Array<(typeof days)[number] | null>> = [];
+for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+const months: Array<{ col: number; label: string }> = [];
+weeks.forEach((w, col) => {
+  const d = w.find(Boolean);
+  if (!d) return;
+  const m = new Date(d.date + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' });
+  if (months.at(-1)?.label !== m) months.push({ col, label: m });
+});
+const pretty = (date: string) => new Date(date + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+const busiest = days.reduce((a, d) => (d.count > a.count ? d : a));
+
+// Bytes of code per language in my public repos, as GitHub's linguist counts them.
+const mine = github.repos.filter((r) => !site.hiddenRepos.includes(r.name) && r.name !== github.owner);
+const langs = languageShare(mine.map((r) => r.languages as Record<string, number>));
+const COLOURS: Record<string, string> = { TypeScript: '#3178c6', 'C++': '#f34b7d', JavaScript: '#f1e05a', CSS: '#8a63d2', HTML: '#e34c26', Other: '#8a87a3' };
+---
+<section class="section" data-reveal id="github" aria-labelledby="gh-title">
+  <h2 id="gh-title" class="section-title">Building in public</h2>
+  <div class="gh-grid">
+    <div class="contrib">
+      <div class="contrib-stats">
+        <span><b>{contrib.total.toLocaleString('en-IN')}</b> contributions in the last year</span>
+        <span><b>{contrib.longest}</b> day longest streak</span>
+        {contrib.current > 0 && <span><b>{contrib.current}</b> day current streak</span>}
+      </div>
+      <div class="contrib-scroll">
+        <div class="contrib-months" style={`grid-template-columns: repeat(${weeks.length}, 12px)`}>
+          {months.map((m) => <span style={`grid-column:${m.col + 1}`}>{m.label}</span>)}
+        </div>
+        <div class="contrib-cal" style={`grid-template-columns: repeat(${weeks.length}, 12px)`} role="img" aria-label={`${contrib.total} contributions in the last year`}>
+          {weeks.map((w, c) => w.map((d, r) => d
+            ? <span class={`cd l${d.level}`} style={`grid-column:${c + 1};grid-row:${r + 1};--i:${c}`} title={`${d.count} contribution${d.count === 1 ? '' : 's'} on ${pretty(d.date)}`}></span>
+            : null))}
+        </div>
+      </div>
+      <p class="contrib-foot"><span>Busiest day: {busiest.count} on {pretty(busiest.date)}</span><span class="contrib-key">Less <i class="cd l0"></i><i class="cd l1"></i><i class="cd l2"></i><i class="cd l3"></i><i class="cd l4"></i> More</span></p>
+    </div>
+    <a class="now-building spot" id="building" href={site.github} rel="noopener" target="_blank" data-owner={contrib.owner} data-hidden={site.hiddenRepos.join(",")} hidden>
+      <span class="nb-label"><span class="status-dot"></span>Currently building</span>
+      <span class="nb-repo" id="nb-repo"></span>
+      <span class="nb-msg" id="nb-msg"></span>
+      <span class="nb-when" id="nb-when"></span>
+    </a>
+  </div>
+  {langs.length > 0 && (
+    <div class="langs">
+      <p class="langs-label">Languages across my public repos</p>
+      <div class="langs-bar" role="img" aria-label={langs.map((l) => `${l.name} ${l.pct}%`).join(', ')}>
+        {langs.map((l, i) => <span style={`flex-grow:${l.pct};background:${COLOURS[l.name] ?? COLOURS.Other};--i:${i}`}></span>)}
+      </div>
+      <ul class="langs-key">
+        {langs.map((l) => <li><i style={`background:${COLOURS[l.name] ?? COLOURS.Other}`}></i>{l.name} <b>{l.pct}%</b></li>)}
+      </ul>
+    </div>
+  )}
+</section>

@@ -1,0 +1,61 @@
+---
+import '@fontsource/unbounded/500.css';
+import '@fontsource/unbounded/700.css';
+import '@fontsource/barlow/400.css';
+import '@fontsource/barlow/400-italic.css';
+import '@fontsource/barlow/500.css';
+import '@fontsource/barlow/600.css';
+import '@fontsource/barlow-condensed/500.css';
+import '@fontsource/barlow-condensed/600.css';
+import '../styles/global.css';
+import { site } from '../data/site';
+
+interface Props { title?: string; description?: string; page?: string }
+const { title = `${site.name}, ${site.role.toLowerCase()}`, description = site.line, page = 'map' } = Astro.props;
+---
+<!doctype html>
+<html lang="en" class="no-js" data-page={page}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="theme-color" content="#07060f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f6f5fb" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline>
+      document.documentElement.classList.replace('no-js', 'js');
+      // Set the theme before the first paint, so the page never flashes the wrong one.
+      try {
+        var t = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        document.documentElement.dataset.theme = t;
+      } catch (e) { document.documentElement.dataset.theme = 'dark'; }
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="masthead">
+      <a href="/" class="brand"><span class="brand-name">{site.name.toUpperCase()}</span><span class="brand-role">{site.status}</span></a>
+      <nav aria-label="Main">
+        <a href="/#work" data-section="work">Work</a>
+        <a href="/#problem-solving" data-section="problem-solving">DSA</a>
+        <a href={site.resume}>Resume</a>
+        <a href={site.github} rel="noopener">GitHub</a>
+        <a href={`mailto:${site.email}`}>Email</a>
+        {page === 'map' && <button type="button" class="recruit-btn" id="recruit-open">30-second view</button>}
+        <button type="button" class="theme-btn" id="theme" aria-label="Switch between light and dark">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle class="sun-core" cx="12" cy="12" r="5" /><g class="sun-rays"><path d="M12 1.5v2.5M12 20v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M1.5 12H4M20 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8" /></g><circle class="moon-mask" cx="17" cy="8" r="5" /></svg>
+        </button>
+        {page === 'map' && <button type="button" class="k-btn" id="palette-open" aria-label="Open the command menu"><kbd>⌘</kbd><kbd>K</kbd></button>}
+      </nav>
+      <span class="progress" id="progress" aria-hidden="true"></span>
+    </header>
+    <slot />
+    <script>
+      import { themeToggle } from '../lib/theme';
+      themeToggle();
+    </script>
+  </body>
+</html>

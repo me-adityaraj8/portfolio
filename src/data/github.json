@@ -1,0 +1,275 @@
+{
+  "owner": "me-adityaraj8",
+  "fetched": "2026-10-22T14:07:32.595Z",
+  "profile": {
+    "login": "me-adityaraj8",
+    "name": null,
+    "avatar": "https://avatars.githubusercontent.com/u/190913734?v=4",
+    "bio": null,
+    "followers": 2,
+    "following": 12,
+    "repos": 18,
+    "since": "2024-12-07T05:28:50Z"
+  },
+  "repos": [
+    {
+      "name": "ai.resume-analyser",
+      "createdAt": "2025-07-29T06:25:02Z",
+      "description": null,
+      "language": "JavaScript",
+      "isFork": false,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/ai.resume-analyser",
+      "homepage": null,
+      "commits": 2,
+      "languages": {}
+    },
+    {
+      "name": "career-os",
+      "createdAt": "2026-07-06T17:52:12Z",
+      "description": "Rys — a keyboard-first job-search workspace. Kanban pipeline, resume tracking, and AI that helps you land the offer.",
+      "language": "TypeScript",
+      "isFork": false,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/career-os",
+      "homepage": "https://rys-eight.vercel.app",
+      "commits": 57,
+      "languages": {
+        "TypeScript": 628125,
+        "CSS": 8411,
+        "JavaScript": 5064,
+        "PLpgSQL": 2284,
+        "HTML": 2227,
+        "Dockerfile": 2003
+      }
+    },
+    {
+      "name": "cp",
+      "createdAt": "2026-08-22T16:33:12Z",
+      "description": null,
+      "language": "C++",
+      "isFork": false,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/cp",
+      "homepage": null,
+      "commits": 769,
+      "languages": {
+        "C++": 1103514
+      }
+    },
+    {
+      "name": "CURRENCY.converter",
+      "createdAt": "2025-08-01T06:04:59Z",
+      "description": null,
+      "language": "TypeScript",
+      "isFork": false,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/CURRENCY.converter",
+      "homepage": "https://currency-converter-murex-theta.vercel.app",
+      "commits": 4,
+      "languages": {
+        "TypeScript": 10870,
+        "JavaScript": 990,
+        "CSS": 894,
+        "HTML": 387
+      }
+    },
+    {
+      "name": "first-contributions",
+      "createdAt": "2026-10-18T05:56:49Z",
+      "description": null,
+      "language": null,
+      "isFork": true,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/first-contributions",
+      "homepage": "https://firstcontributions.github.io",
+      "commits": null,
+      "languages": {}
+    },
+    {
+      "name": "Fixora",
+      "createdAt": "2026-06-07T10:39:03Z",
+      "description": "A full-stack repair & maintenance service marketplace",
+      "language": "JavaScript",
+      "isFork": false,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/Fixora",
+      "homepage": "https://fixora-tau-ten.vercel.app",
+      "commits": 28,
+      "languages": {
+        "JavaScript": 67635,
+        "CSS": 4390
+      }
+    },
+    {
+      "name": "js_CaurC",
+      "createdAt": "2025-06-11T14:46:07Z",
+      "description": "learning js with chai aur code",
+      "language": "JavaScript",
+      "isFork": false,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/js_CaurC",
+      "homepage": null,
+      "commits": 18,
+      "languages": {
+        "JavaScript": 19195,
+        "HTML": 3836
+      }
+    },
+    {
+      "name": "kairo",
+      "createdAt": "2026-09-12T07:24:30Z",
+      "description": "Gamified task tracker - real tasks become quests that award XP and gold",
+      "language": "TypeScript",
+      "isFork": false,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/kairo",
+      "homepage": "https://kairo-olive-beta.vercel.app",
+      "commits": 43,
+      "languages": {
+        "TypeScript": 441826,
+        "CSS": 3556,
+        "JavaScript": 227
+      }
+    },
+    {
+      "name": "Kalaa-website",
+      "createdAt": "2025-07-30T07:48:22Z",
+      "description": null,
+      "language": "TypeScript",
+      "isFork": false,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/Kalaa-website",
+      "homepage": "https://kalaa-website.vercel.app",
+      "commits": 4,
+      "languages": {
+        "TypeScript": 106233,
+        "JavaScript": 990,
+        "HTML": 390,
+        "CSS": 59
+      }
+    },
+    {
+      "name": "me-adityaraj8",
+      "createdAt": "2026-09-19T22:03:52Z",
+      "description": "My GitHub profile README",
+      "language": null,
+      "isFork": false,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/me-adityaraj8",
+      "homepage": null,
+      "commits": 158,
+      "languages": {}
+    },
+    {
+      "name": "nanocoder",
+      "createdAt": "2026-10-18T11:12:24Z",
+      "description": "An open coding agent for your terminal, built by a community collective rather than a company. Bring your own model, keep your code on your machine, and owe nothing to anyone.",
+      "language": null,
+      "isFork": true,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/nanocoder",
+      "homepage": "https://docs.nanocollective.org/nanocoder",
+      "commits": null,
+      "languages": {}
+    },
+    {
+      "name": "NexusEditor",
+      "createdAt": "2026-09-21T20:17:03Z",
+      "description": "NexusEditor: A real-time collaborative rich-text editor built with Next.js, Socket.io, and Prisma. Features live document syncing, secure sharing, and role-based permissions.",
+      "language": null,
+      "isFork": true,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/NexusEditor",
+      "homepage": "https://nexus-editor-jet.vercel.app",
+      "commits": null,
+      "languages": {}
+    },
+    {
+      "name": "parley",
+      "createdAt": "2026-09-15T19:37:22Z",
+      "description": "Peer-to-peer video calling in the browser — WebRTC mesh, Cloudflare Workers signaling, GSAP interface. Media never touches a server.",
+      "language": "TypeScript",
+      "isFork": false,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/parley",
+      "homepage": "https://parley-taupe-phi.vercel.app",
+      "commits": 22,
+      "languages": {
+        "TypeScript": 407633,
+        "JavaScript": 52868,
+        "CSS": 9796,
+        "Shell": 2668
+      }
+    },
+    {
+      "name": "qrgen",
+      "createdAt": "2026-10-18T12:01:03Z",
+      "description": "Chrome extension that makes QR codes for links, text, Wi-Fi, contacts, email and phone. Styles, logos, PNG/SVG export. Works offline.",
+      "language": "TypeScript",
+      "isFork": false,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/qrgen",
+      "homepage": null,
+      "commits": 8,
+      "languages": {
+        "TypeScript": 229014,
+        "CSS": 40777,
+        "JavaScript": 3143,
+        "HTML": 437
+      }
+    },
+    {
+      "name": "selenograph",
+      "createdAt": "2026-09-04T14:02:31Z",
+      "description": null,
+      "language": null,
+      "isFork": true,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/selenograph",
+      "homepage": null,
+      "commits": null,
+      "languages": {}
+    },
+    {
+      "name": "snake_game_",
+      "createdAt": "2025-06-04T18:31:27Z",
+      "description": null,
+      "language": "JavaScript",
+      "isFork": false,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/snake_game_",
+      "homepage": null,
+      "commits": 4,
+      "languages": {
+        "JavaScript": 3981,
+        "CSS": 1556,
+        "HTML": 530
+      }
+    },
+    {
+      "name": "sourcekit-lsp",
+      "createdAt": "2026-10-18T06:41:30Z",
+      "description": "Language Server Protocol implementation for Swift and C-based languages",
+      "language": null,
+      "isFork": true,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/sourcekit-lsp",
+      "homepage": null,
+      "commits": null,
+      "languages": {}
+    },
+    {
+      "name": "TechnoBees",
+      "createdAt": "2025-09-12T18:35:27Z",
+      "description": null,
+      "language": null,
+      "isFork": false,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/TechnoBees",
+      "homepage": null,
+      "commits": null,
+      "languages": {}
+    }
+  ]
+}

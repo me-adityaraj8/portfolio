@@ -1,0 +1,38 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { monthYear } from '../../lib/work';
+import { site } from '../../data/site';
+import Diagram from '../../components/Diagram.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects', (p) => p.data.kind !== 'early');
+  return projects.map((p) => ({ params: { slug: p.id }, props: { project: p } }));
+}
+
+const { project } = Astro.props;
+const d = project.data;
+const { Content } = await render(project);
+---
+<Base title={`${d.title}, by ${site.name}`} description={d.summary} page="case">
+  <main class="case-page" id="main" tabindex="-1">
+    <article class="case">
+      <p class="kicker">{monthYear(d.date)}{d.role ? ` · ${d.role}` : ''}</p>
+      <h1 style={`view-transition-name: title-${project.id}`}>{d.title}</h1>
+      <p class="lede">{d.summary}</p>
+      <dl class="case-meta">
+        {d.stack.length > 0 && <div><dt>Stack</dt><dd>{d.stack.join(', ')}</dd></div>}
+        {d.commits !== undefined && <div><dt>Commits</dt><dd>{d.commits}</dd></div>}
+        <div><dt>Links</dt><dd>
+          {d.links.live && <a href={d.links.live} rel="noopener">Live</a>}
+          {d.links.code && <a href={d.links.code} rel="noopener">Code</a>}
+          {!d.links.code && d.private && <span>Code is private, happy to walk through it</span>}
+        </dd></div>
+      </dl>
+      {d.facts.length > 0 && <ul class="facts">{d.facts.map((f) => <li>{f}</li>)}</ul>}
+      {d.architecture && <Diagram nodes={d.architecture.nodes} edges={d.architecture.edges} title={d.title} />}
+      <div class="prose"><Content /></div>
+      <p class="back"><a href="/#work">Back to all the work</a></p>
+    </article>
+  </main>
+</Base>

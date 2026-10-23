@@ -1,0 +1,277 @@
+{
+  "handles": {
+    "codeforces": "FierceSpartan",
+    "leetcode": "me_adityaraj8",
+    "codolio": "me.adityaraj8"
+  },
+  "codolio": {
+    "asOf": "2026-10-21",
+    "solved": 608,
+    "activeDays": 330,
+    "maxStreak": 82,
+    "contests": 39,
+    "globalRank": 5617,
+    "awards": 3,
+    "topics": [
+      [
+        "Arrays",
+        117
+      ],
+      [
+        "Math",
+        54
+      ],
+      [
+        "Dynamic Programming",
+        40
+      ],
+      [
+        "Strings",
+        39
+      ],
+      [
+        "Trees",
+        33
+      ],
+      [
+        "Hash maps and sets",
+        32
+      ],
+      [
+        "Binary trees",
+        32
+      ],
+      [
+        "Sorting",
+        32
+      ],
+      [
+        "Two pointers",
+        25
+      ],
+      [
+        "DFS",
+        24
+      ]
+    ]
+  },
+  "codeforces": {
+    "rating": 1398,
+    "maxRating": 1407,
+    "rank": "pupil",
+    "maxRank": "specialist",
+    "contests": 33,
+    "history": [
+      {
+        "rating": 370,
+        "contest": "Codeforces Round 1029 (Div. 3)",
+        "rank": 18788,
+        "at": 1749401400000
+      },
+      {
+        "rating": 649,
+        "contest": "Educational Codeforces Round 181 (Rated for Div. 2)",
+        "rank": 12533,
+        "at": 1753202100000
+      },
+      {
+        "rating": 887,
+        "contest": "Codeforces Round 1039 (Div. 2)",
+        "rank": 8216,
+        "at": 1753634100000
+      },
+      {
+        "rating": 1003,
+        "contest": "Atto Round 1 (Codeforces Round 1041, Div. 1 + Div. 2)",
+        "rank": 9185,
+        "at": 1754588100000
+      },
+      {
+        "rating": 1101,
+        "contest": "Codeforces Round 1042 (Div. 3)",
+        "rank": 8886,
+        "at": 1754844600000
+      },
+      {
+        "rating": 1118,
+        "contest": "Codeforces Round 1043 (Div. 3)",
+        "rank": 13227,
+        "at": 1755795000000
+      },
+      {
+        "rating": 1109,
+        "contest": "Codeforces Round 1044 (Div. 2)",
+        "rank": 10567,
+        "at": 1756053300000
+      },
+      {
+        "rating": 1109,
+        "contest": "Codeforces Round 1049 (Div. 2)",
+        "rank": 8526,
+        "at": 1757435700000
+      },
+      {
+        "rating": 1070,
+        "contest": "Codeforces Round 1050 (Div. 4)",
+        "rank": 10261,
+        "at": 1757782200000
+      },
+      {
+        "rating": 1224,
+        "contest": "Codeforces Round 1057 (Div. 2)",
+        "rank": 2688,
+        "at": 1760115000000
+      },
+      {
+        "rating": 1224,
+        "contest": "Codeforces Round 1059 (Div. 3)",
+        "rank": 6562,
+        "at": 1760719800000
+      },
+      {
+        "rating": 1239,
+        "contest": "Codeforces Round 1061 (Div. 2)",
+        "rank": 6002,
+        "at": 1761323700000
+      },
+      {
+        "rating": 1228,
+        "contest": "Codeforces Global Round 30 (Div. 1 + Div. 2)",
+        "rank": 6375,
+        "at": 1762450500000
+      },
+      {
+        "rating": 1175,
+        "contest": "Codeforces Round 1063 (Div. 2)",
+        "rank": 8416,
+        "at": 1762794300000
+      },
+      {
+        "rating": 1159,
+        "contest": "Codeforces Round 1068 (Div. 2)",
+        "rank": 7993,
+        "at": 1764952500000
+      },
+      {
+        "rating": 1235,
+        "contest": "Codeforces Round 1069 (Div. 2)",
+        "rank": 2351,
+        "at": 1765016100000
+      },
+      {
+        "rating": 1258,
+        "contest": "Codeforces Global Round 31 (Div. 1 + Div. 2)",
+        "rank": 6163,
+        "at": 1766163900000
+      },
+      {
+        "rating": 1308,
+        "contest": "Codeforces Round 1071 (Div. 3)",
+        "rank": 3401,
+        "at": 1766510100000
+      },
+      {
+        "rating": 1355,
+        "contest": "Good Bye 2025",
+        "rank": 4960,
+        "at": 1766856900000
+      },
+      {
+        "rating": 1363,
+        "contest": "Educational Codeforces Round 186 (Rated for Div. 2)",
+        "rank": 4355,
+        "at": 1767026100000
+      },
+      {
+        "rating": 1295,
+        "contest": "Hello 2026",
+        "rank": 11505,
+        "at": 1767807300000
+      },
+      {
+        "rating": 1300,
+        "contest": "Codeforces Round 1073 (Div. 2)",
+        "rank": 5052,
+        "at": 1768671300000
+      },
+      {
+        "rating": 1245,
+        "contest": "Codeforces Round 1077 (Div. 2)",
+        "rank": 10615,
+        "at": 1769708100000
+      },
+      {
+        "rating": 1289,
+        "contest": "Codeforces Round 1079 (Div. 2)",
+        "rank": 4044,
+        "at": 1770831300000
+      },
+      {
+        "rating": 1324,
+        "contest": "Codeforces Round 1082 (Div. 2)",
+        "rank": 2738,
+        "at": 1771866300000
+      },
+      {
+        "rating": 1407,
+        "contest": "Codeforces Round 1093 (Div. 2)",
+        "rank": 1619,
+        "at": 1776098100000
+      },
+      {
+        "rating": 1390,
+        "contest": "Spectral::Cup 2026 Round 2 (Codeforces Round 1100, Div. 1 + Div. 2)",
+        "rank": 4330,
+        "at": 1779557700000
+      },
+      {
+        "rating": 1366,
+        "contest": "Codeforces Round 1102 (Div. 2)",
+        "rank": 5627,
+        "at": 1780851000000
+      },
+      {
+        "rating": 1337,
+        "contest": "Educational Codeforces Round 191 (Rated for Div. 2)",
+        "rank": 6121,
+        "at": 1781022900000
+      },
+      {
+        "rating": 1336,
+        "contest": "Order Capital Round 2 (Codeforces Round 1104, Div. 1 + Div. 2)",
+        "rank": 5131,
+        "at": 1781804100000
+      },
+      {
+        "rating": 1319,
+        "contest": "Codeforces Round 1107 (Div. 3)",
+        "rank": 5165,
+        "at": 1782838200000
+      },
+      {
+        "rating": 1362,
+        "contest": "Codeforces Round 1112 (Div. 2)",
+        "rank": 2483,
+        "at": 1785085500000
+      },
+      {
+        "rating": 1398,
+        "contest": "Educational Codeforces Round 194 (Rated for Div. 2)",
+        "rank": 2528,
+        "at": 1788885300000
+      }
+    ]
+  },
+  "leetcode": {
+    "rating": 1557,
+    "contests": 6,
+    "top": 31.32,
+    "solved": {
+      "all": 220,
+      "easy": 76,
+      "medium": 114,
+      "hard": 30
+    }
+  },
+  "fetched": "2026-10-21T13:51:58.033Z"
+}

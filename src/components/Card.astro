@@ -1,0 +1,26 @@
+---
+import QRCode from 'qrcode';
+import type { Project } from '../lib/work';
+
+interface Props { project: Project }
+const { project } = Astro.props;
+const d = project.data;
+const [a, b] = d.accent ?? ['#6c5ce7', '#22d3ee'];
+const qr = d.demo === 'qr' ? await QRCode.toString('https://github.com/me-adityaraj8/qrgen', { type: 'svg', margin: 1, color: { dark: '#1d1b2f', light: '#ffffff' } }) : '';
+const action = d.demo ? 'Try it live' : 'Read the case study';
+---
+<article class="card spot" style={`--a:${a};--b:${b}`} data-stack={d.stack.join('|')}>
+  <a class="card-hit" href={`/work/${project.id}`} data-open={project.id} data-demo={d.demo ?? ''} data-live={d.links.live ?? ''} data-title={d.title} aria-label={`${d.title}: ${action}`}></a>
+  <div class="preview" aria-hidden="true">
+    {d.shot && <img src={d.shot} alt="" loading="lazy" decoding="async" width="1440" height="900" />}
+    {d.demo === 'qr' && (
+      <div class="mock mock--qr"><div class="qr" set:html={qr} /><p>github.com/me-adityaraj8/qrgen</p></div>
+    )}
+  </div>
+  <div class="card-body">
+    <h3>{d.title} <span class="arrow" aria-hidden="true">↗</span></h3>
+    <p>{d.summary}</p>
+    <ul class="tags">{d.stack.slice(0, 6).map((t) => <li>{t}</li>)}</ul>
+    {d.demo && <span class="live-pill" data-ping={d.demo === 'site' ? d.links.live : undefined}><span></span><em>Live demo</em></span>}
+  </div>
+</article>

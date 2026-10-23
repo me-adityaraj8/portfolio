@@ -1,0 +1,21 @@
+---
+import { Code } from 'astro:components';
+import snippets from '../data/snippets.json';
+---
+<section class="section" data-reveal id="code" aria-labelledby="code-title">
+  <h2 id="code-title" class="section-title">Code I'm proud of</h2>
+  {snippets.map((s) => (
+    <article class="snippet spot">
+      <div class="snippet-text">
+        <p class="snippet-where">{s.repo} · {s.path.split('/').slice(-3).join('/')}</p>
+        <h3>{s.title}</h3>
+        <p>{s.why}</p>
+        <a href={s.url} rel="noopener" target="_blank" class="snippet-link">View lines {s.from}–{s.to} on GitHub ↗</a>
+      </div>
+      <div class="snippet-code">
+        <div class="snippet-bar"><span></span><span></span><span></span><code>{s.path.split('/').pop()}</code></div>
+        <Code code={s.code} lang={s.lang as 'ts'} theme="github-dark-default" />
+      </div>
+    </article>
+  ))}
+</section>
