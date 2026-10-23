@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://adityaraj.dev',
+  site: 'https://me-adityaraj8.vercel.app',
   devToolbar: { enabled: false },
 });
