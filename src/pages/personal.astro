@@ -1,22 +1,340 @@
 ---
+/**
+ * Off the clock: one bento panel where every hobby gets its own small drawing,
+ * then a strip of photos. Everything visual here is CSS and SVG, so nothing is borrowed.
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import { site } from '../data/site';
 import { personal } from '../data/personal';
+
+const g = Object.fromEntries(personal.groups.map((x) => [x.id, x]));
+const photos = Object.entries(import.meta.glob<{ default: ImageMetadata }>('../assets/photos/*.{jpg,jpeg,png,webp,avif}', { eager: true }))
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([file, mod]) => ({ src: mod.default, name: file.split('/').pop()!.replace(/\.[^.]+$/, '').replace(/^\d+[-_ ]*/, '').replace(/[-_]+/g, ' ') }));
+
+// Typographic posters for the films and shows: colours are mine, no artwork is used.
+const posterTones: Record<string, [string, string, string]> = {
+  'Fight Club': ['#f472b6', '#7c2d12', 'Film'], 'Shutter Island': ['#94a3b8', '#0f172a', 'Film'], Interstellar: ['#fbbf24', '#0c0a09', 'Film'],
+  Inception: ['#38bdf8', '#082f49', 'Film'], 'Black Swan': ['#f4f4f5', '#18181b', 'Film'], Dark: ['#fde68a', '#1c1917', 'Series'],
+  'Breaking Bad': ['#a3e635', '#14532d', 'Series'], 'Better Call Saul': ['#facc15', '#7f1d1d', 'Series'], 'The Sopranos': ['#ef4444', '#0a0a0a', 'Series'],
+};
+const rotating = ['cooking biryani.', 'singing along, badly or not.', 'at the gym.', 'overanalyzing a plot.', 'chasing a photo.', 'debugging at 3 AM.'];
+const bars = Array.from({ length: 42 }, (_, i) => 0.25 + Math.abs(Math.sin(i * 0.55) * Math.cos(i * 0.21)) * 0.75);
 ---
-<Base title={`Off the clock, ${site.name}`} description={personal.intro} page="personal">
-  <main class="personal-page" id="main" tabindex="-1">
-    <p class="kicker">Off the clock</p>
-    <h1>The other half</h1>
-    <p class="lede">{personal.intro}</p>
-    <div class="personal-grid">
-      {personal.groups.map((g, i) => (
-        <section class="personal-card" style={`--a:${g.tone[0]};--b:${g.tone[1]};--i:${i}`} aria-labelledby={`p-${i}`}>
-          <h2 id={`p-${i}`}>{g.title}</h2>
-          {g.body.map((p) => <p>{p}</p>)}
-          {g.tags && <ul class="personal-tags">{g.tags.map((t) => <li>{t}</li>)}</ul>}
-        </section>
-      ))}
+<Base title={`Off the clock, ${site.name}`} description={personal.intro} page="personal" image="/og/home.png">
+  <main class="pp" id="main" tabindex="-1">
+    <header class="pp-hero">
+      <p class="kicker">Off the clock</p>
+      <h1>
+        <span class="pp-line">When I'm not shipping,</span>
+        <span class="pp-line">I'm probably</span>
+        <span class="pp-rotor" aria-live="off"><span id="rotor">{rotating[0]}</span></span>
+      </h1>
+      <p class="pp-intro">{personal.intro}</p>
+    </header>
+
+    <div class="bento">
+      <section class="cell c-movies" style={`--a:${g.movies.tone[0]}`} data-cell>
+        <div class="cell-text"><h2>{g.movies.title}</h2>{g.movies.body.map((p) => <p>{p}</p>)}</div>
+        <ul class="posters" aria-label="Favourite films and shows">
+          {g.movies.tags!.map((t, i) => {
+            const [fg, bg, kind] = posterTones[t] ?? ['#fff', '#111', 'Film'];
+            return <li style={`--fg:${fg};--bg:${bg};--i:${i};--n:${g.movies.tags!.length}`}><span class="poster-kind">{kind}</span><b>{t}</b><span class="poster-rule"></span></li>;
+          })}
+        </ul>
+      </section>
+
+      <section class="cell c-music" style={`--a:${g.music.tone[0]}`} data-cell>
+        <div class="cell-text"><h2>{g.music.title}</h2>{g.music.body.map((p) => <p>{p}</p>)}</div>
+        <div class="vinyl-wrap" aria-hidden="true">
+          <div class="sleeve"><span>Random<br />Frequencies</span></div>
+          <div class="vinyl"><div class="vinyl-label"><span>A</span></div></div>
+        </div>
+        <ul class="genres">{g.music.tags!.map((t) => <li>{t}</li>)}</ul>
+      </section>
+
+      <section class="cell c-singing" style={`--a:${g.singing.tone[0]}`} data-cell>
+        <div class="wave" aria-hidden="true">{bars.map((h, i) => <span style={`--h:${h.toFixed(2)};--i:${i}`}></span>)}</div>
+        <div class="cell-text"><h2>{g.singing.title}</h2>{g.singing.body.map((p) => <p>{p}</p>)}</div>
+      </section>
+
+      <section class="cell c-sports" style={`--a:${g.sports.tone[0]}`} data-cell>
+        <svg class="court" viewBox="0 0 320 150" aria-hidden="true">
+          <path class="court-arc" d="M20 120 Q160 -20 300 120" />
+          <line x1="160" y1="78" x2="160" y2="140" class="court-net" />
+          <line x1="0" y1="140" x2="320" y2="140" class="court-floor" />
+          <g class="shuttle"><circle r="5" /><path d="M-4 -3 L-16 -9 L-16 9 L-4 3 Z" /></g>
+        </svg>
+        <div class="cell-text"><h2>{g.sports.title}</h2>{g.sports.body.map((p) => <p>{p}</p>)}</div>
+        <ul class="tags">{g.sports.tags!.map((t) => <li>{t}</li>)}</ul>
+      </section>
+
+      <section class="cell c-cooking" style={`--a:${g.cooking.tone[0]}`} data-cell>
+        <div class="cell-text"><h2>{g.cooking.title}</h2>{g.cooking.body.map((p) => <p>{p}</p>)}</div>
+        <div class="recipes" aria-hidden="true">
+          {g.cooking.tags!.map((t, i) => (
+            <div class="recipe" style={`--i:${i}`}><span class="recipe-no">No. {String(i + 1).padStart(2, '0')}</span><b>{t}</b><span class="recipe-lines"></span><span class="recipe-stamp">House favourite</span></div>
+          ))}
+        </div>
+      </section>
+
+      <section class="cell c-books" style={`--a:${g.books.tone[0]}`} data-cell>
+        <div class="spines" aria-hidden="true">
+          {[['Self-help', 86, '#818cf8'], ['Habits', 70, '#38bdf8'], ['Focus', 92, '#a78bfa'], ['Mindset', 78, '#2dd4bf'], ['Life, figured out (soon)', 100, '#f472b6']].map(([t, w, c], i) => (
+            <span style={`--w:${w}%;--c:${c};--i:${i}`}>{t}</span>
+          ))}
+        </div>
+        <div class="cell-text"><h2>{g.books.title}</h2>{g.books.body.map((p) => <p>{p}</p>)}</div>
+      </section>
+
+      <section class="cell c-coding" style={`--a:${g.coding.tone[0]}`} data-cell>
+        <div class="cell-text"><h2>{g.coding.title}</h2>{g.coding.body.map((p) => <p>{p}</p>)}</div>
+        <div class="term" aria-hidden="true">
+          <div class="term-bar"><i></i><i></i><i></i><span>~/quick-project</span></div>
+          <pre><span class="t1"><b>$</b> npm run quick-project</span>
+<span class="t2"><em>21:04</em> this'll take an hour, tops</span>
+<span class="t3"><em>23:47</em> added auth. and a dark mode. and AI.</span>
+<span class="t4"><em>01:12</em> refactoring something nobody asked for</span>
+<span class="t5"><em>03:04</em> debugging something completely unrelated<span class="caret"></span></span></pre>
+        </div>
+      </section>
+
+      <section class="cell c-side" style={`--a:${g.side.tone[0]}`} data-cell>
+        <div class="cell-text"><h2>{g.side.title}</h2>{g.side.body.map((p) => <p>{p}</p>)}</div>
+        <ul class="quests">
+          {g.side.tags!.map((t) => <li><span class="q-check"></span>{t}</li>)}
+          <li class="q-next"><span class="q-dots"><i></i><i></i><i></i></span>Next quest loading</li>
+        </ul>
+      </section>
     </div>
-    <p class="back"><a href="/">Back to the work</a></p>
+
+    <section class="photos" aria-labelledby="ph-title" data-cell>
+      <div class="photos-head">
+        <div>
+          <p class="kicker">Through my lens</p>
+          <h2 id="ph-title">{g.photography.title}</h2>
+          {g.photography.body.map((p) => <p class="photos-text">{p}</p>)}
+        </div>
+        {photos.length > 3 && (
+          <div class="photos-nav"><button type="button" id="ph-prev" aria-label="Previous photos">←</button><button type="button" id="ph-next" aria-label="Next photos">→</button></div>
+        )}
+      </div>
+      {photos.length > 0 ? (
+        <ul class="strip" id="strip">
+          {photos.map((p) => (
+            <li><Image src={p.src} widths={[400, 800]} sizes="(max-width: 899px) 75vw, 340px" alt={p.name} loading="lazy" />{p.name && <span class="ph-cap">{p.name}</span>}</li>
+          ))}
+        </ul>
+      ) : (
+        <ul class="strip strip--empty" aria-label="Photos coming soon">
+          {[0, 1, 2, 3].map((i) => <li style={`--i:${i}`}><div class="vf"></div>{i === 0 && <p class="vf-note">Frames loading. Photos coming soon.</p>}</li>)}
+        </ul>
+      )}
+    </section>
+
+    <section class="pp-end">
+      <h2>Thanks for stopping by.</h2>
+      <p>That's the other half. Back to the part where I build things.</p>
+      <a class="button" href="/#work">See the work</a>
+    </section>
   </main>
+
+  <script>
+    import { gsap } from 'gsap';
+    import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // The rotating end of the headline.
+    const rotor = document.getElementById('rotor')!;
+    const lines = ['cooking biryani.', 'singing along, badly or not.', 'at the gym.', 'overanalyzing a plot.', 'chasing a photo.', 'debugging at 3 AM.'];
+    let n = 0;
+    if (!reduced) {
+      setInterval(() => {
+        n = (n + 1) % lines.length;
+        gsap.timeline()
+          .to(rotor, { yPercent: -100, opacity: 0, duration: 0.45, ease: 'power3.in' })
+          .call(() => { rotor.textContent = lines[n]; })
+          .fromTo(rotor, { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.7, ease: 'expo.out' });
+      }, 2600);
+    }
+
+    // Cells start their drawings when they come into view, and pause when they leave.
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) e.target.classList.toggle('on', e.isIntersecting);
+    }, { rootMargin: '0px 0px -10% 0px' });
+    document.querySelectorAll('[data-cell]').forEach((c) => io.observe(c));
+
+    if (!reduced) {
+      gsap.registerPlugin(ScrollTrigger);
+      gsap.from('.pp-hero > *', { y: 28, opacity: 0, duration: 1.1, ease: 'expo.out', stagger: 0.1 });
+      gsap.utils.toArray<HTMLElement>('.cell, .photos, .pp-end').forEach((el) => {
+        gsap.from(el, { y: 50, opacity: 0, duration: 1.1, ease: 'expo.out', clearProps: 'transform,opacity', scrollTrigger: { trigger: el, start: 'top 90%', once: true } });
+      });
+    }
+
+    // Photo strip arrows.
+    const strip = document.getElementById('strip');
+    const step = () => (strip?.clientWidth ?? 0) * 0.8;
+    document.getElementById('ph-prev')?.addEventListener('click', () => strip?.scrollBy({ left: -step(), behavior: reduced ? 'auto' : 'smooth' }));
+    document.getElementById('ph-next')?.addEventListener('click', () => strip?.scrollBy({ left: step(), behavior: reduced ? 'auto' : 'smooth' }));
+  </script>
+
+  <style>
+    .pp { max-width: 1240px; margin: 0 auto; padding: 150px 32px 96px; }
+    .pp-hero { max-width: 1100px; margin-bottom: 72px; }
+    .pp-hero h1 { margin-top: 18px; font-size: clamp(34px, 5vw, 68px); line-height: 1.04; letter-spacing: -0.03em; }
+    .pp-line { display: block; }
+    .pp-rotor { display: block; overflow: hidden; padding-bottom: 0.08em; }
+    .pp-rotor span { display: inline-block; background: linear-gradient(90deg, #f472b6, #c084fc 35%, #38bdf8 70%, #2dd4bf); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .pp-intro { max-width: 560px; margin: 26px 0 0; font-size: 19px; color: var(--ink-2); }
+
+    /* One panel, cells split by hairlines. */
+    .bento { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1px; background: var(--hair-2); border: 1px solid var(--hair-2); border-radius: 24px; overflow: hidden; }
+    .cell { position: relative; display: flex; flex-direction: column; gap: 22px; padding: 30px; background: var(--bg-2); overflow: hidden; }
+    .cell::before { content: ''; position: absolute; inset: 0; background: radial-gradient(420px 260px at 0% 0%, color-mix(in srgb, var(--a) 9%, transparent), transparent 70%); pointer-events: none; }
+    .cell > * { position: relative; }
+    .cell h2 { font-size: 21px; line-height: 1.2; letter-spacing: -0.01em; color: var(--ink); }
+    .cell-text p { margin: 10px 0 0; max-width: 62ch; font-size: 15px; line-height: 1.6; color: var(--ink-3); }
+    .c-movies { grid-column: span 8; }
+    .c-music { grid-column: span 4; grid-row: span 2; }
+    .c-singing { grid-column: span 4; }
+    .c-sports { grid-column: span 4; }
+    .c-cooking { grid-column: span 6; }
+    .c-books { grid-column: span 6; }
+    .c-coding { grid-column: span 7; }
+    .c-side { grid-column: span 5; }
+
+    /* Movies: a fanned wall of typographic posters. */
+    .posters { position: relative; display: flex; justify-content: center; height: 210px; padding-right: 40px !important; margin: auto 0 0; padding: 0; list-style: none; }
+    .posters li { flex: none; display: flex; flex-direction: column; justify-content: space-between; width: 112px; height: 168px; margin-right: -40px; padding: 12px 11px; border-radius: 8px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--fg) 22%, var(--bg)), var(--bg) 70%); border: 1px solid rgb(255 255 255 / 0.1); box-shadow: 0 18px 40px rgb(0 0 0 / 0.45);
+      transform: translateY(calc(sin((var(--i) - 4) * 0.4) * 10px)) rotate(calc((var(--i) - 4) * 3deg)); transform-origin: 50% 120%; transition: transform 0.6s var(--ease), margin 0.6s var(--ease); }
+    .posters li:nth-child(odd) { margin-top: 16px; }
+    .c-movies:hover .posters li { margin-right: -14px; transform: rotate(calc((var(--i) - 4) * 1deg)); }
+    .posters li:hover { transform: translateY(-14px) rotate(0) scale(1.06) !important; z-index: 2; }
+    .poster-kind { font: 600 10px var(--cond); letter-spacing: 0.2em; text-transform: uppercase; color: color-mix(in srgb, var(--fg) 70%, transparent); }
+    .posters b { font: 700 13px/1.05 var(--display); text-transform: uppercase; letter-spacing: -0.01em; color: var(--fg); }
+    .poster-rule { height: 2px; width: 40%; background: var(--fg); opacity: 0.6; }
+
+    /* Music: a record sliding out of its sleeve, spinning while it's on screen. */
+    .vinyl-wrap { position: relative; height: 260px; margin: auto 0; }
+    .sleeve { position: absolute; left: 0; top: 10px; width: 200px; height: 200px; display: grid; align-content: end; padding: 16px; border-radius: 6px; z-index: 1;
+      background: linear-gradient(135deg, #f472b6, #7c3aed 55%, #1e1b4b); box-shadow: 0 20px 50px rgb(0 0 0 / 0.5); }
+    .sleeve span { font: 700 18px/1.05 var(--display); text-transform: uppercase; color: #fff; }
+    .vinyl { position: absolute; left: 80px; top: 18px; width: 186px; height: 186px; border-radius: 50%;
+      background: repeating-radial-gradient(circle, #111 0 2px, #1d1d1f 2px 4px); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06), 0 14px 40px rgb(0 0 0 / 0.5);
+      transition: left 0.9s var(--ease); }
+    .vinyl::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 30deg, transparent 0 20%, rgb(255 255 255 / 0.08) 25%, transparent 32% 70%, rgb(255 255 255 / 0.06) 75%, transparent 82%); }
+    .vinyl-label { position: absolute; inset: 34%; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(circle, #0b0b0c 0 6%, #f472b6 7%, #c084fc); }
+    .vinyl-label span { font: 700 11px var(--display); color: #fff; transform: translateY(12px); }
+    .c-music.on .vinyl { left: 128px; animation: spin 4s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .genres { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .genres li, .tags li { padding: 6px 12px; border: 1px solid color-mix(in srgb, var(--a) 40%, var(--hair)); border-radius: 999px; background: color-mix(in srgb, var(--a) 8%, transparent); font-size: 13px; color: var(--ink); }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+
+    /* Singing: a live waveform. */
+    .wave { display: flex; align-items: center; gap: 4px; height: 96px; }
+    .wave span { flex: 1; height: calc(var(--h) * 100%); border-radius: 3px; background: linear-gradient(180deg, var(--a), #f472b6); opacity: 0.85; transform-origin: center; }
+    .c-singing.on .wave span { animation: sing 1.1s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -73ms); }
+    @keyframes sing { from { transform: scaleY(0.25); } to { transform: scaleY(1); } }
+
+    /* Sports: a shuttle flying over the net. */
+    .court { width: 100%; height: auto; }
+    .court-arc { fill: none; stroke: var(--hair-2); stroke-width: 1.5; stroke-dasharray: 2 7; stroke-linecap: round; }
+    .court-net { stroke: var(--ink-4); stroke-width: 2; stroke-dasharray: 3 3; }
+    .court-floor { stroke: var(--hair-2); stroke-width: 1; }
+    .shuttle { fill: var(--a); offset-path: path('M20 120 Q160 -20 300 120'); offset-rotate: auto; offset-distance: 0%; }
+    .shuttle path { fill: color-mix(in srgb, var(--a) 40%, white); }
+    .c-sports.on .shuttle { animation: rally 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; }
+    @keyframes rally { to { offset-distance: 100%; } }
+
+    /* Cooking: recipe cards. */
+    .recipes { position: relative; display: flex; gap: 18px; margin-top: auto; padding: 10px 0 6px 6px; }
+    .recipe { position: relative; display: grid; gap: 8px; width: 210px; padding: 16px 18px 18px; border-radius: 6px; background: #fdf6e3; color: #3b2a1a; box-shadow: 0 16px 36px rgb(0 0 0 / 0.4);
+      transform: rotate(calc(-3deg + var(--i) * 6deg)); transition: transform 0.5s var(--ease); }
+    .recipe:hover { transform: rotate(0) translateY(-6px); }
+    .recipe-no { font: 600 11px var(--cond); letter-spacing: 0.18em; text-transform: uppercase; color: #b45309; }
+    .recipe b { font: 700 19px/1.1 var(--display); color: #1c1308; }
+    .recipe-lines { height: 46px; background: repeating-linear-gradient(transparent 0 14px, rgb(59 42 26 / 0.18) 14px 15px); }
+    .recipe-stamp { position: absolute; right: 12px; bottom: 12px; padding: 3px 8px; border: 1.5px solid #dc2626; border-radius: 4px; font: 700 10px var(--cond); letter-spacing: 0.12em; text-transform: uppercase; color: #dc2626; transform: rotate(-8deg); }
+
+    /* Books: a stack of spines. */
+    .spines { display: grid; gap: 5px; }
+    .spines span { width: var(--w); padding: 9px 14px; border-radius: 4px; background: linear-gradient(90deg, color-mix(in srgb, var(--c) 75%, black), var(--c)); font: 600 12px var(--cond); letter-spacing: 0.14em; text-transform: uppercase; color: #fff;
+      box-shadow: inset 4px 0 0 rgb(0 0 0 / 0.25); transform: translateX(calc(var(--i) * 6px - 12px)); transition: transform 0.6s var(--ease); }
+    .c-books:hover .spines span { transform: translateX(0); }
+
+    /* Coding: a terminal heading toward 3 AM. */
+    .term { margin-top: auto; border: 1px solid rgb(255 255 255 / 0.08); border-radius: 12px; background: #0b0d12; overflow: hidden; }
+    .term-bar { display: flex; align-items: center; gap: 6px; padding: 10px 12px; border-bottom: 1px solid rgb(255 255 255 / 0.06); }
+    .term-bar i { width: 9px; height: 9px; border-radius: 50%; background: #ff5f57; }
+    .term-bar i:nth-child(2) { background: #febc2e; } .term-bar i:nth-child(3) { background: #28c840; }
+    .term-bar span { margin-left: 8px; font: 12px ui-monospace, Menlo, monospace; color: #8b949e; }
+    .term pre { margin: 0; padding: 14px 16px 16px; font: 13px/1.85 ui-monospace, 'SF Mono', Menlo, monospace; color: #c9d1d9; white-space: normal; }
+    .term pre > span { display: block; opacity: 0; }
+    .term b { color: #7ee787; font-weight: 400; } .term em { font-style: normal; color: #a79bff; margin-right: 10px; }
+    .c-coding.on .term pre > span { animation: line 0.01s forwards; }
+    .c-coding.on .t2 { animation-delay: 0.7s !important; } .c-coding.on .t3 { animation-delay: 1.4s !important; } .c-coding.on .t4 { animation-delay: 2.1s !important; } .c-coding.on .t5 { animation-delay: 2.8s !important; }
+    @keyframes line { to { opacity: 1; } }
+    .caret { display: inline-block; width: 8px; height: 15px; margin-left: 4px; vertical-align: -2px; background: #c9d1d9; animation: blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* Side quests. */
+    .quests { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+    .quests li { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid var(--hair-2); border-radius: 12px; font: 600 16px var(--sans); color: var(--ink); }
+    .q-check { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--a); background: color-mix(in srgb, var(--a) 20%, transparent); }
+    .q-next { color: var(--ink-3) !important; border-style: dashed !important; }
+    .q-dots { display: inline-flex; gap: 4px; }
+    .q-dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--ink-3); animation: pulse 1.2s ease-in-out infinite; }
+    .q-dots i:nth-child(2) { animation-delay: 0.2s; } .q-dots i:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse { 50% { opacity: 0.2; transform: translateY(-2px); } }
+
+    /* Photography: a strip of frames. */
+    .photos { margin-top: 96px; }
+    .photos-head { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 28px; }
+    .photos h2 { margin-top: 12px; font-size: clamp(26px, 3.4vw, 40px); letter-spacing: -0.02em; }
+    .photos-text { max-width: 640px; margin: 12px 0 0; color: var(--ink-3); font-size: 16px; }
+    .photos-nav { display: flex; gap: 10px; }
+    .photos-nav button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--hair-2); font-size: 18px; color: var(--ink); }
+    .photos-nav button:hover { border-color: var(--glow); }
+    .strip { display: grid; grid-auto-flow: column; grid-auto-columns: min(340px, 75vw); gap: 16px; margin: 0; padding: 0 0 12px; list-style: none; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+    .strip::-webkit-scrollbar { display: none; }
+    .strip li { position: relative; aspect-ratio: 4 / 5; border-radius: 20px; overflow: hidden; scroll-snap-align: start; background: var(--card); }
+    .strip img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s var(--ease); }
+    .strip li:hover img { transform: scale(1.04); }
+    .ph-cap { position: absolute; left: 16px; bottom: 14px; padding: 5px 10px; border-radius: 999px; background: rgb(0 0 0 / 0.55); backdrop-filter: blur(6px); font-size: 13px; color: #fff; text-transform: capitalize; }
+    .strip--empty { grid-auto-columns: min(280px, 70vw); }
+    .strip--empty li { aspect-ratio: 3 / 4;  border: 1px dashed var(--hair-2); background: repeating-linear-gradient(135deg, transparent 0 14px, rgb(var(--ink-rgb) / 0.025) 14px 15px), var(--bg-2); }
+    .vf { position: absolute; inset: 18px; background:
+      linear-gradient(var(--ink-4), var(--ink-4)) top left / 22px 2px no-repeat, linear-gradient(var(--ink-4), var(--ink-4)) top left / 2px 22px no-repeat,
+      linear-gradient(var(--ink-4), var(--ink-4)) top right / 22px 2px no-repeat, linear-gradient(var(--ink-4), var(--ink-4)) top right / 2px 22px no-repeat,
+      linear-gradient(var(--ink-4), var(--ink-4)) bottom left / 22px 2px no-repeat, linear-gradient(var(--ink-4), var(--ink-4)) bottom left / 2px 22px no-repeat,
+      linear-gradient(var(--ink-4), var(--ink-4)) bottom right / 22px 2px no-repeat, linear-gradient(var(--ink-4), var(--ink-4)) bottom right / 2px 22px no-repeat; }
+    .vf::after { content: ''; position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; margin: -13px; border: 1.5px solid var(--ink-4); border-radius: 50%; }
+    .vf-note { position: absolute; left: 0; right: 0; bottom: 44px; margin: 0; text-align: center; font-size: 14px; color: var(--ink-3); }
+
+    /* The end. */
+    .pp-end { margin-top: 110px; padding: 80px 32px; border: 1px solid var(--hair-2); border-radius: 24px; text-align: center;
+      background: radial-gradient(circle at 1px 1px, rgb(var(--ink-rgb) / 0.12) 1px, transparent 0) 0 0 / 22px 22px, var(--bg-2); }
+    .pp-end h2 { font-size: clamp(28px, 4vw, 48px); letter-spacing: -0.02em; }
+    .pp-end p { margin: 14px auto 28px; max-width: 520px; color: var(--ink-3); }
+
+    @media (max-width: 1099px) {
+      .c-movies, .c-music, .c-coding, .c-side, .c-cooking, .c-books { grid-column: span 12; grid-row: auto; }
+      .c-singing, .c-sports { grid-column: span 6; }
+    }
+    @media (max-width: 699px) {
+      .pp { padding: 110px 20px 72px; }
+      .cell { padding: 24px 20px; }
+      .c-singing, .c-sports { grid-column: span 12; }
+      .posters { height: 210px; overflow: hidden; }
+      .posters li { width: 104px; height: 156px; margin-right: -52px; }
+      .recipes { flex-direction: column; } .recipe { width: auto; }
+      .photos-head { flex-direction: column; align-items: start; }
+    }
+    @media (prefers-reduced-motion: reduce) { .term pre > span { opacity: 1; } }
+  </style>
 </Base>

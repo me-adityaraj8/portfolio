@@ -1,14 +1,15 @@
 /**
- * The personal page at /personal, in my own words. `tags` are the named favourites,
- * shown as chips under the text. Add a group and it appears; the footer links here
- * as long as there's at least one.
+ * The personal page at /personal, in my own words. Each group's `id` picks the visual
+ * drawn for it on the page; `tags` are the named favourites. Photos for the photography
+ * strip go in src/assets/photos (any jpg, png or webp), and appear in name order.
  */
-export interface Group { title: string; body: string[]; tags?: string[]; tone: [string, string] }
+export interface Group { id: string; title: string; body: string[]; tags?: string[]; tone: [string, string] }
 
 export const personal = {
   intro: "What I'm into when I'm not shipping something. Consider it a work in progress, much like literally everything else.",
   groups: [
     {
+      id: 'movies',
       title: 'Movies, Shows & Losing the Plot',
       tone: ['#f43f5e', '#a855f7'],
       body: [
@@ -18,6 +19,7 @@ export const personal = {
       tags: ['Fight Club', 'Shutter Island', 'Interstellar', 'Inception', 'Black Swan', 'Dark', 'Breaking Bad', 'Better Call Saul', 'The Sopranos'],
     },
     {
+      id: 'music',
       title: 'Music & Random Frequencies',
       tone: ['#f472b6', '#c084fc'],
       body: [
@@ -26,6 +28,7 @@ export const personal = {
       tags: ['Retro jazz', 'R&B', 'Acid jazz', 'Synth', 'Cloud rap', 'Nu-disco', 'Bollywood, occasionally'],
     },
     {
+      id: 'singing',
       title: 'Singing, Just Because',
       tone: ['#fb923c', '#f472b6'],
       body: [
@@ -33,6 +36,7 @@ export const personal = {
       ],
     },
     {
+      id: 'sports',
       title: 'Sports & Sweat',
       tone: ['#34d399', '#22d3ee'],
       body: [
@@ -41,6 +45,7 @@ export const personal = {
       tags: ['Gym', 'Bodybuilding', 'Badminton', 'Cricket'],
     },
     {
+      id: 'cooking',
       title: 'Cooking > Ordering In',
       tone: ['#fbbf24', '#f97316'],
       body: [
@@ -49,6 +54,7 @@ export const personal = {
       tags: ['Biryani', 'Butter chicken'],
     },
     {
+      id: 'books',
       title: 'Self-Help & Other Attempts at Getting My Life Together',
       tone: ['#818cf8', '#38bdf8'],
       body: [
@@ -56,6 +62,7 @@ export const personal = {
       ],
     },
     {
+      id: 'photography',
       title: 'Photography & Random Things That Look Cool',
       tone: ['#2dd4bf', '#818cf8'],
       body: [
@@ -63,6 +70,7 @@ export const personal = {
       ],
     },
     {
+      id: 'coding',
       title: 'Coding Things Into Existence',
       tone: ['#a78bfa', '#22d3ee'],
       body: [
@@ -70,6 +78,7 @@ export const personal = {
       ],
     },
     {
+      id: 'side',
       title: 'Side Quests',
       tone: ['#facc15', '#34d399'],
       body: [
