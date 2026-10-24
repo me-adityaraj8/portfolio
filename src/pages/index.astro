@@ -5,7 +5,6 @@ import HoverCard from '../components/HoverCard.astro';
 import Icon from '../components/Icon.astro';
 import ProblemSolving from '../components/ProblemSolving.astro';
 import Building from '../components/Building.astro';
-import Snippet from '../components/Snippet.astro';
 import cp from '../data/cp.json';
 import contrib from '../data/contrib.json';
 import { getWork } from '../lib/work';
@@ -136,7 +135,6 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
 
   <Building />
 
-  <Snippet />
 
   <section class="section now" data-reveal id="now" aria-labelledby="now-title">
     <h2 id="now-title" class="section-title">Now</h2>

@@ -49,6 +49,8 @@ const person = personJsonLd({
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <script is:inline>
       document.documentElement.classList.replace('no-js', 'js');
+      // The hero waits for its entrance animation, but never longer than this.
+      setTimeout(function () { document.documentElement.classList.add('motion-ready'); }, 2500);
       // Set the theme before the first paint, so the page never flashes the wrong one.
       try {
         var t = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');

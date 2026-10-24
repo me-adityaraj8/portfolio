@@ -7,6 +7,7 @@ import { rank } from './palette';
 import { beat, listen, onBeat } from './beat';
 import { building, contest, growFrom, guestbook, liveStats, recruiter } from './extras';
 import { health, hirer, keyboard, perf, stackFilter } from './more';
+import { motion } from './motion';
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
@@ -23,6 +24,7 @@ export function start() {
   const hire = hirer(spell);
   if (fine) { cursor(); spotlights(); }
   scrollEffects();
+  motion(lenis);
   palette(lenis, [
     { label: 'Keyboard shortcuts', group: 'Help', run: () => $<HTMLDialogElement>('keys').showModal() },
     { label: 'Hire Aditya', group: 'Links', run: hire },

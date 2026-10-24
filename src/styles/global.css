@@ -618,22 +618,6 @@ main:focus { outline: none; }
 .langs-key i { width: 9px; height: 9px; border-radius: 50%; }
 .langs-key b { color: var(--ink); font-weight: 500; }
 
-/* ── Code I'm proud of. */
-.snippet { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 28px; align-items: center; padding: 26px; border: 1px solid var(--hair-2); border-radius: 20px; background: var(--card); }
-.snippet + .snippet { margin-top: 20px; }
-.snippet-where { margin: 0 0 10px; font: 500 12px var(--cond); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
-.snippet h3 { font-size: 22px; letter-spacing: -0.01em; }
-.snippet-text > p:not(.snippet-where) { color: var(--ink-2); font-size: 16px; }
-.snippet-link { font-size: 15px; color: var(--glow); }
-.snippet-code { min-width: 0; border: 1px solid rgb(255 255 255 / 0.08); border-radius: 14px; background: #0d1117; overflow: hidden; box-shadow: 0 24px 60px rgb(0 0 0 / 0.35); }
-.snippet-bar { display: flex; align-items: center; gap: 7px; padding: 11px 14px; border-bottom: 1px solid rgb(255 255 255 / 0.07); }
-.snippet-bar span { width: 10px; height: 10px; border-radius: 50%; background: #ff5f57; }
-.snippet-bar span:nth-child(2) { background: #febc2e; }
-.snippet-bar span:nth-child(3) { background: #28c840; }
-.snippet-bar code { margin-left: 10px; font: 12px ui-monospace, 'SF Mono', Menlo, monospace; color: #8b949e; }
-.snippet-code pre { margin: 0; padding: 16px 18px; font: 13px/1.65 ui-monospace, 'SF Mono', Menlo, monospace; overflow-x: auto; background: transparent !important; }
-@media (max-width: 899px) { .snippet { grid-template-columns: 1fr; padding: 20px; } }
-
 /* ── Architecture diagrams. */
 .diagram { margin: 36px 0; padding: 22px; border: 1px solid var(--hair-2); border-radius: 18px; background: var(--card); }
 .diagram svg { display: block; width: 100%; height: auto; font-family: var(--sans); }
@@ -694,3 +678,7 @@ main:focus { outline: none; }
 .js .connect .thanks-line span { transform: translateY(105%); transition: transform 0.9s var(--ease) calc(var(--i) * 28ms + 150ms); }
 .js .connect.in .thanks-line span { transform: none; }
 @media (prefers-reduced-motion: reduce) { .js .connect .thanks-line span { transform: none; } }
+
+/* ── GSAP: the hero stays hidden until its entrance starts (with a timeout in Base, in case scripts fail). */
+html.js[data-page='map']:not(.motion-ready) .hero-inner, html.js[data-page='map']:not(.motion-ready) .scroll-cue, html.js[data-page='map']:not(.motion-ready) .scroll-down { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { html.js:not(.motion-ready) .hero-inner, html.js:not(.motion-ready) .scroll-cue, html.js:not(.motion-ready) .scroll-down { opacity: 1; } }
