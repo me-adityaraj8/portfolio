@@ -61,7 +61,8 @@ export const site = {
       detail: 'B.Tech, Computer Science and Engineering',
       years: '2024 – present',
       place: 'Bhagalpur, India',
-      note: 'Coursework across systems, theory and AI, from operating systems and DBMS to automata theory and soft computing.',
+      /** Sources: iiitbh.ac.in (About, Director's message) and its 2022-23 annual report. */
+      note: 'An Institute of National Importance, set up in 2017 under the IIIT (PPP) Act. It is run jointly by the Government of India, the Government of Bihar and BELTRON, the state electronics corporation. IIT Guwahati mentors it, and it sits in Sabour, on the banks of the Ganga. I study Computer Science and Engineering here, from operating systems and networks to AI and soft computing.',
       /** From the semester timetables and the resume. `now` marks this semester's courses. */
       courses: [
         { name: 'Computer Networks', now: true },
