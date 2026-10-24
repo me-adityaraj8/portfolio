@@ -9,7 +9,7 @@ const projects = (await getCollection('projects')).sort((a, b) => b.data.date.lo
 <Base title={`Index of work, ${site.name}`} description={`Every project by ${site.name}, newest first.`} page="index" image="/og/work.png">
   <main class="index-page" id="main" tabindex="-1">
     <h1>Index of work</h1>
-    <p class="lede">Everything on the map, newest first. The map places each one by when I started it.</p>
+    <p class="lede">Everything I have built, newest first.</p>
     <table class="index-table">
       <thead><tr><th scope="col">Started</th><th scope="col">Project</th><th scope="col">What it is</th><th scope="col">Links</th></tr></thead>
       <tbody>

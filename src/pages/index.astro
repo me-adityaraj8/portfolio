@@ -11,6 +11,7 @@ import { getWork } from '../lib/work';
 import { site } from '../data/site';
 import github from '../data/github.json';
 import { usesTool } from '../lib/skills';
+import { hasPersonal } from '../data/personal';
 import { Image } from 'astro:assets';
 import { shot } from '../lib/shots';
 
@@ -242,7 +243,7 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
       ))}
     </p>
     <div class="foot">
-      <span class="foot-left">© {new Date().getFullYear()} {site.name}.<span class="live-stats" id="live-stats" data-backend={site.live.backend} data-counter={site.live.counter} data-key={site.live.counterKey}><span id="visits"></span><span id="here" hidden><i></i><b id="here-n"></b> here now</span><span id="perf" class="perf" hidden></span></span></span>
+      <span class="foot-left">© {new Date().getFullYear()} {site.name}.{hasPersonal && <a class="foot-personal" href="/personal">Personal</a>}<span class="live-stats" id="live-stats" data-backend={site.live.backend} data-counter={site.live.counter} data-key={site.live.counterKey}><span id="visits"></span><span id="here" hidden><i></i><b id="here-n"></b> here now</span><span id="perf" class="perf" hidden></span></span></span>
       <div class="wx" id="wx" data-place={site.weather.place} data-lat={site.weather.lat} data-lon={site.weather.lon} hidden>
         <span class="wx-icon" id="wx-icon" aria-hidden="true"></span>
         <span class="wx-text">

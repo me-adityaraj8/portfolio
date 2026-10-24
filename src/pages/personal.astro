@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+import { personal } from '../data/personal';
+
+const groups = personal.groups.filter((g) => g.items.length > 0);
+---
+<Base title={`Off the clock, ${site.name}`} description={personal.intro} page="personal">
+  <main class="personal-page" id="main" tabindex="-1">
+    <p class="kicker">Off the clock</p>
+    <h1>The other half</h1>
+    <p class="lede">{personal.intro}</p>
+    {groups.length === 0 && <p class="personal-empty">This page is being filled in.</p>}
+    <div class="personal-grid">
+      {groups.map((g) => (
+        <section class="personal-card spot" style={`--a:${g.tone[0]};--b:${g.tone[1]}`} aria-labelledby={`p-${g.title}`}>
+          <p class="personal-blurb">{g.blurb}</p>
+          <h2 id={`p-${g.title}`}>{g.title}</h2>
+          <ul>
+            {g.items.map((it) => <li><b>{it.name}</b>{it.note && <span>{it.note}</span>}</li>)}
+          </ul>
+        </section>
+      ))}
+    </div>
+    <p class="back"><a href="/">Back to the work</a></p>
+  </main>
+</Base>
