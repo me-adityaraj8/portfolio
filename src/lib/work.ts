@@ -21,4 +21,4 @@ export async function getWork() {
 }
 
 export const monthYear = (date: string) =>
-  new Date(date + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+  new Date(date + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });

@@ -58,7 +58,13 @@ const month = (d: string) => `${MONTHS[Number(d.slice(5, 7)) - 1]} ${d.slice(0, 
       li { margin: 1px 0; }
       .item + .item { margin-top: 6px; }
       a { color: #16141f; }
-      @media print { body { background: #fff; } .bar { display: none; } .page { margin: 0; padding: 0; width: auto; min-height: 0; box-shadow: none; } }
+      @media screen and (max-width: 860px) {
+        .page { width: auto; min-height: 0; margin: 0 12px 24px; padding: 28px 22px; }
+        .bar { flex-wrap: wrap; }
+        .row { flex-wrap: wrap; gap: 2px 12px; }
+        .contact { word-break: break-word; }
+      }
+            @media print { body { background: #fff; } .bar { display: none; } .page { margin: 0; padding: 0; width: auto; min-height: 0; box-shadow: none; } }
     </style>
   </head>
   <body>

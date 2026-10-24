@@ -35,7 +35,7 @@ const COLOURS: Record<string, string> = { TypeScript: '#3178c6', 'C++': '#f34b7d
         <span><b>{contrib.longest}</b> day longest streak</span>
         {contrib.current > 0 && <span><b>{contrib.current}</b> day current streak</span>}
       </div>
-      <div class="contrib-scroll">
+      <div class="contrib-scroll" id="contrib-scroll">
         <div class="contrib-months" style={`grid-template-columns: repeat(${weeks.length}, 12px)`}>
           {months.map((m) => <span style={`grid-column:${m.col + 1}`}>{m.label}</span>)}
         </div>
@@ -66,3 +66,8 @@ const COLOURS: Record<string, string> = { TypeScript: '#3178c6', 'C++': '#f34b7d
     </div>
   )}
 </section>
+<script>
+  // On narrow screens the calendar scrolls; start it at the most recent weeks.
+  const box = document.getElementById('contrib-scroll');
+  if (box) box.scrollLeft = box.scrollWidth;
+</script>

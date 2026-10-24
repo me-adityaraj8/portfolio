@@ -327,7 +327,7 @@ a.tl-org { cursor: pointer; }
 .ps-totals div { display: flex; flex-direction: column-reverse; gap: 6px; border-top: 1px solid var(--hair-2); padding-top: 14px; }
 .ps-totals dd { margin: 0; font: 700 36px/1 var(--display); letter-spacing: -0.02em; }
 .ps-totals dt { font: 500 12px var(--cond); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
-.ps-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.ps-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 .plat { display: flex; flex-direction: column; gap: 10px; padding: 22px 24px; border: 1px solid var(--hair-2); border-radius: 18px; background: var(--card); text-decoration: none;
   transition: transform 0.4s var(--ease), border-color 0.3s, box-shadow 0.4s var(--ease); }
 .plat:hover { color: inherit; transform: translateY(-3px); border-color: rgb(var(--ink-rgb) / 0.28); box-shadow: 0 24px 60px rgb(0 0 0 / 0.4); }
@@ -685,3 +685,28 @@ html.js[data-page='map']:not(.motion-ready) .hero-inner, html.js[data-page='map'
 
 /* ── Personal page. */
 .foot-personal { color: var(--ink-2); text-decoration: underline; text-decoration-color: rgb(var(--ink-rgb) / 0.3); }
+
+/* ── Responsive safety and small screens. */
+html, body { overflow-x: clip; }
+.contrib-scroll { overflow-x: auto; scrollbar-width: thin; padding-bottom: 6px; }
+@media (max-width: 479px) {
+  .masthead { padding: 0 14px; }
+  .brand-name { letter-spacing: 0.14em; }
+  .masthead nav { gap: 12px; }
+  .masthead nav a[href*='github.com'] { display: none; }
+}
+@media (max-width: 640px) {
+  .index-table, .index-table tbody { display: block; }
+  .index-table thead { display: none; }
+  .index-table tr { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; padding: 16px 0; border-bottom: 1px solid var(--hair); }
+  .index-table th, .index-table td { padding: 0; border: 0; }
+  .index-table td:first-child { grid-column: 1 / -1; font-size: 13px; }
+  .index-table tbody th { grid-column: 1; white-space: normal; }
+  .index-table td:nth-child(3) { display: block; grid-column: 1 / -1; grid-row: 3; }
+  .index-table td:last-child { grid-column: 2; grid-row: 2; }
+}
+@media (max-width: 420px) {
+  .hero h1 { font-size: 17.5vw; }
+  .hero .actions { row-gap: 14px; }
+  .scroll-cue { display: none; }
+}

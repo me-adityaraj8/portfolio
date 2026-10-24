@@ -6,6 +6,8 @@ import { bestMatch } from '../src/lib/music.ts';
 
 const root = new URL('../', import.meta.url);
 const UA = { 'User-Agent': 'aditya-portfolio build (me.adityaraj8@gmail.com)' };
+const squash = (s) => s.toLowerCase().normalize('NFKD').replace(/[^a-z0-9$]+/g, ' ').trim();
+const titleMatches = (track, title) => squash(track).startsWith(squash(title));
 const slug = (s) => s.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const save = async (url, path) => {
   const res = await fetch(url, { headers: UA });
@@ -27,9 +29,22 @@ for (const t of personal.movies.titles) {
 
 const songs = [];
 for (const s of personal.music.songs) {
-  const q = encodeURIComponent(`${s.title} ${s.artist}`);
-  const results = (await (await fetch(`https://itunes.apple.com/search?term=${q}&entity=song&limit=15&country=in`)).json()).results ?? [];
-  const hit = bestMatch(results, s.title, s.artist);
+  // The title has to match too; otherwise any song by the artist would do. Try a few searches.
+  let hit = null;
+  for (const [term, country] of [[`${s.title} ${s.artist}`, 'in'], [`${s.title} ${s.artist}`, 'us'], [s.title, 'us'], [s.artist, 'us']]) {
+    const results = (await (await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=50&country=${country}`)).json()).results ?? [];
+    const best = bestMatch(results.filter((r) => titleMatches(r.trackName, s.title)), s.title, s.artist.split(/ & | feat\. /)[0]);
+    if (best) { hit = best; break; }
+  }
+  // Search misses some songs entirely; the artist's full catalogue still has them.
+  if (!hit) {
+    const lead = s.artist.split(/ & | feat\. /)[0];
+    const artist = (await (await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(lead)}&entity=musicArtist&limit=1&country=us`)).json()).results?.[0];
+    if (artist) {
+      const all = (await (await fetch(`https://itunes.apple.com/lookup?id=${artist.artistId}&entity=song&limit=200&country=us`)).json()).results ?? [];
+      hit = all.find((r) => r.wrapperType === 'track' && titleMatches(r.trackName, s.title) && r.previewUrl) ?? null;
+    }
+  }
   if (!hit) { console.log('no match:', s.title); continue; }
   const id = slug(`${s.artist}-${s.title}`);
   await save(hit.artworkUrl100.replace('100x100bb', '600x600bb'), `src/assets/covers/${id}.jpg`);

@@ -1,47 +1,89 @@
 {
-  "fetched": "2026-10-24T14:03:24.765Z",
+  "fetched": "2026-10-24T14:25:15.294Z",
   "songs": [
     {
-      "id": "the-weeknd-blinding-lights",
-      "title": "Blinding Lights",
-      "artist": "The Weeknd",
-      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0c/c5/03/0cc503b5-9299-b207-a13c-ba5358733c56/mzaf_18217607061023109918.plus.aac.p.m4a",
-      "link": "https://music.apple.com/in/album/blinding-lights/1499385848?i=1499386265&uo=4"
+      "id": "louis-armstrong-what-a-wonderful-world",
+      "title": "What a Wonderful World",
+      "artist": "Louis Armstrong",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/f0/28/3e/f0283e36-b2b5-ae0d-5276-9b55535cbdf4/mzaf_12728860797817529355.plus.aac.p.m4a",
+      "link": "https://music.apple.com/in/album/what-a-wonderful-world/1440787250?i=1440787254&uo=4"
     },
     {
-      "id": "the-weeknd-starboy",
-      "title": "Starboy",
-      "artist": "The Weeknd",
-      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/11/71/d6/1171d6ad-3c96-e027-2af6-58028426588c/mzaf_15137631797407745471.plus.aac.p.m4a",
-      "link": "https://music.apple.com/in/album/starboy-feat-daft-punk/1440870373?i=1440870375&uo=4"
+      "id": "miles-davis-so-what",
+      "title": "So What",
+      "artist": "Miles Davis",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/54/e8/0a/54e80a8b-1d60-6b59-e908-6fd65c4ff783/mzaf_2469862574651846302.plus.aac.p.m4a",
+      "link": "https://music.apple.com/in/album/so-what/268443092?i=268443097&uo=4"
     },
     {
-      "id": "the-neighbourhood-sweater-weather",
-      "title": "Sweater Weather",
-      "artist": "The Neighbourhood",
-      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b0/38/0c/b0380cab-0f01-9988-e994-17920afba750/mzaf_3083289112228470832.plus.aac.p.m4a",
-      "link": "https://music.apple.com/in/album/sweater-weather/1682583963?i=1682584224&uo=4"
+      "id": "the-dave-brubeck-quartet-take-five",
+      "title": "Take Five",
+      "artist": "The Dave Brubeck Quartet",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/20/7b/54/207b54c3-8e3b-b423-f4d6-78b8e4755584/mzaf_2319149165237089400.plus.aac.p.m4a",
+      "link": "https://music.apple.com/in/album/take-five/292800458?i=292800466&uo=4"
     },
     {
-      "id": "glass-animals-heat-waves",
-      "title": "Heat Waves",
-      "artist": "Glass Animals",
-      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a3/4c/b9/a34cb911-40fc-5f0c-e862-14bd171a77aa/mzaf_384792072030970151.plus.aac.p.m4a",
-      "link": "https://music.apple.com/in/album/heat-waves/1508562310?i=1508562516&uo=4"
+      "id": "childish-gambino-redbone",
+      "title": "Redbone",
+      "artist": "Childish Gambino",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/05/f1/e2/05f1e25b-aa46-5a60-040a-a8d52483d487/mzaf_5014076935652388885.plus.aac.p.m4a",
+      "link": "https://music.apple.com/us/album/redbone/1771719334?i=1771719595&uo=4"
     },
     {
-      "id": "ritviz-udd-gaye",
-      "title": "Udd Gaye",
-      "artist": "Ritviz",
-      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/20/a3/0f/20a30fea-e620-8d75-384d-2e06daed5943/mzaf_13309941552269230484.plus.aac.p.m4a",
-      "link": "https://music.apple.com/in/album/udd-gaye/1550578434?i=1550578437&uo=4"
+      "id": "silk-sonic-leave-the-door-open",
+      "title": "Leave the Door Open",
+      "artist": "Silk Sonic",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ba/43/f5/ba43f52f-2bb0-4cde-a5d0-89fc01ec14d7/mzaf_1992637601291938921.plus.aac.p.m4a",
+      "link": "https://music.apple.com/in/album/leave-the-door-open/1612867237?i=1612867242&uo=4"
     },
     {
-      "id": "anuv-jain-baarishein",
-      "title": "Baarishein",
-      "artist": "Anuv Jain",
-      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/de/84/d5/de84d517-ca82-fcc6-528e-2397c866d31c/mzaf_15371366101597876011.plus.aac.p.m4a",
-      "link": "https://music.apple.com/in/album/baarishein/1708026322?i=1708026325&uo=4"
+      "id": "fkj-masego-tadow",
+      "title": "Tadow",
+      "artist": "FKJ & Masego",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/79/84/5a/79845aff-d45c-150c-57a6-78eb4da1bff2/mzaf_12662196009080274370.plus.aac.p.m4a",
+      "link": "https://music.apple.com/in/album/tadow/1794863649?i=1794863655&uo=4"
+    },
+    {
+      "id": "a-ap-rocky-l-d",
+      "title": "L$D",
+      "artist": "A$AP Rocky",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/51/84/1c/51841cf5-e1b9-8b90-6c0e-daba3bd14d34/mzaf_4970177553591423769.plus.aac.p.m4a",
+      "link": "https://music.apple.com/in/album/l%24d/994721471?i=994721492&uo=4"
+    },
+    {
+      "id": "playboi-carti-location",
+      "title": "Location",
+      "artist": "Playboi Carti",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e2/20/64/e2206423-3b14-9183-d201-5421e71bbe73/mzaf_16665617739537084838.plus.aac.p.m4a",
+      "link": "https://music.apple.com/us/album/location/1440887343?i=1440887503&uo=4"
+    },
+    {
+      "id": "yung-lean-kyoto",
+      "title": "Kyoto",
+      "artist": "Yung Lean",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a9/f2/b2/a9f2b243-c89f-736c-975f-4bb1e8570253/mzaf_16934119159605979425.plus.aac.p.m4a",
+      "link": "https://music.apple.com/us/album/kyoto/1615432265?i=1615432326&uo=4"
+    },
+    {
+      "id": "daft-punk-get-lucky",
+      "title": "Get Lucky",
+      "artist": "Daft Punk",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/72/53/10/725310b8-0e82-9d20-8898-0f1fc47b4cd9/mzaf_13147817334462660235.plus.aac.p.m4a",
+      "link": "https://music.apple.com/in/album/get-lucky/1673536063?i=1673536443&uo=4"
+    },
+    {
+      "id": "dua-lipa-don-t-start-now",
+      "title": "Don't Start Now",
+      "artist": "Dua Lipa",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/fc/1e/ae/fc1eae79-916e-c6a0-3ab1-0f8fd4369b4d/mzaf_12281477982718028773.plus.aac.p.m4a",
+      "link": "https://music.apple.com/in/album/dont-start-now/1552269067?i=1552269070&uo=4"
+    },
+    {
+      "id": "modjo-lady-hear-me-tonight",
+      "title": "Lady (Hear Me Tonight)",
+      "artist": "Modjo",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/39/a0/2a/39a02a04-7e77-c309-9128-02e61098a7b7/mzaf_7220909039799435982.plus.aac.p.m4a",
+      "link": "https://music.apple.com/in/album/lady-hear-me-tonight/692624255?i=692624266&uo=4"
     }
   ]
 }

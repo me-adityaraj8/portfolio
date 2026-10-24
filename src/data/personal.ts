@@ -61,14 +61,20 @@ export const personal = {
     title: 'Music & Random Frequencies',
     body: ["My music taste is all over the place, I like it that way. One minute it's smooth jazz, the next minute I'm floating in some synth-heavy alternate universe. No genre loyalty here, just vibes."],
     genres: ['Retro jazz', 'R&B', 'Acid jazz', 'Synth', 'Cloud rap', 'Nu-disco', 'Bollywood, occasionally'],
-    /** Songs with a 30-second preview each. Swap in your own. */
+    /** Songs with a 30-second preview each. Run `npm run sync:personal` after changing them. */
     songs: [
-      { title: 'Blinding Lights', artist: 'The Weeknd' },
-      { title: 'Starboy', artist: 'The Weeknd' },
-      { title: 'Sweater Weather', artist: 'The Neighbourhood' },
-      { title: 'Heat Waves', artist: 'Glass Animals' },
-      { title: 'Udd Gaye', artist: 'Ritviz' },
-      { title: 'Baarishein', artist: 'Anuv Jain' },
+      { title: 'What a Wonderful World', artist: 'Louis Armstrong' },
+      { title: 'So What', artist: 'Miles Davis' },
+      { title: 'Take Five', artist: 'The Dave Brubeck Quartet' },
+      { title: 'Redbone', artist: 'Childish Gambino' },
+      { title: 'Leave the Door Open', artist: 'Silk Sonic' },
+      { title: 'Tadow', artist: 'FKJ & Masego' },
+      { title: 'L$D', artist: 'A$AP Rocky' },
+      { title: 'Location', artist: 'Playboi Carti' },
+      { title: 'Kyoto', artist: 'Yung Lean' },
+      { title: 'Get Lucky', artist: 'Daft Punk' },
+      { title: "Don't Start Now", artist: 'Dua Lipa' },
+      { title: 'Lady (Hear Me Tonight)', artist: 'Modjo' },
     ] as Song[],
   },
 
@@ -80,13 +86,7 @@ export const personal = {
 
   sports: {
     title: 'Sports & Sweat',
-    body: ["I'm into the discipline of lifting, the thrill of competition, and the satisfaction of getting better at something."],
-    list: [
-      { name: 'Gym', note: 'The discipline of lifting' },
-      { name: 'Bodybuilding', note: 'Competitions, watched closely' },
-      { name: 'Badminton', note: 'Rallies I take a little too seriously. Where my competitive side shows up the most', star: true },
-      { name: 'Cricket', note: 'The occasional match' },
-    ],
+    body: ["Gym sessions, bodybuilding competitions, the occasional cricket match, and badminton rallies that I take a little too seriously. I'm into the discipline of lifting, the thrill of competition, and the satisfaction of getting better at something. Badminton is probably where my competitive side shows up the most."],
   },
 
   cooking: {
@@ -114,7 +114,7 @@ export const personal = {
 
   side: {
     title: 'Side Quests',
-    list: ['Football', 'Guitar'],
+    list: ['Gardening', 'Travelling', 'Socialising'],
     body: ["And whatever else catches my attention next. I'll keep adding things as I go."],
   },
 };

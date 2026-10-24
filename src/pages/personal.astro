@@ -1,7 +1,7 @@
 ---
 /**
  * Off the clock. An editorial page in numbered chapters, each laid out its own way:
- * a poster shelf, a record player, a pull quote, a scoreboard-style list, a feature
+ * a fanned poster wall, a record player, a pull quote, a feature
  * card, a photo spread. Text is mine (src/data/personal.ts); images are real.
  */
 import type { ImageMetadata } from 'astro';
@@ -57,7 +57,7 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
         <h2 id="h-movies">{p.movies.title}</h2>
         <div class="ch-body">{p.movies.body.map((t) => <p>{t}</p>)}</div>
       </div>
-      <ul class="shelf">
+      <ul class="shelf" style={`--n:${p.movies.titles.length}`}>
         {p.movies.titles.map((t, i) => (
           <li style={`--i:${i};--fg:${t.tone[0]};--bg:${t.tone[1]}`}>
             <button type="button" class="poster" data-title={t.id} aria-haspopup="dialog" aria-label={`${t.title}, ${t.kind.toLowerCase()}, ${t.year}. Open details`}>
@@ -65,10 +65,10 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
                 ? <Image src={posters[t.id]} widths={[220]} alt="" loading="lazy" />
                 : <span class="poster-type"><span class="poster-kind">{t.kind}</span><b>{t.title}</b><span class="poster-year">{t.year}</span></span>}
             </button>
-            <span class="poster-cap"><b>{t.title}</b>{t.year}</span>
           </li>
         ))}
       </ul>
+      <p class="shelf-hint">Pick a poster for the details.</p>
     </section>
 
     <dialog class="sheet" id="title-sheet" aria-labelledby="sheet-title">
@@ -97,10 +97,12 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
 
     <!-- 02 Music: words on the left, a record player on the right. -->
     <section class="ch ch-music" id="music" aria-labelledby="h-music" data-reveal-ch>
-      <div class="music-copy">
+      <div class="ch-head">
         <span class="ch-no">{no('music')}</span>
-        <h2 id="h-music">{p.music.title}</h2>
-        <div class="ch-body">{p.music.body.map((t) => <p>{t}</p>)}</div>
+        <div>
+          <h2 id="h-music">{p.music.title}</h2>
+          <div class="ch-body music-body">{p.music.body.map((t) => <p>{t}</p>)}</div>
+        </div>
         <p class="genres" aria-label="Genres">
           {p.music.genres.map((g, i) => <span class:list={['genre', `g${i % 4}`]}>{g}</span>)}
         </p>
@@ -141,22 +143,13 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
       <div class="ch-body ch-body--center">{p.singing.body.map((t) => <p>{t}</p>)}</div>
     </section>
 
-    <!-- 04 Sports: a scoreboard-style index. -->
+    <!-- 04 Sports. -->
     <section class="ch ch-sports" id="sports" aria-labelledby="h-sports" data-reveal-ch>
       <div class="ch-head">
         <span class="ch-no">{no('sports')}</span>
         <h2 id="h-sports">{p.sports.title}</h2>
         <div class="ch-body">{p.sports.body.map((t) => <p>{t}</p>)}</div>
       </div>
-      <ol class="board">
-        {p.sports.list.map((s, i) => (
-          <li class:list={[{ star: s.star }]}>
-            <span class="board-no">{String(i + 1).padStart(2, '0')}</span>
-            <span class="board-name">{s.name}</span>
-            <span class="board-note">{s.note}</span>
-          </li>
-        ))}
-      </ol>
     </section>
 
     <!-- 05 Cooking: the favourite gets the spotlight. -->
@@ -251,8 +244,10 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
   </main>
 
   <script>
+    import Lenis from 'lenis';
     import { gsap } from 'gsap';
     import { ScrollTrigger } from 'gsap/ScrollTrigger';
+    import { SplitText } from 'gsap/SplitText';
 
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const $ = (s: string) => document.querySelector<HTMLElement>(s);
@@ -261,22 +256,69 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
     const io = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle('on', e.isIntersecting)), { rootMargin: '0px 0px -15% 0px' });
     document.querySelectorAll('[data-reveal-ch]').forEach((c) => io.observe(c));
 
+    // Same motion as the home page: smooth scrolling, titles that rise letter by letter,
+    // and groups that arrive one item after another.
+    const bar = document.getElementById('progress');
+    const progress = () => {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      if (bar) bar.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
+    };
+    addEventListener('scroll', progress, { passive: true });
+    progress();
+
+    let lenis: Lenis | null = null;
     if (!reduced) {
-      gsap.registerPlugin(ScrollTrigger);
-      gsap.from('.pp-hero-copy > *', { y: 26, opacity: 0, duration: 1.1, ease: 'expo.out', stagger: 0.08 });
-      gsap.from('.pp-hero-stack figure', { y: 60, opacity: 0, duration: 1.4, ease: 'expo.out', stagger: 0.12, delay: 0.2, clearProps: 'opacity' });
+      gsap.registerPlugin(ScrollTrigger, SplitText);
+      lenis = new Lenis({ lerp: 0.09, anchors: { offset: -72 } });
+      lenis.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add((t) => lenis!.raf(t * 1000));
+      gsap.ticker.lagSmoothing(0);
+
+      const EASE = 'expo.out';
+      const name = SplitText.create('.pp-hero h1', { type: 'words' });
+      gsap.timeline({ defaults: { ease: EASE } })
+        .from('.pp-hero .eyebrow', { y: 16, opacity: 0, duration: 0.9 })
+        .from(name.words, { yPercent: 45, opacity: 0, rotateX: -60, filter: 'blur(14px)', transformOrigin: '50% 100%', transformPerspective: 900, duration: 1.5, stagger: 0.14, onComplete: () => name.revert() }, '<0.1')
+        .from(['.pp-hero-intro', '.toc a'], { y: 20, opacity: 0, duration: 1, stagger: 0.04 }, '<0.5')
+        .from('.pp-hero-stack figure', { y: 80, opacity: 0, duration: 1.4, stagger: 0.12, clearProps: 'opacity' }, '<-0.6');
+
+      // Chapter titles rise in, letter by letter.
+      for (const el of document.querySelectorAll<HTMLElement>('.ch h2, .pp-end h2')) {
+        const split = SplitText.create(el, { type: 'words,chars', mask: 'words' });
+        gsap.from(split.chars, { yPercent: 110, duration: 1.1, ease: EASE, stagger: 0.018, scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+      }
+      // Everything else in a chapter fades up.
       gsap.utils.toArray<HTMLElement>('[data-reveal-ch]').forEach((ch) => {
-        gsap.from(ch.querySelectorAll('.ch-no, h2, .ch-body, .pull'), { y: 30, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.07, scrollTrigger: { trigger: ch, start: 'top 82%', once: true } });
+        gsap.from(ch.querySelectorAll('.ch-no, .ch-body, .pull, .genres, .also'), { y: 30, opacity: 0, duration: 1, ease: EASE, stagger: 0.08, scrollTrigger: { trigger: ch, start: 'top 80%', once: true } });
       });
-      gsap.from('.shelf li', { y: 50, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.06, clearProps: 'transform,opacity', scrollTrigger: { trigger: '.shelf', start: 'top 88%', once: true } });
-      gsap.from('.board li', { x: -40, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.09, clearProps: 'transform,opacity', scrollTrigger: { trigger: '.board', start: 'top 85%', once: true } });
-      gsap.from('.spread .sp', { y: 60, opacity: 0, duration: 1.2, ease: 'expo.out', stagger: 0.1, clearProps: 'transform,opacity', scrollTrigger: { trigger: '.spread', start: 'top 85%', once: true } });
+      // Groups that arrive one after another.
+      const groups: Array<[string, gsap.TweenVars]> = [
+        ['.shelf .poster', { y: 80, opacity: 0, rotate: 6 }],
+        ['.track', { y: 18, opacity: 0 }],
+        ['.spread .sp', { y: 70, opacity: 0, scale: 0.96 }],
+        ['.spines span', { scaleY: 0, transformOrigin: 'bottom' }],
+        ['.quests span', { y: 40, opacity: 0 }],
+      ];
+      for (const [sel, from] of groups) {
+        const items = gsap.utils.toArray<HTMLElement>(sel);
+        if (!items.length) continue;
+        gsap.from(items, { ...from, duration: 1.1, ease: EASE, stagger: 0.06, clearProps: 'transform,opacity', scrollTrigger: { trigger: items[0], start: 'top 90%', once: true } });
+      }
+      for (const sel of ['.deck', '.fav', '.term', '.pp-end']) {
+        gsap.from(sel, { y: 60, opacity: 0, scale: 0.97, duration: 1.2, ease: EASE, clearProps: 'transform,opacity', scrollTrigger: { trigger: sel, start: 'top 88%', once: true } });
+      }
+      // Photos drift gently against the scroll.
+      gsap.utils.toArray<HTMLElement>('.photo img').forEach((img) => {
+        img.style.scale = '1.14';
+        gsap.fromTo(img, { yPercent: -6 }, { yPercent: 6, ease: 'none', scrollTrigger: { trigger: img, start: 'top bottom', end: 'bottom top', scrub: true } });
+      });
     }
 
     // Dialogs: one sheet for titles, one lightbox for photos.
     const open = (d: HTMLDialogElement, from: HTMLElement) => {
       d.showModal();
-      d.addEventListener('close', () => from.focus({ preventScroll: true }), { once: true });
+      lenis?.stop();
+      d.addEventListener('close', () => { lenis?.start(); from.focus({ preventScroll: true }); }, { once: true });
     };
     document.querySelectorAll<HTMLDialogElement>('dialog.sheet, dialog.lightbox').forEach((d) => {
       d.addEventListener('click', (e) => { if (e.target === d || (e.target as Element).closest('[data-close]')) d.close(); });
@@ -326,7 +368,7 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
   </script>
 
   <style>
-    .pp { max-width: 1240px; margin: 0 auto; padding: 140px 32px 96px; }
+    .pp { max-width: 1240px; margin: 0 auto; padding: 140px 32px 96px; overflow-x: clip; }
     .eyebrow { margin: 0; font: 500 12px var(--cond); letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3); }
 
     /* Hero: big type on the left, three of my photos fanned on the right. */
@@ -362,19 +404,20 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
     .also { margin: 18px 0 0; font-size: 15px; color: var(--ink-3); }
     .also a { color: var(--glow); }
 
-    /* 01 Posters. */
-    .shelf { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
-    .shelf li { display: grid; gap: 10px; align-content: start; }
-    .poster { position: relative; display: block; aspect-ratio: 2 / 3; width: 100%; border-radius: 10px; overflow: hidden; background: var(--bg); box-shadow: 0 16px 40px rgb(0 0 0 / 0.45);
-      transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease); }
+    /* 01 Posters: a fanned wall sized to its row, so it never scrolls sideways. */
+    .shelf { container-type: inline-size; display: flex; justify-content: center; margin: 0; padding: 30px 4% 10px; list-style: none; }
+    .shelf li { --w: calc(100cqi / (var(--n) * 0.74 + 0.26)); flex: none; width: var(--w); max-width: 168px; margin-right: calc(var(--w) * -0.26); position: relative; z-index: calc(var(--n) - var(--i));
+      transform: rotate(calc((var(--i) - (var(--n) - 1) / 2) * 3deg)) translateY(calc(abs(var(--i) - (var(--n) - 1) / 2) * 5px)); transform-origin: 50% 120%; transition: transform 0.5s var(--ease); }
+    .shelf li:last-child { margin-right: 0; }
+    .shelf li:hover, .shelf li:focus-within { z-index: 20; transform: rotate(0) translateY(-18px) scale(1.08); }
+    .poster { position: relative; display: block; aspect-ratio: 2 / 3; width: 100%; border-radius: 10px; overflow: hidden; background: var(--bg); box-shadow: 0 18px 44px rgb(0 0 0 / 0.55); transition: box-shadow 0.5s var(--ease); }
     .poster img { display: block; width: 100%; height: 100%; object-fit: cover; }
     .poster::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12); background: linear-gradient(160deg, rgb(255 255 255 / 0.14), transparent 40%); pointer-events: none; }
-    .poster:hover, .poster:focus-visible { transform: translateY(-10px) rotate(-1.5deg); box-shadow: 0 26px 60px rgb(0 0 0 / 0.6), 0 0 0 2px var(--fg); outline: none; }
-    .poster-cap { display: grid; gap: 2px; font-size: 12px; color: var(--ink-4); }
-    .poster-cap b { font-size: 13px; font-weight: 500; color: var(--ink-2); }
+    .poster:hover, .poster:focus-visible { box-shadow: 0 26px 60px rgb(0 0 0 / 0.65), 0 0 0 2px var(--fg); outline: none; }
+    .shelf-hint { margin: 26px 0 0; text-align: center; font-size: 13px; color: var(--ink-4); }
     .poster-type { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 12px; text-align: left;
       background: radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--fg) 30%, var(--bg)), var(--bg) 70%); }
-    .poster-type b { font: 700 clamp(18px, 2vw, 26px)/0.95 var(--display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg); }
+    .poster-type b { font: 700 clamp(11px, 1.8vw, 24px)/0.95 var(--display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg); }
     .poster-kind, .poster-year { font: 600 10px var(--cond); letter-spacing: 0.2em; text-transform: uppercase; color: color-mix(in srgb, var(--fg) 70%, transparent); }
     .poster-type--big b { font-size: 40px; }
 
@@ -409,14 +452,14 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
     .lightbox .sheet-close { top: -6px; right: -6px; }
 
     /* 02 Music. */
-    .ch-music { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: center; }
-    .music-copy .ch-body { margin-top: 20px; }
-    .genres { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 18px; margin: 26px 0 0; line-height: 1.1; }
+    .music-body { margin-top: 20px; }
+    .ch-music .ch-head { align-items: end; }
+    .genres { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 18px; margin: 0; line-height: 1.1; }
     .genre { font-family: var(--display); letter-spacing: -0.02em; }
     .g0 { font-size: 30px; font-weight: 700; color: #f472b6; } .g1 { font-size: 22px; font-weight: 500; color: var(--ink-2); }
     .g2 { font-size: 34px; font-weight: 700; color: #c084fc; } .g3 { font-size: 20px; font-weight: 500; color: #38bdf8; }
     .genre:last-child { font: 400 17px var(--sans); color: var(--ink-3); letter-spacing: 0; }
-    .deck { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 28px; align-items: center; padding: 28px; border: 1px solid var(--hair-2); border-radius: 22px;
+    .deck { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 40px; align-items: center; padding: 32px; border: 1px solid var(--hair-2); border-radius: 22px;
       background: radial-gradient(400px 260px at 0% 0%, rgb(244 114 182 / 0.1), transparent 70%), var(--bg-2); }
     .turntable { position: relative; width: 220px; height: 220px; }
     .record { position: absolute; inset: 0; border-radius: 50%; display: grid; place-items: center;
@@ -430,7 +473,7 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
     .deck.playing .tonearm { transform: rotate(22deg); }
     .playlist-head { white-space: nowrap; }
     .playlist-hint { margin: 4px 0 12px; font-size: 13px; color: var(--ink-4); }
-    .playlist ol { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+    .playlist ol { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 2px 12px; margin: 0; padding: 0; list-style: none; }
     .track { display: grid; grid-template-columns: 40px minmax(0, 1fr) 22px; gap: 12px; align-items: center; width: 100%; padding: 7px 8px; border-radius: 10px; text-align: left; transition: background 0.2s; }
     .track:hover, .track[aria-pressed='true'] { background: rgb(var(--ink-rgb) / 0.06); }
     .track :global(.track-art) { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
@@ -452,21 +495,8 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
     .pull--small { max-width: none; margin: 22px 0; font-size: clamp(26px, 3vw, 38px); background: linear-gradient(90deg, #818cf8, #38bdf8); -webkit-background-clip: text; background-clip: text; }
     .wave { display: flex; align-items: center; gap: 3px; height: 80px; margin: 40px auto 36px; max-width: 760px; }
     .wave span { flex: 1; height: calc(var(--h) * 100%); border-radius: 3px; background: linear-gradient(180deg, #fb923c, #f472b6); opacity: 0.75; }
-    .ch-singing.on .wave span { animation: sway 1.2s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -61ms); }
+        .ch-singing.on .wave span { animation: sway 1.2s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -61ms); }
     @keyframes sway { from { transform: scaleY(0.2); } to { transform: scaleY(1); } }
-
-    /* 04 Sports. */
-    .board { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--hair-2); }
-    .board li { position: relative; display: grid; grid-template-columns: 60px minmax(0, 1.35fr) minmax(0, 0.65fr); gap: 20px; align-items: center; padding: 22px 8px; border-bottom: 1px solid var(--hair-2); overflow: hidden; }
-    .board li::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(52 211 153 / 0.14), transparent); transform: scaleX(0); transform-origin: left; transition: transform 0.6s var(--ease); }
-    .board li:hover::before { transform: none; }
-    .board li > * { position: relative; }
-    .board-no { font: 600 14px var(--cond); letter-spacing: 0.14em; color: var(--ink-4); }
-    .board-name { font: 700 clamp(28px, 4.2vw, 54px)/1 var(--display); letter-spacing: -0.03em; text-transform: uppercase; color: var(--ink); transition: color 0.3s; }
-    .board li:hover .board-name { color: #34d399; }
-    .board-note { font-size: 16px; color: var(--ink-3); }
-    .board li.star .board-name { color: #34d399; }
-    .board li.star .board-note { color: var(--ink); }
 
     /* 05 Cooking. */
     .ch-cooking { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: 64px; align-items: center; }
@@ -491,8 +521,8 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
     .sp3 { grid-column: 6 / span 3; grid-row: 4 / span 4; }
     .sp4 { grid-column: 9 / span 4; grid-row: 5 / span 3; }
     .photo { display: block; width: 100%; height: 100%; border-radius: 16px; overflow: hidden; background: var(--card); }
-    .photo img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 1s var(--ease); }
-    .photo:hover img, .photo:focus-visible img { transform: scale(1.05); }
+    .photo img { display: block; width: 100%; height: 100%; object-fit: cover; transition: scale 1s var(--ease); }
+    .photo:hover img, .photo:focus-visible img { scale: 1.2 !important; }
     .photo-cap { font-size: 13px; color: var(--ink-3); }
 
     /* 07 Reading. */
@@ -526,8 +556,8 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
     /* 09 Side quests. */
     .ch-side { text-align: center; }
     .quests { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 6px 28px; margin: 22px 0 26px; }
-    .quests span { font: 700 clamp(40px, 6vw, 84px)/1 var(--display); letter-spacing: -0.035em; text-transform: uppercase; }
-    .quests span:nth-child(1) { color: #facc15; } .quests span:nth-child(2) { color: #34d399; }
+    .quests span { font: 700 clamp(30px, 5.4vw, 72px)/1 var(--display); letter-spacing: -0.035em; text-transform: uppercase; }
+    .quests span:nth-child(1) { color: #34d399; } .quests span:nth-child(2) { color: #38bdf8; } .quests span:nth-child(3) { color: #f472b6; }
     .quests .quests-more { font: 400 20px var(--sans); letter-spacing: 0; text-transform: none; color: var(--ink-3); }
 
     /* End. */
@@ -538,9 +568,7 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
     .pp-links { display: flex; justify-content: center; align-items: center; gap: 22px; margin-top: 30px !important; }
 
     @media (max-width: 1099px) {
-      .shelf { grid-template-columns: repeat(9, 150px); overflow-x: auto; padding: 12px 4px 14px; scroll-snap-type: x mandatory; scrollbar-width: thin; }
-      .shelf li { scroll-snap-align: start; }
-      .ch-music, .ch-cooking, .ch-coding, .ch-reading { grid-template-columns: 1fr; gap: 40px; }
+      .ch-cooking, .ch-coding, .ch-reading { grid-template-columns: 1fr; gap: 40px; }
       .spines { order: 2; height: 200px; }
     }
     @media (max-width: 899px) {
@@ -551,10 +579,15 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
       .toc { grid-template-columns: repeat(2, auto); }
       .ch { padding-top: 88px; }
       .ch-head { grid-template-columns: 1fr; margin-bottom: 32px; }
-      .deck { grid-template-columns: 1fr; justify-items: center; padding: 22px; }
+      .deck { grid-template-columns: 1fr; justify-items: center; padding: 22px 16px; }
+      .turntable { width: 190px; height: 190px; }
       .playlist { width: 100%; }
-      .board li { grid-template-columns: 40px minmax(0, 1fr); padding: 18px 4px; }
-      .board-note { grid-column: 2; font-size: 15px; }
+      .shelf { padding-top: 16px; }
+    }
+    @media (max-width: 599px) {
+      /* On phones the fan becomes a loose, tilted 3 x 3 pile instead of tiny slivers. */
+      .shelf { flex-wrap: wrap; gap: 14px 10px; padding: 10px 2px 0; }
+      .shelf li { --w: calc((100cqi - 24px) / 3); max-width: none; margin-right: 0; z-index: auto; transform: rotate(calc((var(--i) % 3 - 1) * 2.5deg)) translateY(calc((var(--i) % 2) * 6px)); }
       .fav { padding: 36px 26px 30px; }
       .spread { grid-template-columns: 1fr 1fr; grid-auto-rows: auto; }
       .sp { grid-column: auto !important; grid-row: auto !important; }
