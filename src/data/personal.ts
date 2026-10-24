@@ -1,20 +1,83 @@
 /**
- * The personal page at /personal. Fill in your own picks; a group with no items stays
- * hidden, and the footer link appears once any group has something in it.
- * `note` is optional: a line on why, shown under the name.
+ * The personal page at /personal, in my own words. `tags` are the named favourites,
+ * shown as chips under the text. Add a group and it appears; the footer links here
+ * as long as there's at least one.
  */
-export interface Pick { name: string; note?: string }
-export interface Group { title: string; blurb: string; tone: [string, string]; items: Pick[] }
+export interface Group { title: string; body: string[]; tags?: string[]; tone: [string, string] }
 
 export const personal = {
-  intro: 'What I do when I am not shipping something.',
+  intro: "What I'm into when I'm not shipping something. Consider it a work in progress, much like literally everything else.",
   groups: [
-    { title: 'Music', blurb: 'On repeat lately', tone: ['#f472b6', '#c084fc'], items: [] },
-    { title: 'Sports', blurb: 'Playing and watching', tone: ['#34d399', '#22d3ee'], items: [] },
-    { title: 'Movies and shows', blurb: 'Watched more than once', tone: ['#fbbf24', '#f97316'], items: [] },
-    { title: 'Books', blurb: 'Worth the time', tone: ['#818cf8', '#38bdf8'], items: [] },
-    { title: 'Also into', blurb: 'Everything else', tone: ['#a78bfa', '#f472b6'], items: [] },
+    {
+      title: 'Movies, Shows & Losing the Plot',
+      tone: ['#f43f5e', '#a855f7'],
+      body: [
+        "Psychological thrillers, mind-bending sci-fi, horror, dark plots, and characters who desperately need therapy. Basically, if the ending makes me stare at the screen for 10 minutes, I'm sold. I will overanalyze the plot, read fan theories, and probably still miss something obvious.",
+        'Horror movies get a separate pass because apparently I enjoy being scared for fun.',
+      ],
+      tags: ['Fight Club', 'Shutter Island', 'Interstellar', 'Inception', 'Black Swan', 'Dark', 'Breaking Bad', 'Better Call Saul', 'The Sopranos'],
+    },
+    {
+      title: 'Music & Random Frequencies',
+      tone: ['#f472b6', '#c084fc'],
+      body: [
+        'My music taste is all over the place, and honestly, I like it that way. One minute it\'s smooth jazz, the next minute I\'m floating in some synth-heavy alternate universe. No genre loyalty here, just vibes.',
+      ],
+      tags: ['Retro jazz', 'R&B', 'Acid jazz', 'Synth', 'Cloud rap', 'Nu-disco', 'Bollywood, occasionally'],
+    },
+    {
+      title: 'Singing, Just Because',
+      tone: ['#fb923c', '#f472b6'],
+      body: [
+        "I love singing. Sometimes it's about getting a song just right, sometimes it's just me, my headphones, and a song on repeat. No special occasion needed, no audience required. If I like a song enough, there's a good chance I'll try singing it too. Bonus points if there's a guitar involved.",
+      ],
+    },
+    {
+      title: 'Sports & Sweat',
+      tone: ['#34d399', '#22d3ee'],
+      body: [
+        "Gym sessions, bodybuilding competitions, the occasional cricket match, and badminton rallies that I take a little too seriously. I'm into the discipline of lifting, the thrill of competition, and the satisfaction of getting better at something. Badminton is probably where my competitive side shows up the most.",
+      ],
+      tags: ['Gym', 'Bodybuilding', 'Badminton', 'Cricket'],
+    },
+    {
+      title: 'Cooking > Ordering In',
+      tone: ['#fbbf24', '#f97316'],
+      body: [
+        'I LOVE cooking. Trying recipes, messing around with spices, and making something ridiculously good out of random ingredients is my kind of fun. Give me a kitchen and some time, and ordering food might just become a very unnecessary expense.',
+      ],
+      tags: ['Biryani', 'Butter chicken'],
+    },
+    {
+      title: 'Self-Help & Other Attempts at Getting My Life Together',
+      tone: ['#818cf8', '#38bdf8'],
+      body: [
+        'Mostly self-help and personal development books. Apparently, I believe the next book might finally unlock the secret to having my life completely figured out. Spoiler: still working on it. But hey, picking up a useful idea here and there can\'t hurt.',
+      ],
+    },
+    {
+      title: 'Photography & Random Things That Look Cool',
+      tone: ['#2dd4bf', '#818cf8'],
+      body: [
+        'I take photos, collect interesting visuals, and occasionally see something and think, "wait, that would make a sick picture." Still exploring this whole photography thing, so expect more experiments, random frames, and probably too many pictures of things that caught my eye.',
+      ],
+    },
+    {
+      title: 'Coding Things Into Existence',
+      tone: ['#a78bfa', '#22d3ee'],
+      body: [
+        "I get an idea, convince myself it'll be a quick project, open my laptop, and suddenly it's 3 AM and I'm debugging something completely unrelated. Websites, AI experiments, random tools, ambitious side projects: if it sounds interesting enough, I probably want to build it. Whether I finish it before getting another idea is a different story.",
+      ],
+    },
+    {
+      title: 'Side Quests',
+      tone: ['#facc15', '#34d399'],
+      body: [
+        "Football, guitar, and whatever else catches my attention next. My interests don't follow a roadmap, and neither does this section. I'll keep adding things as I go.",
+      ],
+      tags: ['Football', 'Guitar'],
+    },
   ] as Group[],
 };
 
-export const hasPersonal = personal.groups.some((g) => g.items.length > 0);
+export const hasPersonal = personal.groups.length > 0;
