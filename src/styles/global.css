@@ -378,6 +378,9 @@ a.tl-org { cursor: pointer; }
 .demo[open] ~ .cursor, .palette[open] ~ .cursor { display: none; }
 html.fine body, html.fine a, html.fine button, html.fine .chip, html.fine .topic, html.fine .tl-org { cursor: none; }
 html.fine textarea, html.fine input { cursor: text; }
+/* The ring can't paint above an open dialog, so dialogs get the system pointer back. */
+html.fine dialog { cursor: auto; }
+html.fine dialog :is(a, button) { cursor: pointer; }
 a, button, .chip, .pill, .button { transition-property: color, background, border-color, box-shadow, transform; transition-duration: 0.3s; transition-timing-function: var(--ease); }
 
 /* ── Spotlight and tilt on cards. */

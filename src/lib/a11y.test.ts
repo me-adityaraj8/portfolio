@@ -21,3 +21,12 @@ describe.each([
     expect(contrastRatio(fg, card)).toBeGreaterThanOrEqual(4.5);
   });
 });
+
+// The custom cursor ring can't paint above an open <dialog> (top layer) and is hidden there,
+// so dialogs have to bring the system pointer back or it vanishes.
+test('dialogs show the system pointer', () => {
+  const rules = [...css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, sel, body]) => ({ sel: sel.trim(), body }));
+  const cursorFor = (sel: string) => rules.find((r) => r.sel === sel)?.body.match(/cursor:\s*([\w-]+)/)?.[1];
+  expect(cursorFor('html.fine dialog')).toBe('auto');
+  expect(cursorFor('html.fine dialog :is(a, button)')).toBe('pointer');
+});
