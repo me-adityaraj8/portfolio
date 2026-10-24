@@ -15,7 +15,7 @@ const action = d.demo ? 'Try it live' : 'Read the case study';
   <a class="card-hit" href={`/work/${project.id}`} data-open={project.id} data-demo={d.demo ?? ''} data-live={d.links.live ?? ''} data-title={d.title} aria-label={`${d.title}: ${action}`}></a>
   <div class="preview" aria-hidden="true">
     {d.shot && <Picture src={shot(d.shot)} formats={['avif', 'webp']} widths={[480, 960, 1440]} sizes="(max-width: 899px) 86vw, 480px" alt="" loading="lazy" decoding="async" />}
-    {d.demo === 'qr' && (
+    {d.demo === 'qr' && !d.shot && (
       <div class="mock mock--qr"><div class="qr" set:html={qr} /><p>github.com/me-adityaraj8/qrgen</p></div>
     )}
   </div>

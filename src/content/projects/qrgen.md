@@ -14,8 +14,9 @@ architecture:
     - [qr, guard]
     - [guard, out]
 order: 6
-accent: ['#f43f5e', '#facc15']
+accent: ['#6d28d9', '#2563eb']
 demo: qr
+shot: /shots/qrgen.webp
 title: QRGen
 date: 2026-10-18
 kind: project
