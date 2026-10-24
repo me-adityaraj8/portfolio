@@ -12,7 +12,8 @@
     "sync": "node scripts/sync-github.mjs",
     "sync:cp": "node scripts/sync-cp.mjs",
     "sync:contrib": "node scripts/sync-contrib.mjs",
-    "resume:pdf": "node scripts/resume-pdf.mjs"
+    "resume:pdf": "node scripts/resume-pdf.mjs",
+    "sync:personal": "node scripts/sync-personal.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

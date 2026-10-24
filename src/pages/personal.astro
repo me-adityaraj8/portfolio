@@ -1,144 +1,253 @@
 ---
 /**
- * Off the clock: one bento panel where every hobby gets its own small drawing,
- * then a strip of photos. Everything visual here is CSS and SVG, so nothing is borrowed.
+ * Off the clock. An editorial page in numbered chapters, each laid out its own way:
+ * a poster shelf, a record player, a pull quote, a scoreboard-style list, a feature
+ * card, a photo spread. Text is mine (src/data/personal.ts); images are real.
  */
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import { site } from '../data/site';
-import { personal } from '../data/personal';
+import { personal as p } from '../data/personal';
+import media from '../data/personal-media.json';
 
-const g = Object.fromEntries(personal.groups.map((x) => [x.id, x]));
+type Glob = Record<string, { default: ImageMetadata }>;
+const byName = (files: Glob) => Object.fromEntries(Object.entries(files).map(([f, m]) => [f.split('/').pop()!.replace(/\.[^.]+$/, ''), m.default]));
+const posters = byName(import.meta.glob<{ default: ImageMetadata }>('../assets/posters/*.jpg', { eager: true }));
+const covers = byName(import.meta.glob<{ default: ImageMetadata }>('../assets/covers/*.jpg', { eager: true }));
 const photos = Object.entries(import.meta.glob<{ default: ImageMetadata }>('../assets/photos/*.{jpg,jpeg,png,webp,avif}', { eager: true }))
   .sort(([a], [b]) => a.localeCompare(b))
-  .map(([file, mod]) => ({ src: mod.default, name: file.split('/').pop()!.replace(/\.[^.]+$/, '').replace(/^\d+[-_ ]*/, '').replace(/[-_]+/g, ' ') }));
-
-// Typographic posters for the films and shows: colours are mine, no artwork is used.
-const posterTones: Record<string, [string, string, string]> = {
-  'Fight Club': ['#f472b6', '#7c2d12', 'Film'], 'Shutter Island': ['#94a3b8', '#0f172a', 'Film'], Interstellar: ['#fbbf24', '#0c0a09', 'Film'],
-  Inception: ['#38bdf8', '#082f49', 'Film'], 'Black Swan': ['#f4f4f5', '#18181b', 'Film'], Dark: ['#fde68a', '#1c1917', 'Series'],
-  'Breaking Bad': ['#a3e635', '#14532d', 'Series'], 'Better Call Saul': ['#facc15', '#7f1d1d', 'Series'], 'The Sopranos': ['#ef4444', '#0a0a0a', 'Series'],
-};
-const rotating = ['cooking biryani.', 'singing along, badly or not.', 'at the gym.', 'overanalyzing a plot.', 'chasing a photo.', 'debugging at 3 AM.'];
-const bars = Array.from({ length: 42 }, (_, i) => 0.25 + Math.abs(Math.sin(i * 0.55) * Math.cos(i * 0.21)) * 0.75);
+  .map(([file, m]) => {
+    const raw = file.split('/').pop()!.replace(/\.[^.]+$/, '').replace(/^\d+[-_ ]*/, '').replace(/[-_]+/g, ' ');
+    return { src: m.default, caption: raw.charAt(0).toUpperCase() + raw.slice(1) };
+  });
+const songs = media.songs.filter((s) => covers[s.id]);
+const chapters = [
+  ['movies', 'Movies & shows'], ['music', 'Music'], ['singing', 'Singing'], ['sports', 'Sports'], ['cooking', 'Cooking'],
+  ['photography', 'Photography'], ['reading', 'Reading'], ['coding', 'Coding'], ['side-quests', 'Side quests'],
+];
+const no = (id: string) => String(chapters.findIndex(([c]) => c === id) + 1).padStart(2, '0');
+const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0.47) * Math.cos(i * 0.19)) * 0.82);
 ---
-<Base title={`Off the clock, ${site.name}`} description={personal.intro} page="personal" image="/og/home.png">
+<Base title={`Off the clock, ${site.name}`} description={p.intro} page="personal" image="/og/home.png">
   <main class="pp" id="main" tabindex="-1">
+
     <header class="pp-hero">
-      <p class="kicker">Off the clock</p>
-      <h1>
-        <span class="pp-line">When I'm not shipping,</span>
-        <span class="pp-line">I'm probably</span>
-        <span class="pp-rotor" aria-live="off"><span id="rotor">{rotating[0]}</span></span>
-      </h1>
-      <p class="pp-intro">{personal.intro}</p>
+      <div class="pp-hero-copy">
+        <p class="eyebrow">Off the clock</p>
+        <h1>The other<br />half.</h1>
+        <p class="pp-hero-intro">{p.intro}</p>
+        <nav class="toc" aria-label="On this page">
+          {chapters.map(([id, name], i) => <a href={`#${id}`}><span>{String(i + 1).padStart(2, '0')}</span>{name}</a>)}
+        </nav>
+      </div>
+      {photos.length >= 3 && (
+        <div class="pp-hero-stack" aria-hidden="true">
+          {photos.slice(0, 3).map((ph, i) => (
+            <figure style={`--i:${i}`}><Image src={ph.src} widths={[320, 640]} sizes="(max-width: 899px) 45vw, 300px" alt="" loading={i === 0 ? 'eager' : 'lazy'} /></figure>
+          ))}
+        </div>
+      )}
     </header>
 
-    <div class="bento">
-      <section class="cell c-movies" style={`--a:${g.movies.tone[0]}`} data-cell>
-        <div class="cell-text"><h2>{g.movies.title}</h2>{g.movies.body.map((p) => <p>{p}</p>)}</div>
-        <ul class="posters" aria-label="Favourite films and shows">
-          {g.movies.tags!.map((t, i) => {
-            const [fg, bg, kind] = posterTones[t] ?? ['#fff', '#111', 'Film'];
-            return <li style={`--fg:${fg};--bg:${bg};--i:${i};--n:${g.movies.tags!.length}`}><span class="poster-kind">{kind}</span><b>{t}</b><span class="poster-rule"></span></li>;
-          })}
-        </ul>
-      </section>
-
-      <section class="cell c-music" style={`--a:${g.music.tone[0]}`} data-cell>
-        <div class="cell-text"><h2>{g.music.title}</h2>{g.music.body.map((p) => <p>{p}</p>)}</div>
-        <div class="vinyl-wrap" aria-hidden="true">
-          <div class="sleeve"><span>Random<br />Frequencies</span></div>
-          <div class="vinyl"><div class="vinyl-label"><span>A</span></div></div>
-        </div>
-        <ul class="genres">{g.music.tags!.map((t) => <li>{t}</li>)}</ul>
-      </section>
-
-      <section class="cell c-singing" style={`--a:${g.singing.tone[0]}`} data-cell>
-        <div class="wave" aria-hidden="true">{bars.map((h, i) => <span style={`--h:${h.toFixed(2)};--i:${i}`}></span>)}</div>
-        <div class="cell-text"><h2>{g.singing.title}</h2>{g.singing.body.map((p) => <p>{p}</p>)}</div>
-      </section>
-
-      <section class="cell c-sports" style={`--a:${g.sports.tone[0]}`} data-cell>
-        <svg class="court" viewBox="0 0 320 150" aria-hidden="true">
-          <path class="court-arc" d="M20 120 Q160 -20 300 120" />
-          <line x1="160" y1="78" x2="160" y2="140" class="court-net" />
-          <line x1="0" y1="140" x2="320" y2="140" class="court-floor" />
-          <g class="shuttle"><circle r="5" /><path d="M-4 -3 L-16 -9 L-16 9 L-4 3 Z" /></g>
-        </svg>
-        <div class="cell-text"><h2>{g.sports.title}</h2>{g.sports.body.map((p) => <p>{p}</p>)}</div>
-        <ul class="tags">{g.sports.tags!.map((t) => <li>{t}</li>)}</ul>
-      </section>
-
-      <section class="cell c-cooking" style={`--a:${g.cooking.tone[0]}`} data-cell>
-        <div class="cell-text"><h2>{g.cooking.title}</h2>{g.cooking.body.map((p) => <p>{p}</p>)}</div>
-        <div class="recipes" aria-hidden="true">
-          {g.cooking.tags!.map((t, i) => (
-            <div class="recipe" style={`--i:${i}`}><span class="recipe-no">No. {String(i + 1).padStart(2, '0')}</span><b>{t}</b><span class="recipe-lines"></span><span class="recipe-stamp">House favourite</span></div>
-          ))}
-        </div>
-      </section>
-
-      <section class="cell c-books" style={`--a:${g.books.tone[0]}`} data-cell>
-        <div class="spines" aria-hidden="true">
-          {[['Self-help', 86, '#818cf8'], ['Habits', 70, '#38bdf8'], ['Focus', 92, '#a78bfa'], ['Mindset', 78, '#2dd4bf'], ['Life, figured out (soon)', 100, '#f472b6']].map(([t, w, c], i) => (
-            <span style={`--w:${w}%;--c:${c};--i:${i}`}>{t}</span>
-          ))}
-        </div>
-        <div class="cell-text"><h2>{g.books.title}</h2>{g.books.body.map((p) => <p>{p}</p>)}</div>
-      </section>
-
-      <section class="cell c-coding" style={`--a:${g.coding.tone[0]}`} data-cell>
-        <div class="cell-text"><h2>{g.coding.title}</h2>{g.coding.body.map((p) => <p>{p}</p>)}</div>
-        <div class="term" aria-hidden="true">
-          <div class="term-bar"><i></i><i></i><i></i><span>~/quick-project</span></div>
-          <pre><span class="t1"><b>$</b> npm run quick-project</span>
-<span class="t2"><em>21:04</em> this'll take an hour, tops</span>
-<span class="t3"><em>23:47</em> added auth. and a dark mode. and AI.</span>
-<span class="t4"><em>01:12</em> refactoring something nobody asked for</span>
-<span class="t5"><em>03:04</em> debugging something completely unrelated<span class="caret"></span></span></pre>
-        </div>
-      </section>
-
-      <section class="cell c-side" style={`--a:${g.side.tone[0]}`} data-cell>
-        <div class="cell-text"><h2>{g.side.title}</h2>{g.side.body.map((p) => <p>{p}</p>)}</div>
-        <ul class="quests">
-          {g.side.tags!.map((t) => <li><span class="q-check"></span>{t}</li>)}
-          <li class="q-next"><span class="q-dots"><i></i><i></i><i></i></span>Next quest loading</li>
-        </ul>
-      </section>
-    </div>
-
-    <section class="photos" aria-labelledby="ph-title" data-cell>
-      <div class="photos-head">
-        <div>
-          <p class="kicker">Through my lens</p>
-          <h2 id="ph-title">{g.photography.title}</h2>
-          {g.photography.body.map((p) => <p class="photos-text">{p}</p>)}
-        </div>
-        {photos.length > 3 && (
-          <div class="photos-nav"><button type="button" id="ph-prev" aria-label="Previous photos">←</button><button type="button" id="ph-next" aria-label="Next photos">→</button></div>
-        )}
+    <!-- 01 Movies: a shelf of posters; each opens a card. -->
+    <section class="ch ch-movies" id="movies" aria-labelledby="h-movies" data-reveal-ch>
+      <div class="ch-head">
+        <span class="ch-no">{no('movies')}</span>
+        <h2 id="h-movies">{p.movies.title}</h2>
+        <div class="ch-body">{p.movies.body.map((t) => <p>{t}</p>)}</div>
       </div>
-      {photos.length > 0 ? (
-        <ul class="strip" id="strip">
-          {photos.map((p) => (
-            <li><Image src={p.src} widths={[400, 800]} sizes="(max-width: 899px) 75vw, 340px" alt={p.name} loading="lazy" />{p.name && <span class="ph-cap">{p.name}</span>}</li>
-          ))}
-        </ul>
-      ) : (
-        <ul class="strip strip--empty" aria-label="Photos coming soon">
-          {[0, 1, 2, 3].map((i) => <li style={`--i:${i}`}><div class="vf"></div>{i === 0 && <p class="vf-note">Frames loading. Photos coming soon.</p>}</li>)}
-        </ul>
+      <ul class="shelf">
+        {p.movies.titles.map((t, i) => (
+          <li style={`--i:${i};--fg:${t.tone[0]};--bg:${t.tone[1]}`}>
+            <button type="button" class="poster" data-title={t.id} aria-haspopup="dialog" aria-label={`${t.title}, ${t.kind.toLowerCase()}, ${t.year}. Open details`}>
+              {posters[t.id]
+                ? <Image src={posters[t.id]} widths={[220]} alt="" loading="lazy" />
+                : <span class="poster-type"><span class="poster-kind">{t.kind}</span><b>{t.title}</b><span class="poster-year">{t.year}</span></span>}
+            </button>
+            <span class="poster-cap"><b>{t.title}</b>{t.year}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <dialog class="sheet" id="title-sheet" aria-labelledby="sheet-title">
+      <button type="button" class="sheet-close" data-close aria-label="Close">×</button>
+      {p.movies.titles.map((t) => (
+        <article class="sheet-card" data-card={t.id} hidden style={`--fg:${t.tone[0]};--bg:${t.tone[1]}`}>
+          <div class="sheet-art">
+            {posters[t.id]
+              ? <Image src={posters[t.id]} widths={[220]} alt={`${t.title} poster`} loading="lazy" />
+              : <span class="poster-type poster-type--big"><span class="poster-kind">{t.kind}</span><b>{t.title}</b><span class="poster-year">{t.year}</span></span>}
+          </div>
+          <div class="sheet-text">
+            <p class="eyebrow">{t.kind} · {t.genre}</p>
+            <h3 id={`sheet-${t.id}`}>{t.title}</h3>
+            <p class="sheet-premise">{t.premise}</p>
+            <dl>
+              <div><dt>{t.kind === 'Film' ? 'Released' : 'Ran'}</dt><dd>{t.year}</dd></div>
+              <div><dt>{t.kind === 'Film' ? 'Directed by' : 'Created by'}</dt><dd>{t.by}</dd></div>
+              <div><dt>{t.kind === 'Film' ? 'Runtime' : 'Length'}</dt><dd>{t.length}</dd></div>
+            </dl>
+          </div>
+        </article>
+      ))}
+      <h3 id="sheet-title" class="sr-only">Title details</h3>
+    </dialog>
+
+    <!-- 02 Music: words on the left, a record player on the right. -->
+    <section class="ch ch-music" id="music" aria-labelledby="h-music" data-reveal-ch>
+      <div class="music-copy">
+        <span class="ch-no">{no('music')}</span>
+        <h2 id="h-music">{p.music.title}</h2>
+        <div class="ch-body">{p.music.body.map((t) => <p>{t}</p>)}</div>
+        <p class="genres" aria-label="Genres">
+          {p.music.genres.map((g, i) => <span class:list={['genre', `g${i % 4}`]}>{g}</span>)}
+        </p>
+      </div>
+      {songs.length > 0 && (
+        <div class="deck" id="deck">
+          <div class="turntable" aria-hidden="true">
+            <div class="record" id="record">
+              <Image class="record-label" id="record-label" src={covers[songs[0].id]} widths={[160]} alt="" />
+            </div>
+            <span class="tonearm"></span>
+          </div>
+          <div class="playlist">
+            <p class="eyebrow playlist-head">A few favourites</p><p class="playlist-hint">Tap one to hear 30 seconds</p>
+            <ol>
+              {songs.map((s, i) => (
+                <li>
+                  <button type="button" class="track" data-src={s.preview} data-i={i} aria-pressed="false" aria-label={`Play a preview of ${s.title} by ${s.artist}`}>
+                    <Image src={covers[s.id]} widths={[96]} alt="" loading="lazy" class="track-art" />
+                    <span class="track-text"><b>{s.title}</b><span>{s.artist}</span></span>
+                    <span class="track-state" aria-hidden="true"><i></i><i></i><i></i></span>
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div hidden id="covers">{songs.map((s) => <Image src={covers[s.id]} widths={[160]} alt="" data-cover={s.id} />)}</div>
+        </div>
       )}
     </section>
 
-    <section class="pp-end">
-      <h2>Thanks for stopping by.</h2>
-      <p>That's the other half. Back to the part where I build things.</p>
-      <a class="button" href="/#work">See the work</a>
+    <!-- 03 Singing: one big line, and a waveform that sways. -->
+    <section class="ch ch-singing" id="singing" aria-labelledby="h-singing" data-reveal-ch>
+      <span class="ch-no">{no('singing')}</span>
+      <h2 id="h-singing" class="kicker-title">{p.singing.title}</h2>
+      <blockquote class="pull">“{p.singing.quote}”</blockquote>
+      <div class="wave" aria-hidden="true">{bars.map((h, i) => <span style={`--h:${h.toFixed(2)};--i:${i}`}></span>)}</div>
+      <div class="ch-body ch-body--center">{p.singing.body.map((t) => <p>{t}</p>)}</div>
     </section>
+
+    <!-- 04 Sports: a scoreboard-style index. -->
+    <section class="ch ch-sports" id="sports" aria-labelledby="h-sports" data-reveal-ch>
+      <div class="ch-head">
+        <span class="ch-no">{no('sports')}</span>
+        <h2 id="h-sports">{p.sports.title}</h2>
+        <div class="ch-body">{p.sports.body.map((t) => <p>{t}</p>)}</div>
+      </div>
+      <ol class="board">
+        {p.sports.list.map((s, i) => (
+          <li class:list={[{ star: s.star }]}>
+            <span class="board-no">{String(i + 1).padStart(2, '0')}</span>
+            <span class="board-name">{s.name}</span>
+            <span class="board-note">{s.note}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <!-- 05 Cooking: the favourite gets the spotlight. -->
+    <section class="ch ch-cooking" id="cooking" aria-labelledby="h-cooking" data-reveal-ch>
+      <div class="cook-copy">
+        <span class="ch-no">{no('cooking')}</span>
+        <h2 id="h-cooking">{p.cooking.title}</h2>
+        <div class="ch-body">{p.cooking.body.map((t) => <p>{t}</p>)}</div>
+        <p class="also">Also a regular in my kitchen: {p.cooking.also.join(', ').toLowerCase()}.</p>
+      </div>
+      <div class="fav">
+        <span class="fav-badge">All-time favourite</span>
+        <p class="fav-name">{p.cooking.favourite.name}</p>
+        <p class="fav-note">{p.cooking.favourite.note}</p>
+        <span class="steam" aria-hidden="true"><i></i><i></i><i></i></span>
+      </div>
+    </section>
+
+    <!-- 06 Photography: an asymmetric spread; each photo opens large. -->
+    {photos.length > 0 && (
+      <section class="ch ch-photos" id="photography" aria-labelledby="h-photos" data-reveal-ch>
+        <div class="ch-head">
+          <span class="ch-no">{no('photography')}</span>
+          <h2 id="h-photos">{p.photography.title}</h2>
+          <div class="ch-body">{p.photography.body.map((t) => <p>{t}</p>)}</div>
+        </div>
+        <ul class="spread">
+          {photos.map((ph, i) => (
+            <li class={`sp sp${i % 5}`}>
+              <button type="button" class="photo" data-photo={i} aria-haspopup="dialog" aria-label={`${ph.caption}. View larger`}>
+                <Image src={ph.src} widths={[480, 900, 1400]} sizes="(max-width: 899px) 92vw, 45vw" alt={ph.caption} loading="lazy" />
+              </button>
+              <span class="photo-cap">{ph.caption}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <dialog class="lightbox" id="lightbox" aria-label="Photo">
+      <button type="button" class="sheet-close" data-close aria-label="Close">×</button>
+      {photos.map((ph, i) => (
+        <figure data-shot={i} hidden><Image src={ph.src} widths={[900, 1600]} sizes="90vw" alt={ph.caption} loading="lazy" /><figcaption>{ph.caption} <span>{i + 1} / {photos.length}</span></figcaption></figure>
+      ))}
+      <div class="lb-nav"><button type="button" id="lb-prev" aria-label="Previous photo">←</button><button type="button" id="lb-next" aria-label="Next photo">→</button></div>
+    </dialog>
+
+    <!-- 07 Reading: a quote and a stack of plain spines. -->
+    <section class="ch ch-reading" id="reading" aria-labelledby="h-reading" data-reveal-ch>
+      <div class="spines" aria-hidden="true">{['#818cf8', '#38bdf8', '#a78bfa', '#2dd4bf', '#f472b6', '#fbbf24'].map((c, i) => <span style={`--c:${c};--i:${i}`}></span>)}</div>
+      <div>
+        <span class="ch-no">{no('reading')}</span>
+        <h2 id="h-reading">{p.reading.title}</h2>
+        <blockquote class="pull pull--small">{p.reading.quote}</blockquote>
+        <div class="ch-body">{p.reading.body.map((t) => <p>{t}</p>)}</div>
+      </div>
+    </section>
+
+    <!-- 08 Coding: the 3 AM log. -->
+    <section class="ch ch-coding" id="coding" aria-labelledby="h-coding" data-reveal-ch>
+      <div>
+        <span class="ch-no">{no('coding')}</span>
+        <h2 id="h-coding">{p.coding.title}</h2>
+        <div class="ch-body">{p.coding.body.map((t) => <p>{t}</p>)}</div>
+        <p class="also">The serious versions are <a href="/#work">over here</a>.</p>
+      </div>
+      <div class="term" aria-hidden="true">
+        <div class="term-bar"><i></i><i></i><i></i><span>~/quick-project</span></div>
+        <div class="term-body">
+          <span class="t"><b>$</b> npm run quick-project</span>
+          <span class="t"><em>21:04</em> this'll be a quick one</span>
+          <span class="t"><em>23:30</em> websites, AI experiments, random tools</span>
+          <span class="t"><em>02:10</em> new idea. different project.</span>
+          <span class="t"><em>03:00</em> debugging something completely unrelated<span class="caret"></span></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 Side quests. -->
+    <section class="ch ch-side" id="side-quests" aria-labelledby="h-side" data-reveal-ch>
+      <span class="ch-no">{no('side-quests')}</span>
+      <h2 id="h-side" class="kicker-title">{p.side.title}</h2>
+      <p class="quests">{p.side.list.map((q) => <span>{q}</span>)}</p>
+      <div class="ch-body ch-body--center">{p.side.body.map((t) => <p>{t}</p>)}</div>
+    </section>
+
+    <footer class="pp-end">
+      <h2>Thanks for stopping by.</h2>
+      <p>{p.outro}</p>
+      <p class="pp-links"><a class="button" href="/#work">See the work</a><a href={`mailto:${site.email}`}>Say hi</a></p>
+    </footer>
   </main>
 
   <script>
@@ -146,195 +255,318 @@ const bars = Array.from({ length: 42 }, (_, i) => 0.25 + Math.abs(Math.sin(i * 0
     import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // The rotating end of the headline.
-    const rotor = document.getElementById('rotor')!;
-    const lines = ['cooking biryani.', 'singing along, badly or not.', 'at the gym.', 'overanalyzing a plot.', 'chasing a photo.', 'debugging at 3 AM.'];
-    let n = 0;
-    if (!reduced) {
-      setInterval(() => {
-        n = (n + 1) % lines.length;
-        gsap.timeline()
-          .to(rotor, { yPercent: -100, opacity: 0, duration: 0.45, ease: 'power3.in' })
-          .call(() => { rotor.textContent = lines[n]; })
-          .fromTo(rotor, { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.7, ease: 'expo.out' });
-      }, 2600);
-    }
+    const $ = (s: string) => document.querySelector<HTMLElement>(s);
 
-    // Cells start their drawings when they come into view, and pause when they leave.
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) e.target.classList.toggle('on', e.isIntersecting);
-    }, { rootMargin: '0px 0px -10% 0px' });
-    document.querySelectorAll('[data-cell]').forEach((c) => io.observe(c));
+    // Drawings only move while their chapter is on screen.
+    const io = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle('on', e.isIntersecting)), { rootMargin: '0px 0px -15% 0px' });
+    document.querySelectorAll('[data-reveal-ch]').forEach((c) => io.observe(c));
 
     if (!reduced) {
       gsap.registerPlugin(ScrollTrigger);
-      gsap.from('.pp-hero > *', { y: 28, opacity: 0, duration: 1.1, ease: 'expo.out', stagger: 0.1 });
-      gsap.utils.toArray<HTMLElement>('.cell, .photos, .pp-end').forEach((el) => {
-        gsap.from(el, { y: 50, opacity: 0, duration: 1.1, ease: 'expo.out', clearProps: 'transform,opacity', scrollTrigger: { trigger: el, start: 'top 90%', once: true } });
+      gsap.from('.pp-hero-copy > *', { y: 26, opacity: 0, duration: 1.1, ease: 'expo.out', stagger: 0.08 });
+      gsap.from('.pp-hero-stack figure', { y: 60, opacity: 0, duration: 1.4, ease: 'expo.out', stagger: 0.12, delay: 0.2, clearProps: 'opacity' });
+      gsap.utils.toArray<HTMLElement>('[data-reveal-ch]').forEach((ch) => {
+        gsap.from(ch.querySelectorAll('.ch-no, h2, .ch-body, .pull'), { y: 30, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.07, scrollTrigger: { trigger: ch, start: 'top 82%', once: true } });
       });
+      gsap.from('.shelf li', { y: 50, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.06, clearProps: 'transform,opacity', scrollTrigger: { trigger: '.shelf', start: 'top 88%', once: true } });
+      gsap.from('.board li', { x: -40, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.09, clearProps: 'transform,opacity', scrollTrigger: { trigger: '.board', start: 'top 85%', once: true } });
+      gsap.from('.spread .sp', { y: 60, opacity: 0, duration: 1.2, ease: 'expo.out', stagger: 0.1, clearProps: 'transform,opacity', scrollTrigger: { trigger: '.spread', start: 'top 85%', once: true } });
     }
 
-    // Photo strip arrows.
-    const strip = document.getElementById('strip');
-    const step = () => (strip?.clientWidth ?? 0) * 0.8;
-    document.getElementById('ph-prev')?.addEventListener('click', () => strip?.scrollBy({ left: -step(), behavior: reduced ? 'auto' : 'smooth' }));
-    document.getElementById('ph-next')?.addEventListener('click', () => strip?.scrollBy({ left: step(), behavior: reduced ? 'auto' : 'smooth' }));
+    // Dialogs: one sheet for titles, one lightbox for photos.
+    const open = (d: HTMLDialogElement, from: HTMLElement) => {
+      d.showModal();
+      d.addEventListener('close', () => from.focus({ preventScroll: true }), { once: true });
+    };
+    document.querySelectorAll<HTMLDialogElement>('dialog.sheet, dialog.lightbox').forEach((d) => {
+      d.addEventListener('click', (e) => { if (e.target === d || (e.target as Element).closest('[data-close]')) d.close(); });
+    });
+
+    const sheet = $('#title-sheet') as HTMLDialogElement;
+    document.querySelectorAll<HTMLButtonElement>('.poster').forEach((b) => b.addEventListener('click', () => {
+      sheet.querySelectorAll<HTMLElement>('[data-card]').forEach((c) => { c.hidden = c.dataset.card !== b.dataset.title; });
+      sheet.setAttribute('aria-labelledby', `sheet-${b.dataset.title}`);
+      open(sheet, b);
+    }));
+
+    const lb = $('#lightbox') as HTMLDialogElement;
+    const shots = [...lb.querySelectorAll<HTMLElement>('[data-shot]')];
+    let at = 0;
+    const show = (i: number) => { at = (i + shots.length) % shots.length; shots.forEach((s, k) => { s.hidden = k !== at; }); };
+    document.querySelectorAll<HTMLButtonElement>('.photo').forEach((b) => b.addEventListener('click', () => { show(Number(b.dataset.photo)); open(lb, b); }));
+    $('#lb-prev')?.addEventListener('click', () => show(at - 1));
+    $('#lb-next')?.addEventListener('click', () => show(at + 1));
+    lb.addEventListener('keydown', (e) => { if (e.key === 'ArrowLeft') show(at - 1); if (e.key === 'ArrowRight') show(at + 1); });
+
+    // The record player: one preview at a time; the label becomes the playing song's cover.
+    const deck = $('#deck');
+    if (deck) {
+      const audio = new Audio();
+      audio.preload = 'none';
+      const tracks = [...deck.querySelectorAll<HTMLButtonElement>('.track')];
+      const label = $('#record-label') as HTMLImageElement;
+      const covers = [...deck.querySelectorAll<HTMLImageElement>('#covers img')];
+      let current = -1;
+      const setState = (i: number, playing: boolean) => {
+        tracks.forEach((t, k) => t.setAttribute('aria-pressed', String(playing && k === i)));
+        deck.classList.toggle('playing', playing);
+      };
+      tracks.forEach((t, i) => t.addEventListener('click', () => {
+        if (current === i && !audio.paused) { audio.pause(); return; }
+        current = i;
+        audio.src = t.dataset.src!;
+        const c = covers[i];
+        if (c) { label.srcset = c.srcset; label.src = c.src; }
+        audio.play().catch(() => setState(i, false));
+      }));
+      audio.addEventListener('play', () => setState(current, true));
+      audio.addEventListener('pause', () => setState(current, false));
+      audio.addEventListener('ended', () => setState(current, false));
+    }
   </script>
 
   <style>
-    .pp { max-width: 1240px; margin: 0 auto; padding: 150px 32px 96px; }
-    .pp-hero { max-width: 1100px; margin-bottom: 72px; }
-    .pp-hero h1 { margin-top: 18px; font-size: clamp(34px, 5vw, 68px); line-height: 1.04; letter-spacing: -0.03em; }
-    .pp-line { display: block; }
-    .pp-rotor { display: block; overflow: hidden; padding-bottom: 0.08em; }
-    .pp-rotor span { display: inline-block; background: linear-gradient(90deg, #f472b6, #c084fc 35%, #38bdf8 70%, #2dd4bf); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .pp-intro { max-width: 560px; margin: 26px 0 0; font-size: 19px; color: var(--ink-2); }
+    .pp { max-width: 1240px; margin: 0 auto; padding: 140px 32px 96px; }
+    .eyebrow { margin: 0; font: 500 12px var(--cond); letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3); }
 
-    /* One panel, cells split by hairlines. */
-    .bento { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1px; background: var(--hair-2); border: 1px solid var(--hair-2); border-radius: 24px; overflow: hidden; }
-    .cell { position: relative; display: flex; flex-direction: column; gap: 22px; padding: 30px; background: var(--bg-2); overflow: hidden; }
-    .cell::before { content: ''; position: absolute; inset: 0; background: radial-gradient(420px 260px at 0% 0%, color-mix(in srgb, var(--a) 9%, transparent), transparent 70%); pointer-events: none; }
-    .cell > * { position: relative; }
-    .cell h2 { font-size: 21px; line-height: 1.2; letter-spacing: -0.01em; color: var(--ink); }
-    .cell-text p { margin: 10px 0 0; max-width: 62ch; font-size: 15px; line-height: 1.6; color: var(--ink-3); }
-    .c-movies { grid-column: span 8; }
-    .c-music { grid-column: span 4; grid-row: span 2; }
-    .c-singing { grid-column: span 4; }
-    .c-sports { grid-column: span 4; }
-    .c-cooking { grid-column: span 6; }
-    .c-books { grid-column: span 6; }
-    .c-coding { grid-column: span 7; }
-    .c-side { grid-column: span 5; }
+    /* Hero: big type on the left, three of my photos fanned on the right. */
+    .pp-hero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 48px; align-items: center; min-height: min(78vh, 760px); }
+    .pp-hero h1 { margin: 18px 0 0; font-size: clamp(56px, 9vw, 136px); line-height: 0.92; letter-spacing: -0.045em; text-transform: uppercase; }
+    .pp-hero-intro { max-width: 460px; margin: 26px 0 0; font-size: 20px; line-height: 1.5; color: var(--ink-2); }
+    .toc { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 6px 28px; margin-top: 40px; }
+    .toc a { display: inline-flex; gap: 10px; align-items: baseline; padding: 4px 0; font-size: 15px; color: var(--ink-2); text-decoration: none; }
+    .toc a span { font: 500 12px var(--cond); letter-spacing: 0.12em; color: var(--ink-4); }
+    .toc a:hover { color: var(--ink); }
+    .pp-hero-stack { position: relative; height: 560px; }
+    .pp-hero-stack figure { position: absolute; margin: 0; width: 62%; aspect-ratio: 3 / 4; border-radius: 14px; overflow: hidden; box-shadow: 0 30px 70px rgb(0 0 0 / 0.5); border: 6px solid #f4f2ff; background: #f4f2ff;
+      transition: rotate 0.7s var(--ease), translate 0.7s var(--ease); }
+    .pp-hero-stack figure:nth-child(1) { left: 2%; top: 14%; rotate: -7deg; z-index: 1; }
+    .pp-hero-stack figure:nth-child(2) { left: 36%; top: 0; rotate: 5deg; z-index: 2; }
+    .pp-hero-stack figure:nth-child(3) { left: 20%; top: 34%; rotate: -1.5deg; z-index: 3; }
+    .pp-hero-stack:hover figure:nth-child(1) { rotate: -11deg; translate: -18px 6px; }
+    .pp-hero-stack:hover figure:nth-child(2) { rotate: 9deg; translate: 18px -6px; }
+    .pp-hero-stack img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
-    /* Movies: a fanned wall of typographic posters. */
-    .posters { position: relative; display: flex; justify-content: center; height: 210px; padding-right: 40px !important; margin: auto 0 0; padding: 0; list-style: none; }
-    .posters li { flex: none; display: flex; flex-direction: column; justify-content: space-between; width: 112px; height: 168px; margin-right: -40px; padding: 12px 11px; border-radius: 8px;
-      background: linear-gradient(160deg, color-mix(in srgb, var(--fg) 22%, var(--bg)), var(--bg) 70%); border: 1px solid rgb(255 255 255 / 0.1); box-shadow: 0 18px 40px rgb(0 0 0 / 0.45);
-      transform: translateY(calc(sin((var(--i) - 4) * 0.4) * 10px)) rotate(calc((var(--i) - 4) * 3deg)); transform-origin: 50% 120%; transition: transform 0.6s var(--ease), margin 0.6s var(--ease); }
-    .posters li:nth-child(odd) { margin-top: 16px; }
-    .c-movies:hover .posters li { margin-right: -14px; transform: rotate(calc((var(--i) - 4) * 1deg)); }
-    .posters li:hover { transform: translateY(-14px) rotate(0) scale(1.06) !important; z-index: 2; }
-    .poster-kind { font: 600 10px var(--cond); letter-spacing: 0.2em; text-transform: uppercase; color: color-mix(in srgb, var(--fg) 70%, transparent); }
-    .posters b { font: 700 13px/1.05 var(--display); text-transform: uppercase; letter-spacing: -0.01em; color: var(--fg); }
-    .poster-rule { height: 2px; width: 40%; background: var(--fg); opacity: 0.6; }
+    /* Chapters. */
+    .ch { padding: 120px 0 0; scroll-margin-top: 80px; }
+    .ch-no { display: block; font: 600 15px var(--cond); letter-spacing: 0.14em; color: var(--ink-4); }
+    .ch-no::after { content: ''; display: inline-block; width: 44px; height: 1px; margin-left: 12px; vertical-align: middle; background: var(--hair-2); }
+    .ch h2 { margin: 14px 0 0; font-size: clamp(28px, 3.6vw, 46px); line-height: 1.08; letter-spacing: -0.025em; }
+    .ch-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 64px; align-items: start; margin-bottom: 48px; }
+    .ch-head .ch-no { grid-column: 1 / -1; }
+    .ch-head h2 { margin: 0; }
+    .ch-body p { margin: 0 0 12px; font-size: 17px; line-height: 1.65; color: var(--ink-2); max-width: 60ch; }
+    .ch-body--center { margin: 0 auto; text-align: center; }
+    .ch-body--center p { margin-inline: auto; }
+    .kicker-title { font-size: clamp(22px, 2.4vw, 30px) !important; color: var(--ink-2); }
+    .also { margin: 18px 0 0; font-size: 15px; color: var(--ink-3); }
+    .also a { color: var(--glow); }
 
-    /* Music: a record sliding out of its sleeve, spinning while it's on screen. */
-    .vinyl-wrap { position: relative; height: 260px; margin: auto 0; }
-    .sleeve { position: absolute; left: 0; top: 10px; width: 200px; height: 200px; display: grid; align-content: end; padding: 16px; border-radius: 6px; z-index: 1;
-      background: linear-gradient(135deg, #f472b6, #7c3aed 55%, #1e1b4b); box-shadow: 0 20px 50px rgb(0 0 0 / 0.5); }
-    .sleeve span { font: 700 18px/1.05 var(--display); text-transform: uppercase; color: #fff; }
-    .vinyl { position: absolute; left: 80px; top: 18px; width: 186px; height: 186px; border-radius: 50%;
-      background: repeating-radial-gradient(circle, #111 0 2px, #1d1d1f 2px 4px); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06), 0 14px 40px rgb(0 0 0 / 0.5);
-      transition: left 0.9s var(--ease); }
-    .vinyl::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 30deg, transparent 0 20%, rgb(255 255 255 / 0.08) 25%, transparent 32% 70%, rgb(255 255 255 / 0.06) 75%, transparent 82%); }
-    .vinyl-label { position: absolute; inset: 34%; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(circle, #0b0b0c 0 6%, #f472b6 7%, #c084fc); }
-    .vinyl-label span { font: 700 11px var(--display); color: #fff; transform: translateY(12px); }
-    .c-music.on .vinyl { left: 128px; animation: spin 4s linear infinite; }
+    /* 01 Posters. */
+    .shelf { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+    .shelf li { display: grid; gap: 10px; align-content: start; }
+    .poster { position: relative; display: block; aspect-ratio: 2 / 3; width: 100%; border-radius: 10px; overflow: hidden; background: var(--bg); box-shadow: 0 16px 40px rgb(0 0 0 / 0.45);
+      transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease); }
+    .poster img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .poster::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12); background: linear-gradient(160deg, rgb(255 255 255 / 0.14), transparent 40%); pointer-events: none; }
+    .poster:hover, .poster:focus-visible { transform: translateY(-10px) rotate(-1.5deg); box-shadow: 0 26px 60px rgb(0 0 0 / 0.6), 0 0 0 2px var(--fg); outline: none; }
+    .poster-cap { display: grid; gap: 2px; font-size: 12px; color: var(--ink-4); }
+    .poster-cap b { font-size: 13px; font-weight: 500; color: var(--ink-2); }
+    .poster-type { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 12px; text-align: left;
+      background: radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--fg) 30%, var(--bg)), var(--bg) 70%); }
+    .poster-type b { font: 700 clamp(18px, 2vw, 26px)/0.95 var(--display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg); }
+    .poster-kind, .poster-year { font: 600 10px var(--cond); letter-spacing: 0.2em; text-transform: uppercase; color: color-mix(in srgb, var(--fg) 70%, transparent); }
+    .poster-type--big b { font-size: 40px; }
+
+    /* Title sheet and lightbox. */
+    dialog { color: var(--ink); }
+    dialog::backdrop { background: rgb(var(--bg-rgb) / 0.75); backdrop-filter: blur(10px); }
+    .sheet { width: min(760px, 94vw); padding: 0; border: 1px solid var(--hair-2); border-radius: 22px; background: var(--bg-2); overflow: hidden; }
+    .sheet[open] { animation: pop 0.45s var(--ease); }
+    @keyframes pop { from { opacity: 0; transform: translateY(16px) scale(0.97); } }
+    .sheet-card { display: grid; grid-template-columns: 240px minmax(0, 1fr); }
+    .sheet-card[hidden] { display: none; }
+    .sheet-art { position: relative; aspect-ratio: 2 / 3; background: var(--bg); }
+    .sheet-art img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .sheet-text { padding: 34px 34px 30px; background: radial-gradient(500px 260px at 100% 0%, color-mix(in srgb, var(--fg) 12%, transparent), transparent 70%); }
+    .sheet-text h3 { margin: 10px 0 0; font-size: 34px; line-height: 1.05; letter-spacing: -0.02em; }
+    .sheet-premise { margin: 16px 0 0; font-size: 17px; line-height: 1.6; color: var(--ink-2); }
+    .sheet dl { display: grid; gap: 0; margin: 24px 0 0; border-top: 1px solid var(--hair); }
+    .sheet dl div { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--hair); font-size: 14px; }
+    .sheet dt { color: var(--ink-3); } .sheet dd { margin: 0; text-align: right; }
+    .sheet-close { position: absolute; top: 12px; right: 12px; z-index: 2; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--hair-2); background: rgb(var(--bg-rgb) / 0.7); font-size: 22px; line-height: 1; color: var(--ink); }
+    .sheet-close:hover { border-color: var(--glow); }
+    .lightbox { width: min(1100px, 94vw); max-height: 94vh; padding: 0; border: 0; background: transparent; overflow: visible; }
+    .lightbox[open] { animation: pop 0.4s var(--ease); }
+    .lightbox figure { margin: 0; text-align: center; }
+    .lightbox figure[hidden] { display: none; }
+    .lightbox img { max-width: 100%; max-height: 80vh; width: auto; height: auto; border-radius: 14px; box-shadow: 0 30px 80px rgb(0 0 0 / 0.6); }
+    .lightbox figcaption { display: flex; justify-content: center; gap: 14px; margin-top: 14px; font-size: 15px; color: var(--ink-2); }
+    .lightbox figcaption span { color: var(--ink-4); }
+    .lb-nav { display: flex; justify-content: center; gap: 10px; margin-top: 12px; }
+    .lb-nav button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--hair-2); font-size: 18px; }
+    .lb-nav button:hover { border-color: var(--glow); }
+    .lightbox .sheet-close { top: -6px; right: -6px; }
+
+    /* 02 Music. */
+    .ch-music { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: center; }
+    .music-copy .ch-body { margin-top: 20px; }
+    .genres { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 18px; margin: 26px 0 0; line-height: 1.1; }
+    .genre { font-family: var(--display); letter-spacing: -0.02em; }
+    .g0 { font-size: 30px; font-weight: 700; color: #f472b6; } .g1 { font-size: 22px; font-weight: 500; color: var(--ink-2); }
+    .g2 { font-size: 34px; font-weight: 700; color: #c084fc; } .g3 { font-size: 20px; font-weight: 500; color: #38bdf8; }
+    .genre:last-child { font: 400 17px var(--sans); color: var(--ink-3); letter-spacing: 0; }
+    .deck { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 28px; align-items: center; padding: 28px; border: 1px solid var(--hair-2); border-radius: 22px;
+      background: radial-gradient(400px 260px at 0% 0%, rgb(244 114 182 / 0.1), transparent 70%), var(--bg-2); }
+    .turntable { position: relative; width: 220px; height: 220px; }
+    .record { position: absolute; inset: 0; border-radius: 50%; display: grid; place-items: center;
+      background: repeating-radial-gradient(circle, #101012 0 2px, #1c1c1f 2px 4px); box-shadow: 0 20px 50px rgb(0 0 0 / 0.55), inset 0 0 0 1px rgb(255 255 255 / 0.06); }
+    .record::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 20deg, transparent 0 18%, rgb(255 255 255 / 0.09) 24%, transparent 31% 68%, rgb(255 255 255 / 0.07) 74%, transparent 81%); }
+    .record :global(.record-label) { position: relative; z-index: 1; width: 38%; height: 38%; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 3px #101012; }
+    .deck.playing .record { animation: spin 3.2s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .genres { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
-    .genres li, .tags li { padding: 6px 12px; border: 1px solid color-mix(in srgb, var(--a) 40%, var(--hair)); border-radius: 999px; background: color-mix(in srgb, var(--a) 8%, transparent); font-size: 13px; color: var(--ink); }
-    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .tonearm { position: absolute; right: -6px; top: -4px; width: 8px; height: 110px; border-radius: 4px; background: linear-gradient(#d4d4d8, #71717a); transform-origin: 50% 6px; transform: rotate(-4deg); transition: transform 0.6s var(--ease); z-index: 2; }
+    .tonearm::before { content: ''; position: absolute; left: -7px; top: -6px; width: 22px; height: 22px; border-radius: 50%; background: #3f3f46; border: 2px solid #a1a1aa; }
+    .deck.playing .tonearm { transform: rotate(22deg); }
+    .playlist-head { white-space: nowrap; }
+    .playlist-hint { margin: 4px 0 12px; font-size: 13px; color: var(--ink-4); }
+    .playlist ol { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+    .track { display: grid; grid-template-columns: 40px minmax(0, 1fr) 22px; gap: 12px; align-items: center; width: 100%; padding: 7px 8px; border-radius: 10px; text-align: left; transition: background 0.2s; }
+    .track:hover, .track[aria-pressed='true'] { background: rgb(var(--ink-rgb) / 0.06); }
+    .track :global(.track-art) { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
+    .track-text { display: grid; min-width: 0; }
+    .track-text b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 500; }
+    .track-text span { font-size: 13px; color: var(--ink-3); }
+    .track-state { display: inline-flex; align-items: end; gap: 2px; height: 14px; opacity: 0; }
+    .track-state i { width: 3px; height: 100%; border-radius: 2px; background: #f472b6; transform-origin: bottom; }
+    .track[aria-pressed='true'] .track-state { opacity: 1; }
+    .track[aria-pressed='true'] .track-state i { animation: eq 0.8s ease-in-out infinite alternate; }
+    .track-state i:nth-child(2) { animation-delay: -0.3s !important; } .track-state i:nth-child(3) { animation-delay: -0.55s !important; }
+    @keyframes eq { from { transform: scaleY(0.25); } to { transform: scaleY(1); } }
 
-    /* Singing: a live waveform. */
-    .wave { display: flex; align-items: center; gap: 4px; height: 96px; }
-    .wave span { flex: 1; height: calc(var(--h) * 100%); border-radius: 3px; background: linear-gradient(180deg, var(--a), #f472b6); opacity: 0.85; transform-origin: center; }
-    .c-singing.on .wave span { animation: sing 1.1s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -73ms); }
-    @keyframes sing { from { transform: scaleY(0.25); } to { transform: scaleY(1); } }
+    /* 03 Singing. */
+    .ch-singing { text-align: center; }
+    .ch-singing .ch-no::after, .ch-side .ch-no::after { display: none; }
+    .pull { margin: 22px auto 0; max-width: 18ch; font: 700 clamp(36px, 5.6vw, 76px)/1.02 var(--display); letter-spacing: -0.035em;
+      background: linear-gradient(90deg, #fb923c, #f472b6 45%, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .pull--small { max-width: none; margin: 22px 0; font-size: clamp(26px, 3vw, 38px); background: linear-gradient(90deg, #818cf8, #38bdf8); -webkit-background-clip: text; background-clip: text; }
+    .wave { display: flex; align-items: center; gap: 3px; height: 80px; margin: 40px auto 36px; max-width: 760px; }
+    .wave span { flex: 1; height: calc(var(--h) * 100%); border-radius: 3px; background: linear-gradient(180deg, #fb923c, #f472b6); opacity: 0.75; }
+    .ch-singing.on .wave span { animation: sway 1.2s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -61ms); }
+    @keyframes sway { from { transform: scaleY(0.2); } to { transform: scaleY(1); } }
 
-    /* Sports: a shuttle flying over the net. */
-    .court { width: 100%; height: auto; }
-    .court-arc { fill: none; stroke: var(--hair-2); stroke-width: 1.5; stroke-dasharray: 2 7; stroke-linecap: round; }
-    .court-net { stroke: var(--ink-4); stroke-width: 2; stroke-dasharray: 3 3; }
-    .court-floor { stroke: var(--hair-2); stroke-width: 1; }
-    .shuttle { fill: var(--a); offset-path: path('M20 120 Q160 -20 300 120'); offset-rotate: auto; offset-distance: 0%; }
-    .shuttle path { fill: color-mix(in srgb, var(--a) 40%, white); }
-    .c-sports.on .shuttle { animation: rally 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; }
-    @keyframes rally { to { offset-distance: 100%; } }
+    /* 04 Sports. */
+    .board { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--hair-2); }
+    .board li { position: relative; display: grid; grid-template-columns: 60px minmax(0, 1.35fr) minmax(0, 0.65fr); gap: 20px; align-items: center; padding: 22px 8px; border-bottom: 1px solid var(--hair-2); overflow: hidden; }
+    .board li::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(52 211 153 / 0.14), transparent); transform: scaleX(0); transform-origin: left; transition: transform 0.6s var(--ease); }
+    .board li:hover::before { transform: none; }
+    .board li > * { position: relative; }
+    .board-no { font: 600 14px var(--cond); letter-spacing: 0.14em; color: var(--ink-4); }
+    .board-name { font: 700 clamp(28px, 4.2vw, 54px)/1 var(--display); letter-spacing: -0.03em; text-transform: uppercase; color: var(--ink); transition: color 0.3s; }
+    .board li:hover .board-name { color: #34d399; }
+    .board-note { font-size: 16px; color: var(--ink-3); }
+    .board li.star .board-name { color: #34d399; }
+    .board li.star .board-note { color: var(--ink); }
 
-    /* Cooking: recipe cards. */
-    .recipes { position: relative; display: flex; gap: 18px; margin-top: auto; padding: 10px 0 6px 6px; }
-    .recipe { position: relative; display: grid; gap: 8px; width: 210px; padding: 16px 18px 18px; border-radius: 6px; background: #fdf6e3; color: #3b2a1a; box-shadow: 0 16px 36px rgb(0 0 0 / 0.4);
-      transform: rotate(calc(-3deg + var(--i) * 6deg)); transition: transform 0.5s var(--ease); }
-    .recipe:hover { transform: rotate(0) translateY(-6px); }
-    .recipe-no { font: 600 11px var(--cond); letter-spacing: 0.18em; text-transform: uppercase; color: #b45309; }
-    .recipe b { font: 700 19px/1.1 var(--display); color: #1c1308; }
-    .recipe-lines { height: 46px; background: repeating-linear-gradient(transparent 0 14px, rgb(59 42 26 / 0.18) 14px 15px); }
-    .recipe-stamp { position: absolute; right: 12px; bottom: 12px; padding: 3px 8px; border: 1.5px solid #dc2626; border-radius: 4px; font: 700 10px var(--cond); letter-spacing: 0.12em; text-transform: uppercase; color: #dc2626; transform: rotate(-8deg); }
+    /* 05 Cooking. */
+    .ch-cooking { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: 64px; align-items: center; }
+    .cook-copy .ch-body { margin-top: 20px; }
+    .fav { position: relative; padding: 46px 42px 42px; border-radius: 22px; overflow: hidden; color: #2a1608;
+      background: radial-gradient(500px 300px at 100% 0%, rgb(251 146 60 / 0.55), transparent 60%), linear-gradient(160deg, #fde68a, #fbbf24 55%, #f59e0b); box-shadow: 0 30px 70px rgb(0 0 0 / 0.45); }
+    .fav-badge { display: inline-block; padding: 6px 12px; border: 1.5px solid #7c2d12; border-radius: 999px; font: 700 11px var(--cond); letter-spacing: 0.2em; text-transform: uppercase; color: #7c2d12; }
+    .fav-name { margin: 22px 0 0; font: 700 clamp(48px, 7vw, 96px)/0.9 var(--display); letter-spacing: -0.045em; text-transform: uppercase; color: #1c0f04; }
+    .fav-note { margin: 18px 0 0; max-width: 30ch; font-size: 18px; line-height: 1.5; color: #4a2a0f; }
+    .steam { position: absolute; right: 40px; top: 36px; display: flex; gap: 10px; }
+    .steam i { width: 4px; height: 46px; border-radius: 4px; background: linear-gradient(transparent, rgb(124 45 18 / 0.35)); }
+    .ch-cooking.on .steam i { animation: steam 2.4s ease-in-out infinite; }
+    .steam i:nth-child(2) { animation-delay: -0.8s !important; } .steam i:nth-child(3) { animation-delay: -1.6s !important; }
+    @keyframes steam { 0% { transform: translateY(10px) scaleY(0.6); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-16px) scaleY(1.1); opacity: 0; } }
 
-    /* Books: a stack of spines. */
-    .spines { display: grid; gap: 5px; }
-    .spines span { width: var(--w); padding: 9px 14px; border-radius: 4px; background: linear-gradient(90deg, color-mix(in srgb, var(--c) 75%, black), var(--c)); font: 600 12px var(--cond); letter-spacing: 0.14em; text-transform: uppercase; color: #fff;
-      box-shadow: inset 4px 0 0 rgb(0 0 0 / 0.25); transform: translateX(calc(var(--i) * 6px - 12px)); transition: transform 0.6s var(--ease); }
-    .c-books:hover .spines span { transform: translateX(0); }
+    /* 06 Photo spread. */
+    .spread { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: 120px; gap: 16px; margin: 0; padding: 0; list-style: none; }
+    .sp { position: relative; display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 8px; }
+    .sp0 { grid-column: 1 / span 5; grid-row: 1 / span 5; }
+    .sp1 { grid-column: 6 / span 4; grid-row: 1 / span 3; }
+    .sp2 { grid-column: 10 / span 3; grid-row: 1 / span 4; }
+    .sp3 { grid-column: 6 / span 3; grid-row: 4 / span 4; }
+    .sp4 { grid-column: 9 / span 4; grid-row: 5 / span 3; }
+    .photo { display: block; width: 100%; height: 100%; border-radius: 16px; overflow: hidden; background: var(--card); }
+    .photo img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 1s var(--ease); }
+    .photo:hover img, .photo:focus-visible img { transform: scale(1.05); }
+    .photo-cap { font-size: 13px; color: var(--ink-3); }
 
-    /* Coding: a terminal heading toward 3 AM. */
-    .term { margin-top: auto; border: 1px solid rgb(255 255 255 / 0.08); border-radius: 12px; background: #0b0d12; overflow: hidden; }
-    .term-bar { display: flex; align-items: center; gap: 6px; padding: 10px 12px; border-bottom: 1px solid rgb(255 255 255 / 0.06); }
-    .term-bar i { width: 9px; height: 9px; border-radius: 50%; background: #ff5f57; }
+    /* 07 Reading. */
+    .ch-reading { display: grid; grid-template-columns: minmax(0, 0.6fr) minmax(0, 1fr); gap: 64px; align-items: center; }
+    .spines { display: flex; align-items: end; justify-content: center; gap: 6px; height: 260px; padding: 0 20px; border-bottom: 2px solid var(--hair-2); }
+    .spines span { width: 34px; height: calc(150px + var(--i) * 17px); border-radius: 4px 4px 0 0; background: linear-gradient(90deg, color-mix(in srgb, var(--c) 70%, black), var(--c)); box-shadow: inset 4px 0 0 rgb(0 0 0 / 0.2);
+      transform-origin: bottom; transition: transform 0.6s var(--ease); }
+    .spines span:nth-child(2n) { height: calc(200px - var(--i) * 9px); }
+    .spines span:nth-child(5) { transform: rotate(8deg) translateX(6px); }
+    .ch-reading:hover .spines span { transform: translateY(-6px); }
+    .ch-reading:hover .spines span:nth-child(5) { transform: rotate(14deg) translate(10px, -4px); }
+
+    /* 08 Coding. */
+    .ch-coding { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: center; }
+    .ch-coding .ch-body { margin-top: 20px; }
+    .term { border: 1px solid rgb(255 255 255 / 0.08); border-radius: 14px; background: #0b0d12; overflow: hidden; box-shadow: 0 30px 70px rgb(0 0 0 / 0.45); }
+    .term-bar { display: flex; align-items: center; gap: 6px; padding: 11px 14px; border-bottom: 1px solid rgb(255 255 255 / 0.06); }
+    .term-bar i { width: 10px; height: 10px; border-radius: 50%; background: #ff5f57; }
     .term-bar i:nth-child(2) { background: #febc2e; } .term-bar i:nth-child(3) { background: #28c840; }
     .term-bar span { margin-left: 8px; font: 12px ui-monospace, Menlo, monospace; color: #8b949e; }
-    .term pre { margin: 0; padding: 14px 16px 16px; font: 13px/1.85 ui-monospace, 'SF Mono', Menlo, monospace; color: #c9d1d9; white-space: normal; }
-    .term pre > span { display: block; opacity: 0; }
-    .term b { color: #7ee787; font-weight: 400; } .term em { font-style: normal; color: #a79bff; margin-right: 10px; }
-    .c-coding.on .term pre > span { animation: line 0.01s forwards; }
-    .c-coding.on .t2 { animation-delay: 0.7s !important; } .c-coding.on .t3 { animation-delay: 1.4s !important; } .c-coding.on .t4 { animation-delay: 2.1s !important; } .c-coding.on .t5 { animation-delay: 2.8s !important; }
-    @keyframes line { to { opacity: 1; } }
-    .caret { display: inline-block; width: 8px; height: 15px; margin-left: 4px; vertical-align: -2px; background: #c9d1d9; animation: blink 1s steps(1) infinite; }
+    .term-body { display: grid; gap: 4px; padding: 18px 18px 22px; font: 14px/1.7 ui-monospace, 'SF Mono', Menlo, monospace; color: #c9d1d9; }
+    .term-body b { color: #7ee787; font-weight: 400; } .term-body em { font-style: normal; color: #a79bff; margin-right: 12px; }
+    .t { opacity: 0; }
+    .ch-coding.on .t { animation: show 0.01s forwards; }
+    .ch-coding.on .t:nth-child(2) { animation-delay: 0.6s; } .ch-coding.on .t:nth-child(3) { animation-delay: 1.2s; }
+    .ch-coding.on .t:nth-child(4) { animation-delay: 1.8s; } .ch-coding.on .t:nth-child(5) { animation-delay: 2.4s; }
+    @keyframes show { to { opacity: 1; } }
+    .caret { display: inline-block; width: 8px; height: 16px; margin-left: 4px; vertical-align: -3px; background: #c9d1d9; animation: blink 1s steps(1) infinite; }
     @keyframes blink { 50% { opacity: 0; } }
 
-    /* Side quests. */
-    .quests { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
-    .quests li { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid var(--hair-2); border-radius: 12px; font: 600 16px var(--sans); color: var(--ink); }
-    .q-check { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--a); background: color-mix(in srgb, var(--a) 20%, transparent); }
-    .q-next { color: var(--ink-3) !important; border-style: dashed !important; }
-    .q-dots { display: inline-flex; gap: 4px; }
-    .q-dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--ink-3); animation: pulse 1.2s ease-in-out infinite; }
-    .q-dots i:nth-child(2) { animation-delay: 0.2s; } .q-dots i:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes pulse { 50% { opacity: 0.2; transform: translateY(-2px); } }
+    /* 09 Side quests. */
+    .ch-side { text-align: center; }
+    .quests { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 6px 28px; margin: 22px 0 26px; }
+    .quests span { font: 700 clamp(40px, 6vw, 84px)/1 var(--display); letter-spacing: -0.035em; text-transform: uppercase; }
+    .quests span:nth-child(1) { color: #facc15; } .quests span:nth-child(2) { color: #34d399; }
+    .quests .quests-more { font: 400 20px var(--sans); letter-spacing: 0; text-transform: none; color: var(--ink-3); }
 
-    /* Photography: a strip of frames. */
-    .photos { margin-top: 96px; }
-    .photos-head { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 28px; }
-    .photos h2 { margin-top: 12px; font-size: clamp(26px, 3.4vw, 40px); letter-spacing: -0.02em; }
-    .photos-text { max-width: 640px; margin: 12px 0 0; color: var(--ink-3); font-size: 16px; }
-    .photos-nav { display: flex; gap: 10px; }
-    .photos-nav button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--hair-2); font-size: 18px; color: var(--ink); }
-    .photos-nav button:hover { border-color: var(--glow); }
-    .strip { display: grid; grid-auto-flow: column; grid-auto-columns: min(340px, 75vw); gap: 16px; margin: 0; padding: 0 0 12px; list-style: none; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
-    .strip::-webkit-scrollbar { display: none; }
-    .strip li { position: relative; aspect-ratio: 4 / 5; border-radius: 20px; overflow: hidden; scroll-snap-align: start; background: var(--card); }
-    .strip img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s var(--ease); }
-    .strip li:hover img { transform: scale(1.04); }
-    .ph-cap { position: absolute; left: 16px; bottom: 14px; padding: 5px 10px; border-radius: 999px; background: rgb(0 0 0 / 0.55); backdrop-filter: blur(6px); font-size: 13px; color: #fff; text-transform: capitalize; }
-    .strip--empty { grid-auto-columns: min(280px, 70vw); }
-    .strip--empty li { aspect-ratio: 3 / 4;  border: 1px dashed var(--hair-2); background: repeating-linear-gradient(135deg, transparent 0 14px, rgb(var(--ink-rgb) / 0.025) 14px 15px), var(--bg-2); }
-    .vf { position: absolute; inset: 18px; background:
-      linear-gradient(var(--ink-4), var(--ink-4)) top left / 22px 2px no-repeat, linear-gradient(var(--ink-4), var(--ink-4)) top left / 2px 22px no-repeat,
-      linear-gradient(var(--ink-4), var(--ink-4)) top right / 22px 2px no-repeat, linear-gradient(var(--ink-4), var(--ink-4)) top right / 2px 22px no-repeat,
-      linear-gradient(var(--ink-4), var(--ink-4)) bottom left / 22px 2px no-repeat, linear-gradient(var(--ink-4), var(--ink-4)) bottom left / 2px 22px no-repeat,
-      linear-gradient(var(--ink-4), var(--ink-4)) bottom right / 22px 2px no-repeat, linear-gradient(var(--ink-4), var(--ink-4)) bottom right / 2px 22px no-repeat; }
-    .vf::after { content: ''; position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; margin: -13px; border: 1.5px solid var(--ink-4); border-radius: 50%; }
-    .vf-note { position: absolute; left: 0; right: 0; bottom: 44px; margin: 0; text-align: center; font-size: 14px; color: var(--ink-3); }
-
-    /* The end. */
-    .pp-end { margin-top: 110px; padding: 80px 32px; border: 1px solid var(--hair-2); border-radius: 24px; text-align: center;
+    /* End. */
+    .pp-end { margin-top: 140px; padding: 90px 32px; border: 1px solid var(--hair-2); border-radius: 26px; text-align: center;
       background: radial-gradient(circle at 1px 1px, rgb(var(--ink-rgb) / 0.12) 1px, transparent 0) 0 0 / 22px 22px, var(--bg-2); }
-    .pp-end h2 { font-size: clamp(28px, 4vw, 48px); letter-spacing: -0.02em; }
-    .pp-end p { margin: 14px auto 28px; max-width: 520px; color: var(--ink-3); }
+    .pp-end h2 { font-size: clamp(30px, 4.4vw, 56px); letter-spacing: -0.025em; }
+    .pp-end p { margin: 16px auto 0; max-width: 520px; color: var(--ink-3); }
+    .pp-links { display: flex; justify-content: center; align-items: center; gap: 22px; margin-top: 30px !important; }
 
     @media (max-width: 1099px) {
-      .c-movies, .c-music, .c-coding, .c-side, .c-cooking, .c-books { grid-column: span 12; grid-row: auto; }
-      .c-singing, .c-sports { grid-column: span 6; }
+      .shelf { grid-template-columns: repeat(9, 150px); overflow-x: auto; padding: 12px 4px 14px; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+      .shelf li { scroll-snap-align: start; }
+      .ch-music, .ch-cooking, .ch-coding, .ch-reading { grid-template-columns: 1fr; gap: 40px; }
+      .spines { order: 2; height: 200px; }
     }
-    @media (max-width: 699px) {
-      .pp { padding: 110px 20px 72px; }
-      .cell { padding: 24px 20px; }
-      .c-singing, .c-sports { grid-column: span 12; }
-      .posters { height: 210px; overflow: hidden; }
-      .posters li { width: 104px; height: 156px; margin-right: -52px; }
-      .recipes { flex-direction: column; } .recipe { width: auto; }
-      .photos-head { flex-direction: column; align-items: start; }
+    @media (max-width: 899px) {
+      .pp { padding: 104px 20px 72px; }
+      .pp-hero { grid-template-columns: 1fr; min-height: 0; gap: 20px; }
+      .pp-hero-stack { height: 360px; order: -1; margin-top: 8px; }
+      .pp-hero-stack figure { width: 50%; }
+      .toc { grid-template-columns: repeat(2, auto); }
+      .ch { padding-top: 88px; }
+      .ch-head { grid-template-columns: 1fr; margin-bottom: 32px; }
+      .deck { grid-template-columns: 1fr; justify-items: center; padding: 22px; }
+      .playlist { width: 100%; }
+      .board li { grid-template-columns: 40px minmax(0, 1fr); padding: 18px 4px; }
+      .board-note { grid-column: 2; font-size: 15px; }
+      .fav { padding: 36px 26px 30px; }
+      .spread { grid-template-columns: 1fr 1fr; grid-auto-rows: auto; }
+      .sp { grid-column: auto !important; grid-row: auto !important; }
+      .sp0 { grid-column: 1 / -1 !important; }
+      .photo { aspect-ratio: 3 / 4; height: auto; }
+      .sp0 .photo { aspect-ratio: 4 / 5; }
+      .sheet-card { grid-template-columns: 1fr; }
+      .sheet-art { aspect-ratio: auto; height: 240px; }
+      .sheet-art img { object-fit: contain; background: var(--bg); }
+      .sheet-text { padding: 24px 22px 24px; }
+      .sheet-text h3 { font-size: 28px; }
     }
-    @media (prefers-reduced-motion: reduce) { .term pre > span { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .t { opacity: 1; } }
   </style>
 </Base>
