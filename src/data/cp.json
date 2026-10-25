@@ -265,13 +265,13 @@
   "leetcode": {
     "rating": 1557,
     "contests": 6,
-    "top": 31.32,
+    "top": 31.33,
     "solved": {
-      "all": 220,
-      "easy": 76,
-      "medium": 114,
+      "all": 228,
+      "easy": 78,
+      "medium": 120,
       "hard": 30
     }
   },
-  "fetched": "2026-10-21T13:51:58.033Z"
+  "fetched": "2026-10-25T18:27:15.243Z"
 }

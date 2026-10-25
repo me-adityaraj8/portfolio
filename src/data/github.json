@@ -1,14 +1,14 @@
 {
   "owner": "me-adityaraj8",
-  "fetched": "2026-10-22T14:07:32.595Z",
+  "fetched": "2026-10-25T18:27:11.952Z",
   "profile": {
     "login": "me-adityaraj8",
     "name": null,
     "avatar": "https://avatars.githubusercontent.com/u/190913734?v=4",
     "bio": null,
-    "followers": 2,
-    "following": 12,
-    "repos": 18,
+    "followers": 3,
+    "following": 13,
+    "repos": 20,
     "since": "2024-12-07T05:28:50Z"
   },
   "repos": [
@@ -22,7 +22,13 @@
       "url": "https://github.com/me-adityaraj8/ai.resume-analyser",
       "homepage": null,
       "commits": 2,
-      "languages": {}
+      "languages": {
+        "JavaScript": 1035632,
+        "TypeScript": 8218,
+        "CSS": 5755,
+        "Dockerfile": 599,
+        "HTML": 366
+      }
     },
     {
       "name": "career-os",
@@ -102,6 +108,18 @@
       }
     },
     {
+      "name": "freeCodeCamp",
+      "createdAt": "2026-10-23T05:00:28Z",
+      "description": "freeCodeCamp.org's open-source codebase and curriculum. Learn math, programming, and computer science for free.",
+      "language": null,
+      "isFork": true,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/freeCodeCamp",
+      "homepage": "https://contribute.freecodecamp.org",
+      "commits": null,
+      "languages": {}
+    },
+    {
       "name": "js_CaurC",
       "createdAt": "2025-06-11T14:46:07Z",
       "description": "learning js with chai aur code",
@@ -141,12 +159,12 @@
       "isPrivate": false,
       "url": "https://github.com/me-adityaraj8/Kalaa-website",
       "homepage": "https://kalaa-website.vercel.app",
-      "commits": 4,
+      "commits": 9,
       "languages": {
-        "TypeScript": 106233,
-        "JavaScript": 990,
-        "HTML": 390,
-        "CSS": 59
+        "TypeScript": 210268,
+        "CSS": 4827,
+        "JavaScript": 2504,
+        "HTML": 1709
       }
     },
     {
@@ -158,7 +176,7 @@
       "isPrivate": false,
       "url": "https://github.com/me-adityaraj8/me-adityaraj8",
       "homepage": null,
-      "commits": 158,
+      "commits": 177,
       "languages": {}
     },
     {
@@ -200,6 +218,23 @@
         "JavaScript": 52868,
         "CSS": 9796,
         "Shell": 2668
+      }
+    },
+    {
+      "name": "portfolio",
+      "createdAt": "2026-10-23T05:52:20Z",
+      "description": "My portfolio. Every project opens live.",
+      "language": "TypeScript",
+      "isFork": false,
+      "isPrivate": false,
+      "url": "https://github.com/me-adityaraj8/portfolio",
+      "homepage": "https://me-adityaraj8.vercel.app",
+      "commits": 13,
+      "languages": {
+        "TypeScript": 126261,
+        "Astro": 87306,
+        "CSS": 58405,
+        "JavaScript": 10122
       }
     },
     {
