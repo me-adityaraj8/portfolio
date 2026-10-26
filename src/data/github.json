@@ -1,12 +1,12 @@
 {
   "owner": "me-adityaraj8",
-  "fetched": "2026-10-25T18:27:11.952Z",
+  "fetched": "2026-10-26T15:27:31.385Z",
   "profile": {
     "login": "me-adityaraj8",
     "name": null,
     "avatar": "https://avatars.githubusercontent.com/u/190913734?v=4",
     "bio": null,
-    "followers": 3,
+    "followers": 4,
     "following": 13,
     "repos": 20,
     "since": "2024-12-07T05:28:50Z"
@@ -176,7 +176,7 @@
       "isPrivate": false,
       "url": "https://github.com/me-adityaraj8/me-adityaraj8",
       "homepage": null,
-      "commits": 177,
+      "commits": 181,
       "languages": {}
     },
     {
@@ -229,7 +229,7 @@
       "isPrivate": false,
       "url": "https://github.com/me-adityaraj8/portfolio",
       "homepage": "https://me-adityaraj8.vercel.app",
-      "commits": 13,
+      "commits": 14,
       "languages": {
         "TypeScript": 126261,
         "Astro": 87306,
