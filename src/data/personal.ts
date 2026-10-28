@@ -81,7 +81,7 @@ export const personal = {
   singing: {
     title: 'Singing, Just Because',
     quote: 'No special occasion needed, no audience required.',
-    body: ["I love singing. Sometimes it's about getting a song just right, sometimes it's just me, my headphones, and a song on repeat. If I like a song enough, there's a good chance I'll try singing it too. Bonus points if there's a guitar involved."],
+    body: ["I love singing. Sometimes it's about getting a song just right, sometimes it's just me, my headphones, and a song on repeat. If I like a song enough, there's a good chance I'll try singing it too."],
   },
 
   sports: {
