@@ -13,6 +13,7 @@ describe('shortcutFor', () => {
     expect(shortcutFor(key('t'))).toBe('theme');
     expect(shortcutFor(key('v'))).toBe('recruiter');
     expect(shortcutFor(key('?'))).toBe('help');
+    expect(shortcutFor(key('m'))).toBe('message');
   });
   it('ignores letters while the visitor is typing in a field', () => {
     expect(shortcutFor(key('t', { typing: true }))).toBeNull();

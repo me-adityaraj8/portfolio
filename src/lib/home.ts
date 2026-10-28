@@ -6,7 +6,7 @@ import { ago, bestMatch, onRepeat, parseRecent, type Played } from './music';
 import { rank } from './palette';
 import { beat, listen, onBeat } from './beat';
 import { building, contest, growFrom, guestbook, liveStats, recruiter } from './extras';
-import { backToTop, health, hirer, keyboard, perf, stackFilter } from './more';
+import { backToTop, health, hirer, keyboard, perf, stackFilter, toMessage } from './more';
 import { deck, motion } from './motion';
 import { dm } from './dm';
 
@@ -30,6 +30,7 @@ export function start() {
   palette(lenis, [
     { label: 'Keyboard shortcuts', group: 'Help', run: () => $<HTMLDialogElement>('keys').showModal() },
     { label: 'Hire Aditya', group: 'Links', run: hire },
+    { label: 'Send a message', group: 'Links', run: () => toMessage(lenis) },
   ]);
   recruiter(lenis);
   keyboard(lenis, hire);

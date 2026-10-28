@@ -43,7 +43,7 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
         <a href="#work" class="button">See the work</a>
         <a href={site.resume} target="_blank" rel="noopener">Resume</a>
         <a href={site.github} rel="noopener">GitHub</a>
-        <a href={`mailto:${site.email}`}>Email</a>
+        <a href="#contact" data-message>Message me</a>
       </p>
     </div>
     {deckProjects.length > 0 && (
@@ -347,6 +347,7 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
       <div><dt><kbd>⌘</kbd><kbd>K</kbd></dt><dd>Search sections, projects and links</dd></div>
       <div><dt><kbd>T</kbd></dt><dd>Switch light and dark</dd></div>
       <div><dt><kbd>V</kbd></dt><dd>The 30-second view</dd></div>
+      <div><dt><kbd>M</kbd></dt><dd>Send me a message</dd></div>
       <div><dt><kbd>?</kbd></dt><dd>This list</dd></div>
       <div><dt><kbd>esc</kbd></dt><dd>Close whatever is open</dd></div>
     </dl>

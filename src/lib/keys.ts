@@ -1,7 +1,7 @@
-export type Action = 'palette' | 'theme' | 'recruiter' | 'help';
+export type Action = 'palette' | 'theme' | 'recruiter' | 'help' | 'message';
 export interface KeyPress { key: string; meta: boolean; ctrl: boolean; alt: boolean; typing: boolean }
 
-const LETTERS: Record<string, Action> = { t: 'theme', v: 'recruiter', '?': 'help' };
+const LETTERS: Record<string, Action> = { t: 'theme', v: 'recruiter', '?': 'help', m: 'message' };
 
 /** Which site action a key press asks for. Single keys stay quiet while the visitor types or holds a modifier. */
 export function shortcutFor(k: KeyPress): Action | null {

@@ -23,6 +23,15 @@ export function hirer(spell: (lines: string[]) => Promise<void>) {
   };
 }
 
+/** Scrolls to the message form and puts the cursor in the first field. */
+export function toMessage(lenis: Lenis | null) {
+  const form = document.getElementById('dm');
+  if (!form) return;
+  const name = form.querySelector<HTMLInputElement>('[name=name]');
+  if (lenis) lenis.scrollTo(form, { offset: -120, onComplete: () => name?.focus({ preventScroll: true }) });
+  else { form.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' }); name?.focus({ preventScroll: true }); }
+}
+
 /** Single-key shortcuts, a list of them on "?", and one word that does something. */
 export function keyboard(lenis: Lenis | null, hire: () => void) {
   const help = $<HTMLDialogElement>('keys'), recruit = $<HTMLDialogElement>('recruit');
@@ -35,6 +44,7 @@ export function keyboard(lenis: Lenis | null, hire: () => void) {
     const action = shortcutFor({ key: e.key, meta: e.metaKey, ctrl: e.ctrlKey, alt: e.altKey, typing });
     if (action === 'help') { if (help.open) help.close(); else { help.showModal(); lenis?.stop(); } }
     else if (action === 'recruiter') { if (recruit.open) recruit.close(); else $('recruit-open').click(); }
+    else if (action === 'message') { e.preventDefault(); toMessage(lenis); }
     if (!typing && !e.metaKey && !e.ctrlKey && !e.altKey && feed(e.key)) hire();
   });
 }
@@ -111,6 +121,7 @@ export function perf() {
 
 /** A button that fades in once you're a screen down; its ring fills as you read. */
 export function backToTop(lenis: Lenis | null) {
+  document.querySelectorAll<HTMLAnchorElement>('[data-message]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toMessage(lenis); }));
   const btn = $<HTMLButtonElement>('to-top'), ring = document.getElementById('to-top-progress')!;
   const C = 2 * Math.PI * 21;
   ring.setAttribute('stroke-dasharray', String(C));
