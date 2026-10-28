@@ -8,6 +8,7 @@ import { beat, listen, onBeat } from './beat';
 import { building, contest, growFrom, guestbook, liveStats, recruiter } from './extras';
 import { health, hirer, keyboard, perf, stackFilter } from './more';
 import { deck, motion } from './motion';
+import { dm } from './dm';
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
@@ -43,6 +44,7 @@ export function start() {
   demos(lenis);
   lastPlayed();
   connect();
+  dm();
 }
 
 /** The hero: a dense dot grid in shifting colour, where the pointer sends out BFS waves. */

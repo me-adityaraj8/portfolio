@@ -752,3 +752,34 @@ html, body { overflow-x: clip; }
 .deck-card[inert] .deck-hit::before, .deck-card[inert] .deck-hit::after { opacity: 0; }
 @keyframes rainbow-spin { to { --spin: 360deg; } }
 @media (prefers-reduced-motion: reduce) { .deck-hit::before, .deck-hit::after { animation: none; } }
+
+/* ── Let's connect + direct messages. */
+.connect-grid { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 56px; align-items: start; }
+.dm { position: relative; display: grid; gap: 16px; padding: 28px; border-radius: 22px; background: var(--card); border: 1px solid var(--hair-2); box-shadow: 0 30px 80px rgb(0 0 0 / 0.35); }
+.dm::before { content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none; opacity: 0; transition: opacity 0.5s;
+  background: conic-gradient(from var(--spin), #f472b6, #fb923c, #facc15, #34d399, #38bdf8, #818cf8, #c084fc, #f472b6);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: rainbow-spin 6s linear infinite; }
+.dm:focus-within::before { opacity: 1; }
+.dm-head h3 { font-size: 22px; letter-spacing: -0.01em; }
+.dm-head p { margin: 8px 0 0; color: var(--ink-3); font-size: 15px; }
+.dm-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.dm-field { display: grid; gap: 7px; }
+.dm-field > span { display: flex; justify-content: space-between; font: 500 12px var(--cond); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
+.dm-field small { font: inherit; letter-spacing: 0.06em; color: var(--ink-4); }
+.dm-field small.near { color: #fbbf24; }
+.dm-field input, .dm-field textarea { width: 100%; padding: 12px 14px; border: 1px solid var(--hair-2); border-radius: 12px; background: var(--bg-2); color: var(--ink); font: 400 16px/1.5 var(--sans); resize: vertical; transition: border-color 0.2s, box-shadow 0.2s; }
+.dm-field input:focus, .dm-field textarea:focus { outline: none; border-color: var(--glow); box-shadow: 0 0 0 3px rgb(167 155 255 / 0.18); }
+.dm-field [aria-invalid='true'] { border-color: #f87171; }
+.dm-err { min-height: 0; font-style: normal; font-size: 13px; color: #fca5a5; }
+.dm-err:empty { display: none; }
+.dm-trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.dm-foot { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.dm-send { display: inline-flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 22px; border-radius: 999px; background: var(--ink); color: var(--bg); font: 600 15px var(--sans); transition: transform 0.3s var(--ease), opacity 0.2s; }
+.dm-send svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s var(--ease); }
+.dm-send:hover svg { transform: translateX(3px); }
+.dm-send:disabled { opacity: 0.6; cursor: progress; }
+.dm-status { margin: 0; font-size: 14px; color: var(--ink-3); }
+.dm-status a { color: var(--glow); }
+.dm[data-state='sent'] .dm-status { color: #6ee7b7; }
+.dm[data-state='error'] .dm-status { color: #fca5a5; }
+@media (max-width: 899px) { .connect-grid { grid-template-columns: 1fr; gap: 36px; } .dm { padding: 22px 18px; } .dm-row { grid-template-columns: 1fr; } }

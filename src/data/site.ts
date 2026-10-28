@@ -25,6 +25,11 @@ export const site = {
     counter: 'https://abacus.jasoncameron.dev',
     counterKey: 'adityaraj-portfolio/visits',
   },
+  /**
+   * Direct messages from the site. FormSubmit forwards each one to this inbox; the very
+   * first message triggers a one-time "activate this form" email that has to be confirmed.
+   */
+  messages: { endpoint: 'https://formsubmit.co/ajax/me.adityaraj8@gmail.com' },
   /** Public repos to keep off the site even though GitHub sync would list them. */
   hiddenRepos: ['parley'],
   /**

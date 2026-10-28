@@ -211,8 +211,10 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
   </main>
 
   <footer class="section connect" data-reveal id="contact" aria-labelledby="contact-title">
+    <div class="connect-grid">
+    <div>
     <h2 id="contact-title" class="connect-title">Let's connect</h2>
-    <p class="connect-sub">Find me on these platforms</p>
+    <p class="connect-sub">Find me on these platforms, or send a message straight to my inbox.</p>
     <ul class="pills">
       <li>
         <HoverCard>
@@ -257,6 +259,24 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
         </HoverCard>
       </li>
     </ul>
+    </div>
+    <form class="dm" id="dm" data-mail={site.email} action={site.messages.endpoint} method="POST" novalidate aria-labelledby="dm-title">
+      <div class="dm-head">
+        <h3 id="dm-title">Send me a message</h3>
+        <p>Internships, projects, or just hello. It lands straight in my inbox, and I read every one.</p>
+      </div>
+      <div class="dm-row">
+        <label class="dm-field"><span>Name</span><input name="name" autocomplete="name" required aria-describedby="dm-name-err" /><em id="dm-name-err" class="dm-err"></em></label>
+        <label class="dm-field"><span>Email</span><input name="email" type="email" autocomplete="email" required aria-describedby="dm-email-err" /><em id="dm-email-err" class="dm-err"></em></label>
+      </div>
+      <label class="dm-field"><span>Message <small id="dm-count">0 / 2000</small></span><textarea name="message" rows="5" maxlength="2000" required aria-describedby="dm-message-err"></textarea><em id="dm-message-err" class="dm-err"></em></label>
+      <input type="text" name="_honey" class="dm-trap" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <div class="dm-foot">
+        <button type="submit" class="dm-send" id="dm-send"><span>Send message</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" /></svg></button>
+        <p class="dm-status" id="dm-status" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+    </div>
     <p class="thanks" aria-label="Thank you for visiting">
       {thanksLines.map((line) => (
         <span class="thanks-line" aria-hidden="true">{line.map((l) => <span style={`--i:${l.i};--p:${l.p.toFixed(1)}%`}>{l.ch}</span>)}</span>
