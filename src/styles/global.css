@@ -783,3 +783,13 @@ html, body { overflow-x: clip; }
 .dm[data-state='sent'] .dm-status { color: #6ee7b7; }
 .dm[data-state='error'] .dm-status { color: #fca5a5; }
 @media (max-width: 899px) { .connect-grid { grid-template-columns: 1fr; gap: 36px; } .dm { padding: 22px 18px; } .dm-row { grid-template-columns: 1fr; } }
+
+/* ── With an odd number of projects, the first one spans the row as a wide feature, so the grid has no hole. */
+@media (min-width: 900px) {
+  .grid > .card:first-child:nth-last-child(odd) { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: center; }
+  .grid > .card:first-child:nth-last-child(odd) .preview { margin: 8px; }
+  .grid > .card:first-child:nth-last-child(odd) .card-body { padding: 28px 36px 28px 20px; }
+  .grid > .card:first-child:nth-last-child(odd) .card-body h3 { font-size: 30px; letter-spacing: -0.02em; }
+  .grid > .card:first-child:nth-last-child(odd) .card-body p { font-size: 17px; line-height: 1.55; margin-top: 12px; }
+  .grid > .card:first-child:nth-last-child(odd) .live-pill { position: static; margin-top: 18px; width: fit-content; }
+}
