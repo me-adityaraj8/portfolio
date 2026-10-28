@@ -13,13 +13,13 @@ const EASE = 'expo.out';
 const settle = { transition: 'none' };
 const clear = 'transform,opacity,transition';
 
-export function motion(lenis: Lenis | null) {
+export function motion(lenis: Lenis | null, pulse?: (x: number, y: number, pxPerSec: number, life: number) => void) {
   const root = document.documentElement;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) { root.classList.add('motion-ready'); return; }
   gsap.registerPlugin(ScrollTrigger, SplitText);
   lenis?.on('scroll', ScrollTrigger.update);
 
-  hero();
+  hero(pulse);
   root.classList.add('motion-ready');
   titles();
   batches();
@@ -27,15 +27,59 @@ export function motion(lenis: Lenis | null) {
   bars();
 }
 
-function hero() {
-  // Whole words, not letters: splitting letters drops the font's kerning and the name would rewrap.
-  // No masks either, so the glow isn't clipped into boxes.
-  const name = SplitText.create('.hero h1', { type: 'words' });
-  gsap.timeline({ defaults: { ease: EASE } })
-    .from('.hero .kicker', { y: 16, opacity: 0, duration: 0.9 })
-    .from(name.words, { yPercent: 45, opacity: 0, rotateX: -60, filter: 'blur(14px)', transformOrigin: '50% 100%', transformPerspective: 900, duration: 1.5, stagger: 0.16, onComplete: () => name.revert() }, '<0.1')
-    .from(['.hero .lede', '.hero .meta', '.hero .actions > *'], { y: 22, opacity: 0, duration: 1, stagger: 0.07 }, '<0.45')
-    .from(['.scroll-cue', '#scroll-down'], { opacity: 0, duration: 1 }, '<0.3');
+/**
+ * The name is revealed by a BFS wave: one diamond-shaped front spreads from the start of
+ * the name, the dots ripple with it, and the letters appear exactly where it has reached.
+ */
+function hero(pulse?: (x: number, y: number, pxPerSec: number, life: number) => void) {
+  const h1 = document.querySelector<HTMLElement>('.hero h1');
+  if (!h1) return;
+  const r = h1.getBoundingClientRect();
+  const SPEED = 1100; // px per second, the same for the dots and the clip
+  const oy = r.height * 0.5, reach = r.width + oy;
+  const front = { d: 0 };
+  const clip = () => { h1.style.clipPath = `polygon(0px ${oy - front.d}px, ${front.d}px ${oy}px, 0px ${oy + front.d}px, ${-front.d}px ${oy}px)`; };
+  clip();
+  const tl = gsap.timeline({ defaults: { ease: EASE } });
+  tl.from('.hero .kicker', { opacity: 0, duration: 0.6 })
+    .call(() => pulse?.(r.left, r.top + oy, SPEED, reach / SPEED + 0.6), [], 0.2)
+    .to(front, { d: reach, duration: reach / SPEED, ease: 'none', onUpdate: clip, onComplete: () => { h1.style.clipPath = ''; } }, 0.2)
+    .from(['.hero .lede', '.hero .meta', '.hero .actions > *'], { y: 14, opacity: 0, duration: 0.9, stagger: 0.05 }, '>-0.25')
+    .from('.hero-deck', { x: 40, opacity: 0, duration: 1.2, clearProps: 'transform,opacity' }, '<0.1')
+    .from(['.scroll-cue', '#scroll-down'], { opacity: 0, duration: 0.8 }, '<0.3');
+}
+
+/** The hero's stack of live projects: the front one rotates to the back every few seconds. */
+export function deck(reduced: boolean) {
+  const cards = gsap.utils.toArray<HTMLElement>('.deck-card');
+  const dots = gsap.utils.toArray<HTMLButtonElement>('.deck-dot');
+  const count = document.getElementById('deck-count');
+  if (!cards.length) return;
+  let front = 0, timer = 0, paused = false;
+  const place = (instant = false) => {
+    cards.forEach((c, i) => {
+      const rank = (i - front + cards.length) % cards.length;
+      const v = rank === 0 ? { x: 0, y: 0, scale: 1, rotate: 0, opacity: 1 }
+        : rank === 1 ? { x: -28, y: -24, scale: 0.95, rotate: -2.5, opacity: 0.5 }
+        : rank === 2 ? { x: -52, y: -46, scale: 0.9, rotate: -5, opacity: 0.22 }
+        : { x: -70, y: -64, scale: 0.86, rotate: -6, opacity: 0 };
+      c.style.zIndex = String(cards.length - rank);
+      c.inert = rank !== 0;
+      if (instant || reduced) gsap.set(c, v); else gsap.to(c, { ...v, duration: 0.9, ease: EASE });
+    });
+    dots.forEach((d, i) => d.setAttribute('aria-current', String(i === front)));
+    if (count) count.textContent = `${String(front + 1).padStart(2, '0')} / ${String(cards.length).padStart(2, '0')}`;
+  };
+  const go = (i: number) => { front = (i + cards.length) % cards.length; place(); };
+  const tick = () => { clearTimeout(timer); if (!reduced) timer = window.setTimeout(() => { if (!paused && !document.hidden) go(front + 1); tick(); }, 4800); };
+  place(true);
+  tick();
+  dots.forEach((d, i) => d.addEventListener('click', () => { go(i); tick(); }));
+  const wrap = document.querySelector('.hero-deck')!;
+  wrap.addEventListener('pointerenter', () => { paused = true; });
+  wrap.addEventListener('pointerleave', () => { paused = false; });
+  wrap.addEventListener('focusin', () => { paused = true; });
+  wrap.addEventListener('focusout', () => { paused = false; });
 }
 
 function titles() {

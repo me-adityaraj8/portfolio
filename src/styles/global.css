@@ -710,3 +710,32 @@ html, body { overflow-x: clip; }
   .hero .actions { row-gap: 14px; }
   .scroll-cue { display: none; }
 }
+
+/* ── Hero: name on the left, a stack of live projects on the right. */
+.hero-deck { display: none; }
+@media (min-width: 1100px) {
+  .hero { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 48px; }
+  .hero h1 { font-size: clamp(64px, 9.4vw, 150px); }
+  .hero-deck { position: relative; display: grid; gap: 16px; justify-self: end; width: min(100%, 540px); margin-top: 40px; }
+}
+.deck-label { display: flex; justify-content: space-between; align-items: center; margin: 0; font: 500 12px var(--cond); letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3); }
+.deck-label > span:first-child { display: inline-flex; align-items: center; gap: 8px; }
+#deck-count { color: var(--ink-4); letter-spacing: 0.12em; }
+.deck-stack { position: relative; display: grid; margin: 0; padding: 0; list-style: none; }
+.deck-card { grid-area: 1 / 1; display: grid; gap: 14px; transform-origin: 50% 100%; will-change: transform; }
+.deck-hit { position: relative; display: block; border-radius: 16px; overflow: hidden; border: 1px solid var(--hair-2); text-decoration: none;
+  background: linear-gradient(135deg, var(--a), var(--b)); box-shadow: 0 40px 90px rgb(0 0 0 / 0.55), 0 0 0 1px rgb(255 255 255 / 0.04); transition: box-shadow 0.4s var(--ease); }
+.deck-hit:hover, .deck-hit:focus-visible { box-shadow: 0 40px 90px rgb(0 0 0 / 0.55), 0 0 0 2px var(--a); outline: none; }
+.deck-chrome { display: flex; align-items: center; gap: 6px; padding: 9px 12px; background: rgb(12 11 20 / 0.92); }
+.deck-chrome i { width: 8px; height: 8px; border-radius: 50%; background: rgb(255 255 255 / 0.18); }
+.deck-chrome span { margin-left: 10px; padding: 2px 10px; border-radius: 6px; background: rgb(255 255 255 / 0.06); font: 12px var(--sans); color: rgb(255 255 255 / 0.6); }
+.deck-hit img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
+.deck-meta { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0; }
+.deck-meta b { font: 700 18px var(--display); letter-spacing: -0.01em; }
+.deck-meta span { font-size: 13px; color: var(--ink-3); }
+.deck-dots { display: flex; gap: 8px; margin: 0; }
+.deck-dot { width: 22px; height: 4px; border-radius: 2px; background: var(--hair-2); transition: background 0.3s, width 0.4s var(--ease); }
+.deck-dot[aria-current='true'] { width: 40px; background: var(--ink-2); }
+.hero-inner > .hero-deck { margin: 0; }
+.deck-card[inert] .deck-meta { opacity: 0; } .deck-meta { transition: opacity 0.4s; }
+@media (max-width: 899px) { .masthead nav a.nav-personal { display: none; } }

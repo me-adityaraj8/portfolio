@@ -65,7 +65,8 @@ const person = personJsonLd({
       <nav aria-label="Main">
         <a href="/#work" data-section="work">Work</a>
         <a href="/#problem-solving" data-section="problem-solving">DSA</a>
-        <a href={site.resume}>Resume</a>
+        <a href={site.resume} target="_blank" rel="noopener">Resume</a>
+        <a href="/personal" class="nav-personal">Personal</a>
         <a href={site.github} rel="noopener">GitHub</a>
         <a href={`mailto:${site.email}`}>Email</a>
         {page === 'map' && <button type="button" class="recruit-btn" id="recruit-open">30-second view</button>}

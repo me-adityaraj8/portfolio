@@ -7,7 +7,7 @@ import { rank } from './palette';
 import { beat, listen, onBeat } from './beat';
 import { building, contest, growFrom, guestbook, liveStats, recruiter } from './extras';
 import { health, hirer, keyboard, perf, stackFilter } from './more';
-import { motion } from './motion';
+import { deck, motion } from './motion';
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
@@ -20,11 +20,12 @@ export function start() {
   const raf = (t: number) => { lenis?.raf(t); requestAnimationFrame(raf); };
   requestAnimationFrame(raf);
 
-  const { spell } = field(reduced, fine);
+  const { spell, pulse } = field(reduced, fine);
   const hire = hirer(spell);
   if (fine) { cursor(); spotlights(); }
   scrollEffects();
-  motion(lenis);
+  motion(lenis, pulse);
+  deck(reduced);
   palette(lenis, [
     { label: 'Keyboard shortcuts', group: 'Help', run: () => $<HTMLDialogElement>('keys').showModal() },
     { label: 'Hire Aditya', group: 'Links', run: hire },
@@ -146,7 +147,8 @@ function field(reduced: boolean, fine: boolean) {
           I = Math.max(I, lit * 1.05);
         }
         // Brighter toward the right, so the grid never fights the name on the left.
-        const side = lit > 0 ? 1 : Math.min(1, Math.max(0.18, (x / cols - 0.1) * 1.5));
+        // Waves still show on the dim side, so the opening sweep across the name is visible.
+        const side = lit > 0 ? 1 : Math.max(Math.min(1, I) * 0.85, Math.min(1, Math.max(0.18, (x / cols - 0.1) * 1.5)));
         const b = Math.round(Math.min(1, (0.24 + beat.level * 0.35 + 0.9 * Math.min(1, I)) * side) * 10);
         if (!b) continue;
         const hue = (x / cols) * 0.75 + (y / rows) * 0.25 + Math.sin(t + x * 0.05 + y * 0.04) * 0.18 + I * 0.25;
@@ -168,7 +170,12 @@ function field(reduced: boolean, fine: boolean) {
     if (!reduced) requestAnimationFrame(draw);
   };
   requestAnimationFrame(draw);
-  return { spell };
+  /** One strong wave from a point on screen, moving `pxPerSec` pixels a second. */
+  const pulse = (clientX: number, clientY: number, pxPerSec: number, life: number) => {
+    const r = canvas.getBoundingClientRect();
+    add(Math.floor((clientX - r.left) / S), Math.floor((clientY - r.top) / S), { speed: pxPerSec / S, life, width: 4, k: 1.5 });
+  };
+  return { spell, pulse };
 }
 
 /**
@@ -281,7 +288,7 @@ function palette(lenis: Lenis | null, extra: Item[]) {
       .map(([id, name]) => ({ label: `Go to ${name}`, group: 'Sections', run: go(id) })),
     ...[...document.querySelectorAll<HTMLAnchorElement>('.card-hit')].map((c) => ({ label: `Open ${c.dataset.title}`, group: 'Projects', run: () => c.click() })),
     { label: 'Copy email address', group: 'Links', run: async () => { const a = document.querySelector<HTMLAnchorElement>('[data-copy]'); if (a) await navigator.clipboard.writeText(a.dataset.copy!).catch(() => {}); } },
-    { label: 'Open resume', group: 'Links', run: () => { location.href = linkOf('.pill[href="/resume"]'); } },
+    { label: 'Open resume', group: 'Links', run: open(linkOf('.pill[href="/resume.pdf"]')) },
     { label: 'Open GitHub', group: 'Links', run: open(linkOf('.pill[href*="github.com"]')) },
     { label: 'Open LinkedIn', group: 'Links', run: open(linkOf('.pill[href*="linkedin.com"]')) },
     { label: 'Open Codolio profile', group: 'Links', run: open(linkOf('.ps-link')) },
@@ -334,7 +341,7 @@ function demos(lenis: Lenis | null) {
     else await caseStudy(body, `/work/${slug}`);
     caseLink.hidden = !demo;
     if (push) history.pushState({ demo: slug }, '', `#${slug}`);
-    if (!dialog.open) { dialog.showModal(); opener = hit.closest('.card'); void growFrom(dialog, opener); }
+    if (!dialog.open) { dialog.showModal(); opener = hit.closest('.card, .deck-card'); void growFrom(dialog, opener); }
     body.focus({ preventScroll: true });
     lenis?.stop();
   };
@@ -348,7 +355,7 @@ function demos(lenis: Lenis | null) {
   };
 
   document.addEventListener('click', (e) => {
-    const hit = (e.target as Element).closest<HTMLAnchorElement>('.card-hit');
+    const hit = (e.target as Element).closest<HTMLAnchorElement>('.card-hit, .deck-hit');
     if (!hit || e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault();
     open(hit, true);

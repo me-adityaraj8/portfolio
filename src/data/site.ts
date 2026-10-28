@@ -10,8 +10,8 @@ export const site = {
   email: 'me.adityaraj8@gmail.com',
   github: 'https://github.com/me-adityaraj8',
   linkedin: 'https://www.linkedin.com/in/aditya-raj-kumar-dora-44145b322',
-  /** Built from this file by src/pages/resume.astro; `npm run resume:pdf` refreshes the PDF. */
-  resume: '/resume',
+  /** My Jake's-template resume, as a PDF in /public. Replace the file to update it. */
+  resume: '/resume.pdf',
   /** Where the live time on the page comes from. */
   home: { timeZone: 'Asia/Kolkata' },
   /** Live weather in the footer, from Open-Meteo. */
