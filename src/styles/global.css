@@ -840,3 +840,9 @@ html, body { overflow-x: clip; }
 .glow-btn:focus-visible { outline: 2px solid #ddd6fe; outline-offset: 4px; }
 @media (prefers-reduced-motion: reduce) { .glow-btn { transition: none; } }
 .foot-brand .glow-btn { display: grid; width: fit-content; }
+.deck-controls { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.deck-arrows { display: flex; gap: 8px; margin: 0; }
+.deck-arrow { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--hair-2); background: rgb(var(--bg-rgb) / 0.6); color: var(--ink-2); transition: border-color 0.25s, color 0.25s, transform 0.25s var(--ease); }
+.deck-arrow svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.deck-arrow:hover { color: var(--ink); border-color: var(--glow); }
+#deck-prev:hover { transform: translateX(-2px); } #deck-next:hover { transform: translateX(2px); }

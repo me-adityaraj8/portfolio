@@ -75,6 +75,8 @@ export function deck(reduced: boolean) {
   place(true);
   tick();
   dots.forEach((d, i) => d.addEventListener('click', () => { go(i); tick(); }));
+  document.getElementById('deck-prev')?.addEventListener('click', () => { go(front - 1); tick(); });
+  document.getElementById('deck-next')?.addEventListener('click', () => { go(front + 1); tick(); });
   const wrap = document.querySelector('.hero-deck')!;
   wrap.addEventListener('pointerenter', () => { paused = true; });
   wrap.addEventListener('pointerleave', () => { paused = false; });
