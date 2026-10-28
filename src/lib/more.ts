@@ -137,3 +137,14 @@ export function backToTop(lenis: Lenis | null) {
     document.getElementById('main')?.focus({ preventScroll: true });
   });
 }
+
+/** Glow buttons: a soft light inside follows the pointer. */
+export function glow() {
+  document.querySelectorAll<HTMLElement>('[data-glow]').forEach((el) => {
+    el.addEventListener('pointermove', (e) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--gx', `${e.clientX - r.left}px`);
+      el.style.setProperty('--gy', `${e.clientY - r.top}px`);
+    });
+  });
+}

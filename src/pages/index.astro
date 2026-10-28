@@ -294,11 +294,7 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
           <p class="foot-name">{site.name.toUpperCase()}</p>
           <p class="foot-tag"><span class="status-dot"></span>{site.status}</p>
           {hasPersonal && (
-            <a class="foot-card" href="/personal">
-              <span class="foot-card-k">Off the clock</span>
-              <b>Movies, music, biryani and the photos I take</b>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-            </a>
+            <a class="glow-btn" href="/personal" data-glow><span>Personal</span></a>
           )}
         </div>
         <nav class="foot-nav" aria-label="Footer">
