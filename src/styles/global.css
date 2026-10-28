@@ -793,3 +793,14 @@ html, body { overflow-x: clip; }
   .grid > .card:first-child:nth-last-child(odd) .card-body p { font-size: 17px; line-height: 1.55; margin-top: 12px; }
   .grid > .card:first-child:nth-last-child(odd) .live-pill { position: static; margin-top: 18px; width: fit-content; }
 }
+
+/* ── Back to top. */
+.to-top { position: fixed; right: 24px; bottom: 24px; z-index: 30; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%;
+  background: rgb(var(--bg-rgb) / 0.8); backdrop-filter: blur(10px); color: var(--ink); animation: rise 0.4s var(--ease); transition: transform 0.3s var(--ease); }
+.to-top:hover { transform: translateY(-3px); }
+.to-top > svg { grid-area: 1 / 1; }
+.to-top-ring { width: 48px; height: 48px; transform: rotate(-90deg); fill: none; stroke-width: 2; }
+.to-top-ring circle:first-child { stroke: var(--hair-2); }
+.to-top-ring circle:last-child { stroke: var(--glow); stroke-linecap: round; transition: stroke-dashoffset 0.1s linear; }
+.to-top-arrow { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media (max-width: 899px) { .to-top { right: 16px; bottom: 16px; } }

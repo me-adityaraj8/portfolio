@@ -108,3 +108,21 @@ export function perf() {
   if (document.readyState === 'complete') setTimeout(show, 0);
   else addEventListener('load', () => setTimeout(show, 0), { once: true });
 }
+
+/** A button that fades in once you're a screen down; its ring fills as you read. */
+export function backToTop(lenis: Lenis | null) {
+  const btn = $<HTMLButtonElement>('to-top'), ring = document.getElementById('to-top-progress')!;
+  const C = 2 * Math.PI * 21;
+  ring.setAttribute('stroke-dasharray', String(C));
+  const update = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    btn.hidden = scrollY < innerHeight * 0.9;
+    ring.setAttribute('stroke-dashoffset', String(C * (1 - (max > 0 ? scrollY / max : 0))));
+  };
+  addEventListener('scroll', update, { passive: true });
+  update();
+  btn.addEventListener('click', () => {
+    if (lenis) lenis.scrollTo(0, { duration: 1.4 }); else scrollTo({ top: 0, behavior: reduced() ? 'auto' : 'smooth' });
+    document.getElementById('main')?.focus({ preventScroll: true });
+  });
+}

@@ -6,7 +6,7 @@ import { ago, bestMatch, onRepeat, parseRecent, type Played } from './music';
 import { rank } from './palette';
 import { beat, listen, onBeat } from './beat';
 import { building, contest, growFrom, guestbook, liveStats, recruiter } from './extras';
-import { health, hirer, keyboard, perf, stackFilter } from './more';
+import { backToTop, health, hirer, keyboard, perf, stackFilter } from './more';
 import { deck, motion } from './motion';
 import { dm } from './dm';
 
@@ -36,6 +36,7 @@ export function start() {
   stackFilter(lenis);
   health();
   perf();
+  backToTop(lenis);
   const b = document.getElementById('building')!;
   building(b.dataset.owner!, (b.dataset.hidden ?? '').split(',').filter(Boolean));
   contest();
