@@ -102,9 +102,8 @@ export const personal = {
   },
 
   reading: {
-    title: 'Self-Help & Other Attempts at Getting My Life Together',
-    quote: 'Spoiler: still working on it.',
-    body: ["Mostly self-help and personal development books. Apparently, I believe the next book might finally unlock the secret to having my life completely figured out. But hey, picking up a useful idea here and there can't hurt."],
+    title: 'Books',
+    body: ['Mostly into philosophy, stoicism, self-help, and personal development. I follow Stoicism the most and find a lot of inspiration in Marcus Aurelius and his way of looking at life. Always up for a good read that makes me think a little differently.'],
   },
 
   coding: {

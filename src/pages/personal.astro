@@ -24,7 +24,7 @@ const photos = Object.entries(import.meta.glob<{ default: ImageMetadata }>('../a
 const songs = media.songs.filter((s) => covers[s.id]);
 const chapters = [
   ['movies', 'Movies & shows'], ['music', 'Music'], ['singing', 'Singing'], ['sports', 'Sports'], ['cooking', 'Cooking'],
-  ['photography', 'Photography'], ['reading', 'Reading'], ['coding', 'Coding'], ['side-quests', 'Side quests'],
+  ['photography', 'Photography'], ['reading', 'Books'], ['coding', 'Coding'], ['side-quests', 'Side quests'],
 ];
 const no = (id: string) => String(chapters.findIndex(([c]) => c === id) + 1).padStart(2, '0');
 const lines = [92, 100, 84, 97, 76, 100, 88, 62];
@@ -224,22 +224,21 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
       <div class="lb-nav"><button type="button" id="lb-prev" aria-label="Previous photo">←</button><button type="button" id="lb-next" aria-label="Next photo">→</button></div>
     </dialog>
 
-    <!-- 07 Reading: a book that opens, then keeps turning pages; one line gets highlighted. -->
+    <!-- 07 Books: a book that opens, then keeps turning pages; one line gets highlighted. -->
     <section class="ch ch-reading" id="reading" aria-labelledby="h-reading" data-reveal-ch>
       <div class="book-wrap" aria-hidden="true">
         <div class="book">
           <div class="page page-l">{lines.map((w) => <i style={`--w:${w}%`}></i>)}</div>
           <div class="page page-r">{lines.map((w, i) => <i class:list={[{ hl: i === 3 }]} style={`--w:${w}%`}></i>)}</div>
           <div class="leaf"><div class="leaf-face">{lines.map((w) => <i style={`--w:${100 - w / 3}%`}></i>)}</div><div class="leaf-face leaf-back">{lines.map((w) => <i style={`--w:${w}%`}></i>)}</div></div>
-          <div class="cover"><div class="cover-face"><span>Life,<br />figured out</span><small>Volume {'∞'}</small></div><div class="cover-face cover-in"></div></div>
-          <span class="note">useful idea!</span>
+          <div class="cover"><div class="cover-face"><span>Think<br />a little<br />differently</span><small>Stoic notes</small></div><div class="cover-face cover-in"></div></div>
+          <span class="note">worth rereading</span>
         </div>
         <span class="book-shadow"></span>
       </div>
       <div>
         <span class="ch-no">{no('reading')}</span>
         <h2 id="h-reading">{p.reading.title}</h2>
-        <blockquote class="pull pull--small">{p.reading.quote}</blockquote>
         <div class="ch-body">{p.reading.body.map((t) => <p>{t}</p>)}</div>
       </div>
     </section>
