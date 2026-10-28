@@ -31,6 +31,19 @@ const lines = [92, 100, 84, 97, 76, 100, 88, 62];
 const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0.47) * Math.cos(i * 0.19)) * 0.82);
 ---
 <Base title={`Off the clock, ${site.name}`} description={p.intro} page="personal" image="/og/home.png">
+  <div class="pp-bg" aria-hidden="true">
+    <div class="bg-halftone"></div>
+    <div class="bg-vinyl"><span></span></div>
+    <svg class="bg-wave" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0 60 C 60 10, 120 110, 180 60 S 300 10, 360 60 S 480 110, 540 60 S 660 0, 720 60 S 840 120, 900 60 S 1020 20, 1080 60 S 1170 90, 1200 60" /></svg>
+    <svg class="stk stk-star" data-depth="0.9" viewBox="0 0 100 100"><path d="M50 0 C55 35 65 45 100 50 C65 55 55 65 50 100 C45 65 35 55 0 50 C35 45 45 35 50 0Z" /></svg>
+    <svg class="stk stk-ring" data-depth="0.5" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" /></svg>
+    <svg class="stk stk-note" data-depth="1.2" viewBox="0 0 64 64"><path d="M24 46a8 8 0 1 1-4-7V12l28-6v30a8 8 0 1 1-4-7V14l-20 4z" /></svg>
+    <svg class="stk stk-zig" data-depth="0.7" viewBox="0 0 120 40"><path d="M2 30 L22 8 L42 30 L62 8 L82 30 L102 8 L118 26" /></svg>
+    <svg class="stk stk-half" data-depth="0.35" viewBox="0 0 100 50"><path d="M0 50 A50 50 0 0 1 100 50Z" /></svg>
+    <svg class="stk stk-plus" data-depth="1" viewBox="0 0 40 40"><path d="M20 4v32M4 20h32" /></svg>
+    <svg class="stk stk-note2" data-depth="0.6" viewBox="0 0 64 64"><path d="M24 46a8 8 0 1 1-4-7V12l28-6v30a8 8 0 1 1-4-7V14l-20 4z" /></svg>
+    <div class="bg-grain"></div>
+  </div>
   <main class="pp" id="main" tabindex="-1">
 
     <header class="pp-hero">
@@ -334,6 +347,11 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
         if (!items.length) continue;
         gsap.from(items, { ...from, duration: 1.1, ease: EASE, stagger: 0.06, clearProps: 'transform,opacity', scrollTrigger: { trigger: items[0], start: 'top 90%', once: true } });
       }
+      // Background stickers drift at their own speed as you scroll, which gives the page depth.
+      gsap.utils.toArray<HTMLElement>('.stk').forEach((el) => {
+        const d = Number(el.dataset.depth ?? 0.5);
+        gsap.to(el, { y: () => -innerHeight * 0.6 * d, rotate: d * 40, ease: 'none', scrollTrigger: { trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: 0.6 } });
+      });
       for (const sel of ['.deck', '.fav', '.term', '.pp-end']) {
         gsap.from(sel, { y: 60, opacity: 0, scale: 0.97, duration: 1.2, ease: EASE, clearProps: 'transform,opacity', scrollTrigger: { trigger: sel, start: 'top 88%', once: true } });
       }
@@ -424,7 +442,42 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
   </script>
 
   <style>
-    .pp { max-width: 1240px; margin: 0 auto; padding: 140px 32px 96px; overflow-x: clip; }
+    .pp { position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 140px 32px 96px; overflow-x: clip; }
+
+    /* Background: grain, a slow vinyl, halftone print, a sound wave, and stickers in the margins. */
+    .pp-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+      background: radial-gradient(60vw 50vh at 85% 8%, rgb(167 139 250 / 0.09), transparent 70%), radial-gradient(50vw 50vh at 0% 100%, rgb(244 114 182 / 0.07), transparent 70%); }
+    .bg-grain { position: absolute; inset: -50%; opacity: 0.09; mix-blend-mode: overlay; animation: grain 1.2s steps(4) infinite;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+    @keyframes grain { 0% { transform: translate(0, 0); } 25% { transform: translate(-3%, 2%); } 50% { transform: translate(2%, -3%); } 75% { transform: translate(-2%, -1%); } 100% { transform: translate(0, 0); } }
+    .bg-halftone { position: absolute; top: 6vh; right: -4vw; width: 46vw; height: 46vw; max-width: 620px; max-height: 620px; opacity: 0.22;
+      background: radial-gradient(circle, #a78bfa 1.6px, transparent 1.9px) 0 0 / 14px 14px;
+      -webkit-mask: radial-gradient(closest-side, #000 20%, transparent); mask: radial-gradient(closest-side, #000 20%, transparent); }
+    .bg-vinyl { position: absolute; left: -22vmax; bottom: -26vmax; width: 60vmax; height: 60vmax; border-radius: 50%; opacity: 0.16;
+      background: repeating-radial-gradient(circle, transparent 0 5px, rgb(255 255 255 / 0.22) 5px 6px), radial-gradient(circle, rgb(244 114 182 / 0.35) 0 6%, transparent 6.2%);
+      animation: vinyl 60s linear infinite; }
+    .bg-vinyl span { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0 20%, rgb(255 255 255 / 0.18) 26%, transparent 34% 70%, rgb(255 255 255 / 0.12) 76%, transparent 84%); }
+    @keyframes vinyl { to { transform: rotate(360deg); } }
+    .bg-wave { position: absolute; left: -2vw; top: 44vh; width: 104vw; height: 120px; opacity: 0.16; fill: none; stroke: #f472b6; stroke-width: 2; stroke-dasharray: 8 10; animation: wave 14s linear infinite; }
+    @keyframes wave { to { stroke-dashoffset: -360; } }
+    .stk { position: absolute; animation: float 9s ease-in-out infinite; }
+    .stk-star { top: 18vh; left: 3vw; width: 54px; fill: #facc15; opacity: 0.5; }
+    .stk-ring { top: 70vh; right: 4vw; width: 90px; fill: none; stroke: #22d3ee; stroke-width: 7; opacity: 0.35; animation-delay: -3s; }
+    .stk-note { top: 34vh; right: 2.5vw; width: 46px; fill: #f472b6; opacity: 0.45; animation-delay: -5s; }
+    .stk-zig { top: 86vh; left: 6vw; width: 110px; fill: none; stroke: #34d399; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; opacity: 0.4; animation-delay: -2s; }
+    .stk-half { top: 8vh; left: 42vw; width: 80px; fill: #a78bfa; opacity: 0.18; animation-delay: -6s; }
+    .stk-plus { top: 58vh; left: 2vw; width: 30px; fill: none; stroke: #fb923c; stroke-width: 6; stroke-linecap: round; opacity: 0.45; animation-delay: -1s; }
+    .stk-note2 { top: 92vh; right: 18vw; width: 34px; fill: #a78bfa; opacity: 0.35; animation-delay: -4s; }
+    @keyframes float { 50% { translate: 0 -14px; } }
+    @media (max-width: 699px) {
+      .stk-half, .stk-note2, .stk-plus { display: none; }
+      .stk { scale: 0.7; opacity: 0.22 !important; }
+      .bg-halftone { width: 80vw; height: 80vw; right: -30vw; }
+      .bg-wave { top: 60vh; }
+    }
+    @media (prefers-reduced-motion: reduce) { .bg-grain, .bg-vinyl, .bg-wave, .stk { animation: none; } }
+    :global(html[data-theme='light']) .bg-grain { mix-blend-mode: multiply; opacity: 0.06; }
+    :global(html[data-theme='light']) .bg-vinyl { opacity: 0.08; background: repeating-radial-gradient(circle, transparent 0 5px, rgb(21 19 31 / 0.3) 5px 6px), radial-gradient(circle, #f472b6 0 12%, transparent 12.2%); }
     .eyebrow { margin: 0; font: 500 12px var(--cond); letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3); }
 
     /* Hero: big type on the left, three of my photos fanned on the right. */
