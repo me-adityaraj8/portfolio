@@ -48,6 +48,11 @@ export function start() {
   lastPlayed();
   connect();
   dm();
+  // Links like "Say hi" on other pages land here and open the message form.
+  if (location.hash === '#message') {
+    history.replaceState(null, '', location.pathname + location.search);
+    setTimeout(() => toMessage(lenis), 400);
+  }
 }
 
 /** The hero: a dense dot grid in shifting colour, where the pointer sends out BFS waves. */
