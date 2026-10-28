@@ -805,3 +805,31 @@ html, body { overflow-x: clip; }
 .to-top-arrow { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 @media (max-width: 899px) { .to-top { right: 16px; bottom: 16px; } }
 .pill--spotify:hover { border-color: rgb(30 215 96 / 0.6); box-shadow: 0 0 24px rgb(30 215 96 / 0.18); }
+
+/* ── Footer. */
+.foot { display: block; margin-top: 64px; padding-top: 40px; border-top: 1px solid var(--hair); color: var(--ink-3); font-size: 14px; }
+.foot-main { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr) auto; gap: 40px; align-items: start; }
+.foot-name { margin: 0; font: 500 14px/1 var(--display); letter-spacing: 0.22em; color: var(--ink); }
+.foot-tag { display: inline-flex; align-items: center; gap: 8px; margin: 12px 0 0; font: 500 13px var(--cond); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+.foot-card { position: relative; display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; align-items: center; margin-top: 22px; padding: 16px 18px; max-width: 360px; border-radius: 16px; text-decoration: none; overflow: hidden;
+  background: radial-gradient(260px 140px at 0% 0%, rgb(244 114 182 / 0.16), transparent 70%), radial-gradient(260px 140px at 100% 100%, rgb(56 189 248 / 0.12), transparent 70%), var(--card); border: 1px solid var(--hair-2); transition: transform 0.4s var(--ease), border-color 0.3s; }
+.foot-card:hover { transform: translateY(-3px); border-color: rgb(244 114 182 / 0.5); color: inherit; }
+.foot-card-k { grid-column: 1; font: 500 11px var(--cond); letter-spacing: 0.18em; text-transform: uppercase; color: #f9a8d4; }
+.foot-card b { grid-column: 1; font-weight: 500; font-size: 15px; color: var(--ink); line-height: 1.35; }
+.foot-card svg { grid-column: 2; grid-row: 1 / span 2; width: 22px; height: 22px; fill: none; stroke: var(--ink-2); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s var(--ease); }
+.foot-card:hover svg { transform: translateX(4px); }
+.foot-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.foot-nav div { display: grid; gap: 10px; align-content: start; }
+.foot-h { margin: 0 0 4px; font: 500 12px var(--cond); letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-4); }
+.foot-nav a { width: fit-content; color: var(--ink-2); text-decoration: none; font-size: 15px; }
+.foot-nav a:hover { color: var(--ink); }
+.foot-main .wx { justify-self: end; }
+.foot-base { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--hair); font-size: 13px; color: var(--ink-4); }
+.foot-src { margin-left: auto; color: var(--ink-3); text-decoration: none; }
+.foot-src:hover { color: var(--ink); }
+@media (max-width: 1099px) { .foot-main { grid-template-columns: 1fr 1fr; } .foot-main .wx { grid-column: 1 / -1; justify-self: start; } }
+@media (max-width: 699px) {
+  .foot-main { grid-template-columns: 1fr; gap: 32px; }
+  .foot-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .foot-src { margin-left: 0; }
+}

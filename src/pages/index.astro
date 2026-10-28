@@ -289,13 +289,35 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
       ))}
     </p>
     <div class="foot">
-      <span class="foot-left">© {new Date().getFullYear()} {site.name}.{hasPersonal && <a class="foot-personal" href="/personal">Personal</a>}<span class="live-stats" id="live-stats" data-backend={site.live.backend} data-counter={site.live.counter} data-key={site.live.counterKey}><span id="visits"></span><span id="here" hidden><i></i><b id="here-n"></b> here now</span><span id="perf" class="perf" hidden></span></span></span>
-      <div class="wx" id="wx" data-place={site.weather.place} data-lat={site.weather.lat} data-lon={site.weather.lon} hidden>
-        <span class="wx-icon" id="wx-icon" aria-hidden="true"></span>
-        <span class="wx-text">
-          <span class="wx-top"><b id="wx-temp"></b><span id="wx-label"></span></span>
-          <span class="wx-sub" id="wx-sub"></span>
-        </span>
+      <div class="foot-main">
+        <div class="foot-brand">
+          <p class="foot-name">{site.name.toUpperCase()}</p>
+          <p class="foot-tag"><span class="status-dot"></span>{site.status}</p>
+          {hasPersonal && (
+            <a class="foot-card" href="/personal">
+              <span class="foot-card-k">Off the clock</span>
+              <b>Movies, music, biryani and the photos I take</b>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </a>
+          )}
+        </div>
+        <nav class="foot-nav" aria-label="Footer">
+          <div><p class="foot-h">Explore</p><a href="#work">Work</a><a href="#problem-solving">DSA</a><a href="/work">All projects</a></div>
+          <div><p class="foot-h">About</p>{hasPersonal && <a href="/personal">Personal</a>}<a href={site.resume} target="_blank" rel="noopener">Resume</a><a href="#contact" data-message>Message me</a></div>
+          <div><p class="foot-h">Elsewhere</p><a href={site.github} rel="noopener" target="_blank">GitHub</a><a href={site.linkedin} rel="noopener" target="_blank">LinkedIn</a><a href={site.spotify} rel="noopener" target="_blank">Spotify</a></div>
+        </nav>
+        <div class="wx" id="wx" data-place={site.weather.place} data-lat={site.weather.lat} data-lon={site.weather.lon} hidden>
+          <span class="wx-icon" id="wx-icon" aria-hidden="true"></span>
+          <span class="wx-text">
+            <span class="wx-top"><b id="wx-temp"></b><span id="wx-label"></span></span>
+            <span class="wx-sub" id="wx-sub"></span>
+          </span>
+        </div>
+      </div>
+      <div class="foot-base">
+        <span>© {new Date().getFullYear()} {site.name}</span>
+        <span class="live-stats" id="live-stats" data-backend={site.live.backend} data-counter={site.live.counter} data-key={site.live.counterKey}><span id="visits"></span><span id="here" hidden><i></i><b id="here-n"></b> here now</span><span id="perf" class="perf" hidden></span></span>
+        <a class="foot-src" href={`${site.github}/portfolio`} rel="noopener" target="_blank">Built with Astro · view the source</a>
       </div>
     </div>
   </footer>
