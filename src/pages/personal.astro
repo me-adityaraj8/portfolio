@@ -27,6 +27,7 @@ const chapters = [
   ['photography', 'Photography'], ['reading', 'Reading'], ['coding', 'Coding'], ['side-quests', 'Side quests'],
 ];
 const no = (id: string) => String(chapters.findIndex(([c]) => c === id) + 1).padStart(2, '0');
+const lines = [92, 100, 84, 97, 76, 100, 88, 62];
 const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0.47) * Math.cos(i * 0.19)) * 0.82);
 ---
 <Base title={`Off the clock, ${site.name}`} description={p.intro} page="personal" image="/og/home.png">
@@ -206,9 +207,18 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
       <div class="lb-nav"><button type="button" id="lb-prev" aria-label="Previous photo">←</button><button type="button" id="lb-next" aria-label="Next photo">→</button></div>
     </dialog>
 
-    <!-- 07 Reading: a quote and a stack of plain spines. -->
+    <!-- 07 Reading: a book that opens, then keeps turning pages; one line gets highlighted. -->
     <section class="ch ch-reading" id="reading" aria-labelledby="h-reading" data-reveal-ch>
-      <div class="spines" aria-hidden="true">{['#818cf8', '#38bdf8', '#a78bfa', '#2dd4bf', '#f472b6', '#fbbf24'].map((c, i) => <span style={`--c:${c};--i:${i}`}></span>)}</div>
+      <div class="book-wrap" aria-hidden="true">
+        <div class="book">
+          <div class="page page-l">{lines.map((w) => <i style={`--w:${w}%`}></i>)}</div>
+          <div class="page page-r">{lines.map((w, i) => <i class:list={[{ hl: i === 3 }]} style={`--w:${w}%`}></i>)}</div>
+          <div class="leaf"><div class="leaf-face">{lines.map((w) => <i style={`--w:${100 - w / 3}%`}></i>)}</div><div class="leaf-face leaf-back">{lines.map((w) => <i style={`--w:${w}%`}></i>)}</div></div>
+          <div class="cover"><div class="cover-face"><span>Life,<br />figured out</span><small>Volume {'∞'}</small></div><div class="cover-face cover-in"></div></div>
+          <span class="note">useful idea!</span>
+        </div>
+        <span class="book-shadow"></span>
+      </div>
       <div>
         <span class="ch-no">{no('reading')}</span>
         <h2 id="h-reading">{p.reading.title}</h2>
@@ -305,7 +315,6 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
         ['.shelf .poster', { y: 80, opacity: 0, rotate: 6 }],
         ['.track', { y: 18, opacity: 0 }],
         ['.spread .sp', { y: 70, opacity: 0, scale: 0.96 }],
-        ['.spines span', { scaleY: 0, transformOrigin: 'bottom' }],
         ['.quests span', { y: 40, opacity: 0 }],
       ];
       for (const [sel, from] of groups) {
@@ -578,13 +587,35 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
 
     /* 07 Reading. */
     .ch-reading { display: grid; grid-template-columns: minmax(0, 0.6fr) minmax(0, 1fr); gap: 64px; align-items: center; }
-    .spines { display: flex; align-items: end; justify-content: center; gap: 6px; height: 260px; padding: 0 20px; border-bottom: 2px solid var(--hair-2); }
-    .spines span { width: 34px; height: calc(150px + var(--i) * 17px); border-radius: 4px 4px 0 0; background: linear-gradient(90deg, color-mix(in srgb, var(--c) 70%, black), var(--c)); box-shadow: inset 4px 0 0 rgb(0 0 0 / 0.2);
-      transform-origin: bottom; transition: transform 0.6s var(--ease); }
-    .spines span:nth-child(2n) { height: calc(200px - var(--i) * 9px); }
-    .spines span:nth-child(5) { transform: rotate(8deg) translateX(6px); }
-    .ch-reading:hover .spines span { transform: translateY(-6px); }
-    .ch-reading:hover .spines span:nth-child(5) { transform: rotate(14deg) translate(10px, -4px); }
+    .book-wrap { position: relative; display: grid; place-items: center; height: 320px; perspective: 1600px; }
+    .book { --w: min(400px, 82vw); --h: calc(var(--w) * 0.66); position: relative; width: var(--w); height: var(--h); transform: rotateX(18deg) rotateZ(-4deg); transform-style: preserve-3d; transition: transform 0.8s var(--ease); }
+    .ch-reading:hover .book { transform: rotateX(10deg) rotateZ(-2deg) translateY(-6px); }
+    .page, .leaf-face, .cover-face { position: absolute; top: 0; width: 50%; height: 100%; }
+    .page { display: grid; align-content: center; gap: 9%; padding: 0 8%; background: linear-gradient(90deg, #ede6d6, #f8f3e7 18%, #f8f3e7); }
+    .page-l { left: 0; opacity: 0; transition: opacity 0.4s 0.75s; border-radius: 6px 0 0 6px; background: linear-gradient(270deg, #ddd4bf, #f3ecdd 16%, #f8f3e7); box-shadow: -6px 10px 30px rgb(0 0 0 / 0.35); }
+    .ch-reading.on .page-l { opacity: 1; }
+    .page-r { left: 50%; border-radius: 0 6px 6px 0; box-shadow: 6px 10px 30px rgb(0 0 0 / 0.35); }
+    .page i, .leaf-face i { display: block; position: relative; width: var(--w); height: 3px; border-radius: 2px; background: rgb(60 52 40 / 0.28); }
+    .page i.hl::after { content: ''; position: absolute; left: -4%; top: -5px; height: 13px; width: 0; border-radius: 3px; background: rgb(250 204 21 / 0.7); mix-blend-mode: multiply; }
+    .ch-reading.on .page i.hl::after { animation: highlight 4.8s linear 1.6s infinite; }
+    @keyframes highlight { 0%, 62% { width: 0; opacity: 1; } 74%, 92% { width: 108%; opacity: 1; } 97%, 100% { width: 108%; opacity: 0; } }
+    .leaf { position: absolute; left: 50%; top: 0; width: 50%; height: 100%; transform-origin: left center; transform-style: preserve-3d; transform: translateZ(1.5px); }
+    .leaf-face { left: 0; width: 100%; display: grid; align-content: center; gap: 9%; padding: 0 8%; backface-visibility: hidden; border-radius: 0 6px 6px 0; background: linear-gradient(90deg, #e4dcc8, #fbf7ee 30%); }
+    .leaf-back { transform: rotateY(180deg); border-radius: 6px 0 0 6px; background: linear-gradient(270deg, #e4dcc8, #fbf7ee 30%); }
+    .ch-reading.on .leaf { animation: turn 4.8s cubic-bezier(0.6, 0, 0.3, 1) 1.6s infinite; }
+    @keyframes turn { 0% { transform: translateZ(1.5px) rotateY(0); opacity: 0; } 6%, 25% { transform: translateZ(1.5px) rotateY(0); opacity: 1; } 60%, 94% { transform: translateZ(1.5px) rotateY(-180deg); opacity: 1; } 100% { transform: translateZ(1.5px) rotateY(-180deg); opacity: 0; } }
+    .cover { position: absolute; left: 50%; top: -2%; width: 51%; height: 104%; transform-origin: left center; transform-style: preserve-3d; transform: translateZ(3px); transition: transform 1.5s cubic-bezier(0.65, 0, 0.25, 1) 0.2s; }
+    .cover-face { left: 0; width: 100%; display: grid; align-content: space-between; padding: 12%; border-radius: 4px 8px 8px 4px; backface-visibility: hidden;
+      background: radial-gradient(120% 80% at 100% 0%, #f472b6, transparent 60%), linear-gradient(160deg, #6d28d9, #312e81); box-shadow: inset 6px 0 0 rgb(0 0 0 / 0.25), 0 20px 40px rgb(0 0 0 / 0.45); }
+    .cover-face span { font: 700 clamp(18px, 2.4vw, 26px)/1 var(--display); letter-spacing: -0.02em; text-transform: uppercase; color: #fdf4ff; }
+    .cover-face small { font: 500 11px var(--cond); letter-spacing: 0.2em; text-transform: uppercase; color: rgb(253 244 255 / 0.7); }
+    .cover-in { transform: rotateY(180deg); background: linear-gradient(90deg, #312e81, #4c1d95); }
+    .ch-reading.on .cover { transform: translateZ(-1px) rotateY(-180deg); }
+    .note { position: absolute; right: -6%; top: -16%; padding: 6px 10px; border-radius: 4px; background: #fde68a; color: #422006; font: italic 500 14px var(--sans); transform: rotate(6deg) scale(0); transform-origin: bottom left;
+      box-shadow: 0 8px 18px rgb(0 0 0 / 0.35); transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 2.2s; }
+    .ch-reading.on .note { transform: rotate(6deg) scale(1); }
+    .book-shadow { position: absolute; bottom: 18px; left: 50%; width: min(420px, 86vw); height: 30px; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, rgb(0 0 0 / 0.55), transparent); z-index: -1; }
+    @media (prefers-reduced-motion: reduce) { .cover { transform: translateZ(-1px) rotateY(-180deg); transition: none; } .page-l { opacity: 1; } .note { transform: rotate(6deg); transition: none; } .page i.hl::after { width: 108%; } }
 
     /* 08 Coding. */
     .ch-coding { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: center; }
@@ -620,7 +651,7 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
 
     @media (max-width: 1099px) {
       .ch-cooking, .ch-coding, .ch-reading { grid-template-columns: 1fr; gap: 40px; }
-      .spines { order: 2; height: 200px; }
+      .book-wrap { order: 2; height: 280px; }
     }
     @media (max-width: 899px) {
       .pp { padding: 104px 20px 72px; }
