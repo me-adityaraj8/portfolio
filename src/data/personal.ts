@@ -86,7 +86,7 @@ export const personal = {
 
   sports: {
     title: 'Sports & Sweat',
-    body: ["Gym sessions, bodybuilding competitions, the occasional cricket match, and badminton rallies that I take a little too seriously. I'm into the discipline of lifting, the thrill of competition, and the satisfaction of getting better at something. Badminton is probably where my competitive side shows up the most."],
+    body: ["Into the gym, bodybuilding, and badminton. I watch cricket occasionally, but badminton is where I really get competitive. Always down to lift heavier, play better, and see some progress."],
   },
 
   cooking: {
