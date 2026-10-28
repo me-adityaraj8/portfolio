@@ -739,3 +739,16 @@ html, body { overflow-x: clip; }
 .hero-inner > .hero-deck { margin: 0; }
 .deck-card[inert] .deck-meta { opacity: 0; } .deck-meta { transition: opacity 0.4s; }
 @media (max-width: 899px) { .masthead nav a.nav-personal { display: none; } }
+
+/* ── A thin rainbow outline that slowly turns around the front project. */
+@property --spin { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+.deck-hit { border: 0; isolation: isolate; }
+.deck-hit::before { content: ''; position: absolute; inset: 0; z-index: 3; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: conic-gradient(from var(--spin), #f472b6, #fb923c, #facc15, #34d399, #38bdf8, #818cf8, #c084fc, #f472b6);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: rainbow-spin 6s linear infinite; }
+.deck-hit::after { content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; filter: blur(18px); opacity: 0.35;
+  background: conic-gradient(from var(--spin), #f472b6, #fb923c, #facc15, #34d399, #38bdf8, #818cf8, #c084fc, #f472b6); animation: rainbow-spin 6s linear infinite; }
+.deck-card[inert] .deck-hit::before, .deck-card[inert] .deck-hit::after { opacity: 0; }
+@keyframes rainbow-spin { to { --spin: 360deg; } }
+@media (prefers-reduced-motion: reduce) { .deck-hit::before, .deck-hit::after { animation: none; } }
