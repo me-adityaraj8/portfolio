@@ -109,11 +109,20 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
       </div>
       {songs.length > 0 && (
         <div class="deck" id="deck">
-          <div class="turntable" aria-hidden="true">
-            <div class="record" id="record">
-              <Image class="record-label" id="record-label" src={covers[songs[0].id]} widths={[160]} alt="" />
+          <div class="player">
+            <div class="transport">
+              <button type="button" class="play" id="play" aria-label={`Play ${songs[0].title}`}>
+                <svg class="play-ring" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24" /><circle id="play-progress" cx="26" cy="26" r="24" /></svg>
+                <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M8 5.5v13l11-6.5z" /><path class="i-pause" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" /></svg>
+              </button>
+              <p class="now" aria-live="polite"><span class="now-k" id="now-k">Up first</span><b id="now-title">{songs[0].title}</b><span id="now-artist">{songs[0].artist}</span></p>
             </div>
-            <span class="tonearm"></span>
+            <div class="turntable" aria-hidden="true">
+              <div class="record" id="record">
+                <Image class="record-label" id="record-label" src={covers[songs[0].id]} widths={[160]} alt="" />
+              </div>
+              <span class="tonearm"></span>
+            </div>
           </div>
           <div class="playlist">
             <p class="eyebrow playlist-head">A few favourites</p><p class="playlist-hint">Tap one to hear 30 seconds</p>
@@ -348,22 +357,48 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
       const tracks = [...deck.querySelectorAll<HTMLButtonElement>('.track')];
       const label = $('#record-label') as HTMLImageElement;
       const covers = [...deck.querySelectorAll<HTMLImageElement>('#covers img')];
+      const play = $('#play') as HTMLButtonElement, ring = $('#play-progress')!;
+      const nowK = $('#now-k')!, nowTitle = $('#now-title')!, nowArtist = $('#now-artist')!;
+      const C = 2 * Math.PI * 24;
+      ring.setAttribute('stroke-dasharray', String(C));
+      ring.setAttribute('stroke-dashoffset', String(C));
       let current = -1;
+      const show = (i: number) => {
+        const t = tracks[i];
+        nowTitle.textContent = t.querySelector('b')!.textContent;
+        nowArtist.textContent = t.querySelector('.track-text span')!.textContent;
+      };
       const setState = (i: number, playing: boolean) => {
         tracks.forEach((t, k) => t.setAttribute('aria-pressed', String(playing && k === i)));
         deck.classList.toggle('playing', playing);
+        nowK.textContent = playing ? 'Now playing' : i < 0 ? 'Up first' : 'Paused';
+        play.setAttribute('aria-label', `${playing ? 'Pause' : 'Play'} ${nowTitle.textContent}`);
+      };
+      const start = (i: number) => {
+        current = i;
+        audio.src = tracks[i].dataset.src!;
+        const c = covers[i];
+        if (c) { label.srcset = c.srcset; label.src = c.src; }
+        show(i);
+        audio.play().catch(() => setState(i, false));
       };
       tracks.forEach((t, i) => t.addEventListener('click', () => {
         if (current === i && !audio.paused) { audio.pause(); return; }
-        current = i;
-        audio.src = t.dataset.src!;
-        const c = covers[i];
-        if (c) { label.srcset = c.srcset; label.src = c.src; }
-        audio.play().catch(() => setState(i, false));
+        if (current === i && audio.paused && audio.currentTime > 0) { void audio.play(); return; }
+        start(i);
       }));
+      play.addEventListener('click', () => {
+        if (current < 0) start(0);
+        else if (audio.paused) void audio.play();
+        else audio.pause();
+      });
+      audio.addEventListener('timeupdate', () => {
+        if (audio.duration) ring.setAttribute('stroke-dashoffset', String(C * (1 - audio.currentTime / audio.duration)));
+      });
+      // When one preview ends, the next one starts, like a record side.
+      audio.addEventListener('ended', () => start((current + 1) % tracks.length));
       audio.addEventListener('play', () => setState(current, true));
       audio.addEventListener('pause', () => setState(current, false));
-      audio.addEventListener('ended', () => setState(current, false));
     }
   </script>
 
@@ -459,8 +494,24 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
     .g0 { font-size: 30px; font-weight: 700; color: #f472b6; } .g1 { font-size: 22px; font-weight: 500; color: var(--ink-2); }
     .g2 { font-size: 34px; font-weight: 700; color: #c084fc; } .g3 { font-size: 20px; font-weight: 500; color: #38bdf8; }
     .genre:last-child { font: 400 17px var(--sans); color: var(--ink-3); letter-spacing: 0; }
-    .deck { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 40px; align-items: center; padding: 32px; border: 1px solid var(--hair-2); border-radius: 22px;
+    .deck { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 40px; align-items: start; padding: 32px; border: 1px solid var(--hair-2); border-radius: 22px;
       background: radial-gradient(400px 260px at 0% 0%, rgb(244 114 182 / 0.1), transparent 70%), var(--bg-2); }
+    .player { display: grid; gap: 26px; justify-items: start; }
+    .transport { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .play { position: relative; flex: none; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; color: #1a0b1f;
+      background: linear-gradient(180deg, #fbcfe8, #f472b6); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), 0 10px 28px rgb(244 114 182 / 0.4); transition: transform 0.25s var(--ease); }
+    .play:hover { transform: scale(1.06); } .play:active { transform: scale(0.96); }
+    .play > svg { grid-area: 1 / 1; }
+    .play-ring { position: absolute; inset: -5px; width: 62px; height: 62px; transform: rotate(-90deg); fill: none; stroke-width: 2; }
+    .play-ring circle:first-child { stroke: transparent; }
+    .play-ring circle:last-child { stroke: #f9a8d4; stroke-linecap: round; transition: stroke-dashoffset 0.25s linear; }
+    .play-icon { width: 22px; height: 22px; fill: currentColor; }
+    .play-icon .i-pause, .deck.playing .play-icon .i-play { display: none; }
+    .deck.playing .play-icon .i-pause { display: inline; }
+    .now { display: grid; min-width: 0; margin: 0; }
+    .now-k { font: 500 11px var(--cond); letter-spacing: 0.18em; text-transform: uppercase; color: #f9a8d4; }
+    .now b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; font-weight: 600; }
+    .now span:last-child { font-size: 13px; color: var(--ink-3); }
     .turntable { position: relative; width: 220px; height: 220px; }
     .record { position: absolute; inset: 0; border-radius: 50%; display: grid; place-items: center;
       background: repeating-radial-gradient(circle, #101012 0 2px, #1c1c1f 2px 4px); box-shadow: 0 20px 50px rgb(0 0 0 / 0.55), inset 0 0 0 1px rgb(255 255 255 / 0.06); }
