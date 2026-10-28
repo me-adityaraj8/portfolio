@@ -258,6 +258,12 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
           <span slot="card" class="pc pc--small"><strong>Resume</strong><span class="pc-sub">One page, PDF</span></span>
         </HoverCard>
       </li>
+      <li>
+        <HoverCard>
+          <a class="pill pill--spotify" href={site.spotify} rel="noopener" target="_blank"><Icon name="siSpotify" brand /> Spotify</a>
+          <span slot="card" class="pc pc--small"><strong>Spotify</strong><span class="pc-sub">My playlists, and what I've had on repeat</span></span>
+        </HoverCard>
+      </li>
     </ul>
     </div>
     <form class="dm" id="dm" data-mail={site.email} action={site.messages.endpoint} method="POST" novalidate aria-labelledby="dm-title">

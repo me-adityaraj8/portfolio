@@ -10,6 +10,7 @@ export const site = {
   email: 'me.adityaraj8@gmail.com',
   github: 'https://github.com/me-adityaraj8',
   linkedin: 'https://www.linkedin.com/in/aditya-raj-kumar-dora-44145b322',
+  spotify: 'https://open.spotify.com/user/20njug9werhklo57s835mcg07',
   /** My Jake's-template resume, as a PDF in /public. Replace the file to update it. */
   resume: '/resume.pdf',
   /** Where the live time on the page comes from. */
