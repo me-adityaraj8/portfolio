@@ -11,7 +11,7 @@ architecture:
     - [mw, dal]
     - [dal, pg, SQL]
     - [mw, ai, optional]
-order: 5
+order: 4
 accent: ['#3b82f6', '#8b5cf6']
 shot: /shots/rys.webp
 demo: site

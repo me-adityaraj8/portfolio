@@ -13,7 +13,7 @@ architecture:
     - [route, tx]
     - [tx, db]
     - [tx, after, then]
-order: 4
+order: 5
 accent: ['#a855f7', '#f59e0b']
 shot: /shots/kairo.webp
 demo: site
