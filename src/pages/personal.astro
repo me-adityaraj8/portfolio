@@ -36,7 +36,11 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
     <header class="pp-hero">
       <div class="pp-hero-copy">
         <p class="eyebrow">Off the clock</p>
-        <h1>The other<br />half.</h1>
+        <h1 aria-label="The other half.">
+          {[['The', '#f472b6'], ['other', '#a78bfa'], ['half.', '#2dd4bf']].map(([w, c]) => (
+            <span class="ln" aria-hidden="true" style={`--c:${c}`}><span class="ln-t">{w}</span><span class="ln-bar"></span></span>
+          ))}
+        </h1>
         <p class="pp-hero-intro">{p.intro}</p>
         <nav class="toc" aria-label="On this page">
           {chapters.map(([id, name], i) => <a href={`#${id}`}><span>{String(i + 1).padStart(2, '0')}</span>{name}</a>)}
@@ -294,11 +298,19 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
       gsap.ticker.lagSmoothing(0);
 
       const EASE = 'expo.out';
-      const name = SplitText.create('.pp-hero h1', { type: 'words' });
-      gsap.timeline({ defaults: { ease: EASE } })
-        .from('.pp-hero .eyebrow', { y: 16, opacity: 0, duration: 0.9 })
-        .from(name.words, { yPercent: 45, opacity: 0, rotateX: -60, filter: 'blur(14px)', transformOrigin: '50% 100%', transformPerspective: 900, duration: 1.5, stagger: 0.14, onComplete: () => name.revert() }, '<0.1')
-        .from(['.pp-hero-intro', '.toc a'], { y: 20, opacity: 0, duration: 1, stagger: 0.04 }, '<0.5')
+      // Each line: a colour bar sweeps across, the word appears under it, the bar pulls away.
+      const tl = gsap.timeline({ defaults: { ease: EASE } });
+      tl.from('.pp-hero .eyebrow', { y: 16, opacity: 0, duration: 0.8 });
+      document.querySelectorAll<HTMLElement>('.pp-hero .ln').forEach((ln, i) => {
+        const bar = ln.querySelector('.ln-bar')!, text = ln.querySelector('.ln-t')!;
+        const at = 0.25 + i * 0.16;
+        tl.set(text, { opacity: 0 }, 0)
+          .fromTo(bar, { scaleX: 0, transformOrigin: '0% 50%' }, { scaleX: 1, duration: 0.42, ease: 'power3.inOut' }, at)
+          .set(text, { opacity: 1 }, at + 0.42)
+          .set(bar, { transformOrigin: '100% 50%' }, at + 0.42)
+          .to(bar, { scaleX: 0, duration: 0.46, ease: 'power3.inOut' }, at + 0.44);
+      });
+      tl.from(['.pp-hero-intro', '.toc a'], { y: 18, opacity: 0, duration: 0.9, stagger: 0.035 }, 1.05)
         .from('.pp-hero-stack figure', { y: 80, opacity: 0, duration: 1.4, stagger: 0.12, clearProps: 'opacity' }, '<-0.6');
 
       // Chapter titles rise in, letter by letter.
@@ -417,6 +429,8 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
 
     /* Hero: big type on the left, three of my photos fanned on the right. */
     .pp-hero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 48px; align-items: center; min-height: min(78vh, 760px); }
+    .pp-hero .ln { position: relative; display: block; width: fit-content; }
+    .pp-hero .ln-bar { position: absolute; inset: 6% -2% 2%; background: var(--c); transform: scaleX(0); pointer-events: none; }
     .pp-hero h1 { margin: 18px 0 0; font-size: clamp(56px, 9vw, 136px); line-height: 0.92; letter-spacing: -0.045em; text-transform: uppercase; }
     .pp-hero-intro { max-width: 460px; margin: 26px 0 0; font-size: 20px; line-height: 1.5; color: var(--ink-2); }
     .toc { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 6px 28px; margin-top: 40px; }
