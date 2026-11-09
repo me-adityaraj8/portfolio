@@ -625,8 +625,8 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
     .ch-singing { text-align: center; }
     .ch-singing .ch-no::after, .ch-side .ch-no::after { display: none; }
     .pull { margin: 22px auto 0; max-width: 18ch; font: 700 clamp(36px, 5.6vw, 76px)/1.02 var(--display); letter-spacing: -0.035em;
-      background: linear-gradient(90deg, #fb923c, #f472b6 45%, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .pull--small { max-width: none; margin: 22px 0; font-size: clamp(26px, 3vw, 38px); background: linear-gradient(90deg, #818cf8, #38bdf8); -webkit-background-clip: text; background-clip: text; }
+      color: #f472b6; }
+    .pull--small { max-width: none; margin: 22px 0; font-size: clamp(26px, 3vw, 38px); color: #818cf8; }
     .wave { display: flex; align-items: center; gap: 3px; height: 80px; margin: 40px auto 36px; max-width: 760px; }
     .wave span { flex: 1; height: calc(var(--h) * 100%); border-radius: 3px; background: linear-gradient(180deg, #fb923c, #f472b6); opacity: 0.75; }
         .ch-singing.on .wave span { animation: sway 1.2s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -61ms); }
