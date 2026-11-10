@@ -114,6 +114,42 @@ export const site = {
       ],
     },
   ],
+  /** Pull requests to other people's repositories, newest first within each repo. Stars as of Nov 2026. */
+  openSource: [
+    {
+      repo: 'Nano-Collective/nanocoder',
+      about: 'An open coding agent for the terminal, built by a community collective.',
+      stars: 2558,
+      prs: [
+        { n: 1989, state: 'merged', date: '2026-11-07', add: 96, del: 151, title: 'Removed a leftover XML validation marker and made processToolUse return its errors' },
+        { n: 1898, state: 'merged', date: '2026-11-06', add: 41, del: 1, title: 'The CLI now suggests the right option when a flag is typed without its dashes' },
+      ],
+    },
+    {
+      repo: 'freeCodeCamp/freeCodeCamp',
+      about: "freeCodeCamp.org's open-source codebase and curriculum.",
+      stars: 458830,
+      prs: [
+        { n: 71332, state: 'merged', date: '2026-10-23', add: 1, del: 1, title: 'Fixed a broken sentence in a Budget App curriculum hint' },
+      ],
+    },
+    {
+      repo: 'Namansingh3264/NexusEditor',
+      about: 'A real-time collaborative rich-text editor on Next.js, Socket.io and Prisma.',
+      stars: 0,
+      prs: [
+        { n: 1, state: 'merged', date: '2026-09-21', add: 6500, del: 5088, title: 'Fixed the bugs that broke the core features, rebuilt the dashboard UI and made it deployable' },
+      ],
+    },
+    {
+      repo: 'varun00077/selenograph',
+      about: '',
+      stars: 0,
+      prs: [
+        { n: 1, state: 'open', date: '2026-09-04', add: 3138, del: 1357, title: 'Frontend overhaul: fixed deploy-breaking config, restored workflow state, made it accessible' },
+      ],
+    },
+  ] as Array<{ repo: string; about: string; stars: number; prs: Array<{ n: number; state: 'merged' | 'open'; date: string; add: number; del: number; title: string }> }>,
   /** Shown in the stack section; the projects that use each one are worked out from the case studies. */
   stack: [
     { name: 'TypeScript', icon: 'siTypescript' },
