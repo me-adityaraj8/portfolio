@@ -92,7 +92,12 @@ export const personal = {
   cooking: {
     title: 'Cooking > Ordering In',
     body: ['I LOVE cooking. Trying recipes, messing around with spices, and making something ridiculously good out of random ingredients is my kind of fun. Give me a kitchen and some time, and ordering food might just become a very unnecessary expense.'],
-    favourite: { name: 'Biryani', note: 'My all-time favourite food. To cook, and even more to eat.' },
+    favourite: {
+      name: 'Biryani',
+      note: 'My all-time favourite food. To cook, and even more to eat.',
+      /** What comes out when the lid is lifted. */
+      inside: ['Basmati', 'Saffron', 'Fried onions', 'Mint', 'Whole spices', 'Slow dum'],
+    },
     also: ['Butter chicken'],
   },
 
