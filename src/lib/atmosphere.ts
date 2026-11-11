@@ -48,3 +48,30 @@ export function describeWeather(code: number, isDay: boolean): { label: string; 
   if (code === 0) return isDay ? { label: 'Clear sky', icon: 'sun' } : { label: 'Clear night', icon: 'moon' };
   return { label: 'Cloudy', icon: 'cloud' };
 }
+
+/**
+ * Brightness of a cell `dx, dy` cells from a round wave's source, `age` seconds in.
+ * The front is a circle: every cell the same straight-line distance away lights together.
+ */
+export function ring(dx: number, dy: number, age: number, o: { speed: number; life: number; width: number }) {
+  if (age < 0 || age >= o.life) return 0;
+  const behind = age * o.speed - Math.hypot(dx, dy);
+  if (behind < 0 || behind >= o.width) return 0;
+  return (1 - behind / o.width) * (1 - age / o.life);
+}
+
+/**
+ * The light that drifts through the hero's dots: three slow waves laid over each other, so
+ * soft ribbons of brightness wander across the grid like an aurora. 0 is dark, 1 is brightest.
+ */
+export function aurora(x: number, y: number, t: number) {
+  const a = 0.5 * Math.sin(x * 0.07 + y * 0.045 - t * 0.9)
+    + 0.35 * Math.sin(x * 0.03 - y * 0.085 + t * 0.55 + 2)
+    + 0.3 * Math.sin((x + y) * 0.018 + t * 0.35);
+  return Math.min(1, Math.max(0, a) / 1.15) ** 1.3;
+}
+
+/** How strongly the pointer's glow reaches a dot `d` cells away, for a glow of radius `r`. */
+export function lens(d: number, r: number) {
+  return Math.exp(-(d * d) / (2 * r * r));
+}
