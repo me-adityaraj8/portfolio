@@ -163,3 +163,22 @@ export function osMore() {
     if (label) label.textContent = open ? 'View less' : 'View more';
   });
 }
+
+/** Hero: a soft highlight slides along the dock to whichever link the pointer or focus is on. */
+export function dock() {
+  const bar = document.getElementById('dock');
+  if (!bar) return;
+  const links = [...bar.querySelectorAll<HTMLAnchorElement>('a')];
+  const to = (a: HTMLAnchorElement) => {
+    bar.style.setProperty('--x', `${a.offsetLeft}px`);
+    bar.style.setProperty('--w', `${a.offsetWidth}px`);
+    bar.style.setProperty('--glow', getComputedStyle(a).getPropertyValue('--c'));
+    bar.classList.add('lit');
+  };
+  for (const a of links) {
+    a.addEventListener('pointerenter', () => to(a));
+    a.addEventListener('focus', () => to(a));
+  }
+  bar.addEventListener('pointerleave', () => bar.classList.remove('lit'));
+  bar.addEventListener('focusout', (e) => { if (!bar.contains(e.relatedTarget as Node)) bar.classList.remove('lit'); });
+}
