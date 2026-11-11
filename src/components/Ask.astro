@@ -1,0 +1,213 @@
+---
+import { getCollection } from 'astro:content';
+import cp from '../data/cp.json';
+import { site } from '../data/site';
+import { SOURCES } from '../lib/ask';
+
+// Ready answers for the suggested questions, written from the same data as the page.
+// They work even when the live assistant is switched off.
+const projects = (await getCollection('projects')).filter((p) => p.data.order !== undefined && p.data.kind === 'project' && !p.data.private)
+  .sort((a, b) => a.data.order! - b.data.order!);
+const top = projects.slice(0, 3);
+const lower = (s: string) => s.charAt(0).toLowerCase() + s.slice(1).replace(/\.$/, '');
+const list = (xs: string[]) => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join('; ')}; and ${xs.at(-1)}`);
+const merged = site.openSource.flatMap((r) => r.prs.filter((p) => p.state === 'merged').map((p) => ({ ...p, repo: r.repo })));
+const repos = new Set(merged.map((p) => p.repo)).size;
+const nano = merged.filter((p) => p.repo.endsWith('/nanocoder'));
+const nanoRepo = site.openSource.find((r) => r.repo.endsWith('/nanocoder'));
+const count = ['no', 'one', 'two', 'three', 'four'][nano.length] ?? String(nano.length);
+const fcc = site.openSource.find((r) => r.repo === 'freeCodeCamp/freeCodeCamp');
+const { codolio: co, codeforces: cf, leetcode: lc } = cp;
+const kalaa = site.experience[0];
+
+const ready = [
+  {
+    q: 'What has he built?',
+    answer: `His main projects are ${list(top.map((p) => `${p.data.title}, ${lower(p.data.summary)}`))}. ${top.every((p) => p.data.role?.startsWith('Solo')) ? 'He built each one solo, end to end. ' : ''}${top.every((p) => p.data.architecture) ? 'Each has a case study with an architecture diagram.' : 'Each has a case study on the site.'}`,
+    sources: ['/#work', ...projects.slice(0, 2).map((p) => `/work/${p.id}`)],
+  },
+  {
+    q: 'Any open source work?',
+    answer: `He has had ${merged.length} pull requests merged into ${repos} other people's projects. ${nanoRepo && nano.length ? `In nanocoder, a ${nanoRepo.stars.toLocaleString('en-US')}-star terminal coding agent, ${count} of his changes landed: ${nano.map((p) => lower(p.title)).join(', and ')}. ` : ''}${fcc ? `He also fixed curriculum text in freeCodeCamp, a ${Math.round(fcc.stars / 1000)}k-star repo.` : ''}`,
+    sources: ['/#open-source'],
+  },
+  {
+    q: 'How strong is his DSA?',
+    answer: `He has solved ${co.solved} problems across Codeforces and LeetCode and taken part in ${co.contests} rated contests. His Codeforces rating is ${cf.rating} (${cf.rank}), with a peak of ${cf.maxRating} (${cf.maxRank}), and his LeetCode contest rating is ${lc.rating}, in the top ${lc.top.toFixed(1)}%.`,
+    sources: ['/#problem-solving'],
+  },
+  {
+    q: 'Is he open to an internship?',
+    answer: `Yes. He is ${lower(site.status)} and is a third-year B.Tech CSE student at IIIT Bhagalpur. He is also co-founder of ${kalaa.org}. The quickest way to reach him is ${site.email}, and his resume is one click away.`,
+    sources: ['/resume.pdf', '/#experience'],
+  },
+];
+const labels = Object.fromEntries(SOURCES.map((s) => [s.href, s.label]));
+const titles = Object.fromEntries((await getCollection('projects')).map((p) => [`/work/${p.id}`, p.data.title]));
+const hints = ['What did he build Rys with?', 'Which nanocoder bug did he fix?', 'What is Kalaa SkillTech?', 'Which courses is he taking now?', 'What does he do outside code?'];
+---
+<section class="section ask-sec" data-reveal id="ask" aria-labelledby="ask-title">
+  <h2 id="ask-title" class="section-title">Ask about me</h2>
+  <p class="ask-sum">Short on time? Ask anything about my work. Answers come only from what's on this site, with links to where it says so.</p>
+
+  <div class="ask" id="ask-panel" data-ready={JSON.stringify(ready)} data-labels={JSON.stringify({ ...labels, ...titles })} data-hints={JSON.stringify(hints)} data-email={site.email}>
+    <div class="ask-bar">
+      <span class="ask-orb" aria-hidden="true"><span></span></span>
+      <span class="ask-who">
+        <b>Aditya's site assistant</b>
+        <span class="ask-status"><span class="ask-dot"></span><span id="ask-state">Reads only this site</span></span>
+      </span>
+      <button type="button" class="ask-reset" id="ask-reset" hidden>New chat</button>
+    </div>
+
+    <div class="ask-log" id="ask-log" role="log" aria-live="polite" aria-label="Conversation">
+      <div class="msg msg--bot">
+        <p>Hi. I can tell you about Aditya's projects, open source work, problem solving, studies and the startup he co-founded. Pick a question or type your own.</p>
+      </div>
+    </div>
+
+    <div class="ask-chips" id="ask-chips" role="group" aria-label="Suggested questions">
+      {ready.map((r, i) => <button type="button" class="ask-chip" data-i={i} style={`--i:${i}`}>{r.q}</button>)}
+    </div>
+
+    <form class="ask-form" id="ask-form" autocomplete="off">
+      <label class="sr-only" for="ask-input">Your question</label>
+      <input id="ask-input" name="q" maxlength="600" placeholder={hints[0]} enterkeyhint="send" />
+      <button type="submit" class="ask-send" aria-label="Ask">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" /></svg>
+      </button>
+    </form>
+  </div>
+</section>
+
+<script>
+  type Msg = { role: 'user' | 'assistant'; content: string };
+  type Reply = { answer: string; sources: string[] };
+
+  const panel = document.getElementById('ask-panel');
+  if (panel) {
+    const ready = JSON.parse(panel.dataset.ready!) as Array<{ q: string } & Reply>;
+    const labels = JSON.parse(panel.dataset.labels!) as Record<string, string>;
+    const hints = JSON.parse(panel.dataset.hints!) as string[];
+    const email = panel.dataset.email!;
+    const log = document.getElementById('ask-log')!;
+    const form = document.getElementById('ask-form') as HTMLFormElement;
+    const input = document.getElementById('ask-input') as HTMLInputElement;
+    const chips = document.getElementById('ask-chips')!;
+    const reset = document.getElementById('ask-reset')!;
+    const state = document.getElementById('ask-state')!;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const first = log.innerHTML;
+    let history: Msg[] = [];
+    let busy = false;
+
+    const scroll = () => log.scrollTo({ top: log.scrollHeight, behavior: reduced ? 'auto' : 'smooth' });
+    const add = (cls: string, text = '') => {
+      const el = document.createElement('div');
+      el.className = `msg ${cls}`;
+      const p = document.createElement('p');
+      p.textContent = text;
+      el.append(p);
+      log.append(el);
+      scroll();
+      return el;
+    };
+    const setBusy = (on: boolean) => {
+      busy = on;
+      panel.classList.toggle('thinking', on);
+      state.textContent = on ? 'Looking it up' : 'Reads only this site';
+      log.setAttribute('aria-busy', String(on));
+    };
+
+    async function type(el: HTMLElement, r: Reply) {
+      const p = el.querySelector('p')!;
+      const words = r.answer.split(/(\s+)/);
+      if (reduced) p.textContent = r.answer;
+      else for (let i = 0; i < words.length; i++) {
+        p.textContent += words[i];
+        if (i % 2 === 0) { await new Promise((ok) => setTimeout(ok, 18 + Math.random() * 26)); if (i % 12 === 0) scroll(); }
+      }
+      const links = r.sources.filter((s) => labels[s]);
+      if (links.length) {
+        const row = document.createElement('div');
+        row.className = 'msg-src';
+        row.innerHTML = '<span>Sources</span>';
+        links.forEach((s, i) => {
+          const a = document.createElement('a');
+          a.href = s;
+          a.textContent = labels[s];
+          a.style.setProperty('--i', String(i));
+          if (s.endsWith('.pdf')) a.target = '_blank';
+          row.append(a);
+        });
+        el.append(row);
+      }
+      scroll();
+    }
+
+    async function ask(q: string, preset?: Reply) {
+      if (busy || !q.trim()) return;
+      add('msg--me', q);
+      history.push({ role: 'user', content: q });
+      reset.hidden = false;
+      const bot = add('msg--bot msg--wait');
+      setBusy(true);
+      let r: Reply;
+      if (preset) {
+        await new Promise((ok) => setTimeout(ok, reduced ? 0 : 650));
+        r = preset;
+      } else {
+        try {
+          const res = await fetch('/api/ask', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ messages: history }) });
+          const data = await res.json().catch(() => ({}));
+          if (res.ok && data.answer) r = data;
+          else if (res.status === 429) r = { answer: "That's a lot of questions in a short time. Give it a few minutes, or email him directly at " + email + '.', sources: [] };
+          else if (res.status === 503 || res.status === 404) r = { answer: `The live assistant is switched off right now, so I can only answer the suggested questions. For anything else, email him at ${email}.`, sources: ['/resume.pdf'] };
+          else r = { answer: `I couldn't answer that one. Try asking it another way, or email him at ${email}.`, sources: [] };
+        } catch {
+          r = { answer: `I couldn't reach the server. Check your connection, or email him at ${email}.`, sources: [] };
+        }
+      }
+      bot.classList.remove('msg--wait');
+      setBusy(false);
+      await type(bot, r);
+      history.push({ role: 'assistant', content: r.answer });
+    }
+
+    chips.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.ask-chip');
+      if (!b || busy) return;
+      const r = ready[Number(b.dataset.i)];
+      b.disabled = true;
+      ask(r.q, r);
+    });
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const q = input.value.trim();
+      if (!q || busy) return;
+      input.value = '';
+      ask(q);
+    });
+    reset.addEventListener('click', () => {
+      if (busy) return;
+      history = [];
+      log.innerHTML = first;
+      chips.querySelectorAll('button').forEach((b) => (b.disabled = false));
+      reset.hidden = true;
+      input.focus();
+    });
+
+    // The placeholder types out example questions while the field is empty and unfocused.
+    if (!reduced) {
+      let h = 0, c = hints[0].length, dir = -1, wait = 40;
+      setInterval(() => {
+        if (document.activeElement === input || input.value) return;
+        if (wait-- > 0) return;
+        c += dir;
+        if (c <= 0) { dir = 1; h = (h + 1) % hints.length; wait = 4; }
+        if (c >= hints[h].length) { dir = -1; wait = 40; }
+        input.placeholder = hints[h].slice(0, Math.max(0, c)) || ' ';
+      }, 45);
+    }
+  }
+</script>

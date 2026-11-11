@@ -1061,3 +1061,60 @@ html[data-theme='light'] .coin-inner { fill: rgb(255 255 255 / 0.7); }
   .creds-sec .seal-check { stroke-dashoffset: 0; transition: none; }
   .coin-ring { animation: none; }
 }
+
+/* Ask about me */
+.ask-sum { max-width: 60ch; margin: -8px 0 28px; color: var(--ink-3); }
+.ask { position: relative; display: flex; flex-direction: column; max-width: 860px; border-radius: 22px; background: linear-gradient(170deg, var(--card-2), var(--card) 55%); box-shadow: inset 0 0 0 1px var(--hair), 0 40px 80px -50px rgb(108 92 231 / 0.6); overflow: hidden; isolation: isolate; }
+.ask::before { content: ''; position: absolute; inset: -40% -10% auto; height: 70%; z-index: -1; background: radial-gradient(closest-side, rgb(167 155 255 / 0.16), transparent); opacity: 0.6; transition: opacity 0.6s; pointer-events: none; }
+.ask.thinking::before { opacity: 1; animation: ask-breathe 1.6s ease-in-out infinite; }
+@keyframes ask-breathe { 50% { transform: scale(1.08); opacity: 0.7; } }
+.ask-bar { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-bottom: 1px solid var(--hair); }
+.ask-orb { position: relative; flex: none; width: 38px; height: 38px; border-radius: 50%; background: conic-gradient(from 0deg, #a79bff, #f472b6, #38bdf8, #4ade80, #a79bff); animation: ask-spin 9s linear infinite; box-shadow: 0 0 22px -4px rgb(167 155 255 / 0.7); }
+.ask-orb span { position: absolute; inset: 3px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #2b2550, var(--card) 70%); }
+.ask.thinking .ask-orb { animation-duration: 1.1s; }
+@keyframes ask-spin { to { transform: rotate(360deg); } }
+.ask-who { display: flex; flex-direction: column; min-width: 0; }
+.ask-who b { font: 600 15px var(--display); color: var(--ink); }
+.ask-status { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-3); }
+.ask-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 0 3px rgb(74 222 128 / 0.18); }
+.ask.thinking .ask-dot { background: #a79bff; box-shadow: 0 0 0 3px rgb(167 155 255 / 0.25); animation: ask-blink 0.8s ease-in-out infinite; }
+@keyframes ask-blink { 50% { opacity: 0.35; } }
+.ask-reset { margin-left: auto; flex: none; white-space: nowrap; padding: 7px 14px; border-radius: 999px; font: 500 13px var(--sans); color: var(--ink-2); background: rgb(var(--ink-rgb) / 0.05); box-shadow: inset 0 0 0 1px var(--hair); cursor: pointer; transition: background 0.2s, color 0.2s; }
+.ask-reset:hover { background: rgb(var(--ink-rgb) / 0.1); color: var(--ink); }
+.ask-log { display: flex; flex-direction: column; gap: 14px; height: 360px; padding: 22px 20px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.msg { max-width: 82%; animation: msg-in 0.45s var(--ease) both; }
+@keyframes msg-in { from { opacity: 0; transform: translateY(10px) scale(0.98); } }
+.msg p { margin: 0; padding: 12px 16px; border-radius: 16px; font-size: 15.5px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+.msg--bot p { color: var(--ink-2); background: rgb(var(--ink-rgb) / 0.045); box-shadow: inset 0 0 0 1px var(--hair); border-top-left-radius: 6px; }
+.msg--me { align-self: flex-end; }
+.msg--me p { color: #fff; background: linear-gradient(135deg, #6d5ae6, #8b5cf6); border-top-right-radius: 6px; }
+.msg--wait p { display: inline-flex; gap: 5px; padding: 15px 18px; }
+.msg--wait p::before, .msg--wait p::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--glow); animation: ask-dots 1s ease-in-out infinite; }
+.msg--wait p::after { animation-delay: 0.18s; }
+@keyframes ask-dots { 0%, 100% { transform: translateY(0); opacity: 0.4; } 40% { transform: translateY(-5px); opacity: 1; } }
+.msg-src { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; padding-left: 4px; }
+.msg-src span { font: 600 12px var(--cond); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-4); margin-right: 2px; }
+.msg-src a { padding: 4px 11px; border-radius: 999px; font-size: 13px; color: #c4b5fd; text-decoration: none; background: rgb(139 92 246 / 0.12); box-shadow: inset 0 0 0 1px rgb(139 92 246 / 0.35); animation: msg-in 0.4s var(--ease) both; animation-delay: calc(var(--i) * 80ms); transition: background 0.2s; }
+.msg-src a:hover { background: rgb(139 92 246 / 0.24); }
+.ask-chips { display: flex; gap: 8px; padding: 0 20px 14px; overflow-x: auto; scrollbar-width: none; }
+.ask-chip { flex: none; padding: 8px 14px; border-radius: 999px; font: 500 14px var(--sans); color: var(--ink-2); background: transparent; box-shadow: inset 0 0 0 1px var(--hair-2); cursor: pointer; transition: background 0.2s, color 0.2s, opacity 0.3s, transform 0.25s var(--ease); }
+.ask-chip:hover:not(:disabled) { color: var(--ink); background: rgb(var(--ink-rgb) / 0.06); transform: translateY(-1px); }
+.ask-chip:disabled { opacity: 0.38; cursor: default; }
+.ask-form { display: flex; align-items: center; gap: 10px; margin: 0 14px 14px; padding: 6px 6px 6px 18px; border-radius: 16px; background: rgb(var(--bg-rgb) / 0.6); box-shadow: inset 0 0 0 1px var(--hair); transition: box-shadow 0.25s; }
+.ask-form:focus-within { box-shadow: inset 0 0 0 1px rgb(167 155 255 / 0.6), 0 0 0 4px rgb(167 155 255 / 0.12); }
+.ask-form input { flex: 1; min-width: 0; padding: 10px 0; border: 0; outline: 0; background: none; font: 400 16px var(--sans); color: var(--ink); }
+.ask-form input::placeholder { color: var(--ink-4); }
+.ask-send { display: grid; place-items: center; flex: none; width: 42px; height: 42px; border: 0; border-radius: 12px; background: linear-gradient(135deg, #6d5ae6, #8b5cf6); cursor: pointer; transition: transform 0.25s var(--ease), filter 0.2s; }
+.ask-send:hover { transform: translateX(2px); filter: brightness(1.12); }
+.ask-send:active { transform: scale(0.94); }
+.ask-send svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.ask.thinking .ask-send { opacity: 0.5; pointer-events: none; }
+html[data-theme='light'] .ask-orb span { background: radial-gradient(circle at 35% 30%, #fff, #ece9fb 70%); }
+@media (max-width: 640px) {
+  .ask { border-radius: 18px; }
+  .ask-log { height: 420px; padding: 18px 14px; }
+  .msg { max-width: 92%; }
+  .ask-chips { padding: 0 14px 12px; }
+  .ask-form { margin: 0 10px 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .ask-orb, .ask.thinking::before, .msg, .msg-src a { animation: none; } }
