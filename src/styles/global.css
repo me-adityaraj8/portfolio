@@ -770,8 +770,15 @@ html, body { overflow-x: clip; }
 @media (min-width: 1100px) {
   .hero { grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr); gap: 48px; }
   .hero h1 { font-size: clamp(64px, 9.4vw, 150px); }
-  .hero .meta { display: none; }
-  html.js .hero-badge { display: block; }
+}
+html.js .hero-badge { display: block; }
+html.js .hero .meta { display: none; }
+/* On phones and tablets the badge hangs above the name, smaller, and lets the page scroll under a finger. */
+@media (max-width: 1099px) {
+  .hero { align-content: end; }
+  .hero .hero-badge { order: -1; height: 400px; margin: -96px 0 4px; }
+  .hero .badge-card { touch-action: pan-y; }
+  .hero .badge-hint { display: none; }
 }
 
 /* ── Hero: the name's two lines, the rolling "I build" line, and an ID badge on a lanyard. */

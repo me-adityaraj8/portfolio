@@ -27,8 +27,10 @@ export function badge(lenis: Lenis | null, reduced: boolean, pulse?: (x: number,
   const layout = () => {
     const w = wrap.clientWidth, h = wrap.clientHeight;
     ax = w / 2;
-    len = clamp(h * 0.3, 150, 270);
-    scale = clamp((h - len - 104) / 434, 0.62, 1);
+    // Beside the name on a wide screen; above it, shorter and smaller, on a narrow one.
+    const wide = matchMedia('(min-width: 1100px)').matches;
+    len = wide ? clamp(h * 0.3, 150, 270) : clamp(h * 0.26, 84, 130);
+    scale = clamp((h - len - (wide ? 104 : 14)) / 434, 0.5, 1);
   };
   const render = () => {
     const px = ax + bob.x, py = bob.y;
