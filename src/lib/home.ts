@@ -1,7 +1,7 @@
 import Lenis from 'lenis';
 import QRCode from 'qrcode';
 import { assessContrast, MIN_CONTRAST_RATIO } from '../demos/contrast';
-import { describeWeather, ripple, type WeatherIcon } from './atmosphere';
+import { aurora, describeWeather, lens, ring, type WeatherIcon } from './atmosphere';
 import { ago, bestMatch, onRepeat, parseRecent, type Played } from './music';
 import { rank } from './palette';
 import { beat, listen, onBeat } from './beat';
@@ -22,7 +22,7 @@ export function start() {
   const raf = (t: number) => { lenis?.raf(t); requestAnimationFrame(raf); };
   requestAnimationFrame(raf);
 
-  const { spell, pulse } = field(reduced, fine);
+  const { spell, pulse } = field(reduced);
   const hire = hirer(spell);
   if (fine) { cursor(); spotlights(); }
   scrollEffects();
@@ -58,8 +58,12 @@ export function start() {
   }
 }
 
-/** The hero: a dense dot grid in shifting colour, where the pointer sends out BFS waves. */
-function field(reduced: boolean, fine: boolean) {
+/**
+ * The hero: a dense dot grid in shifting colour. Soft ribbons of light drift through it like
+ * an aurora, a glow follows the pointer and nudges the dots aside, and a click, the page
+ * opening or a kick in the music sends out a round wave.
+ */
+function field(reduced: boolean) {
   const canvas = $<HTMLCanvasElement>('field');
   const ctx = canvas.getContext('2d')!;
   const S = 13;
@@ -89,11 +93,17 @@ function field(reduced: boolean, fine: boolean) {
     const r = canvas.getBoundingClientRect();
     return [Math.floor((e.clientX - r.left) / S), Math.floor((e.clientY - r.top) / S)];
   };
-  let last = '', lastAt = 0;
+  // The pointer's glow: where it is heading, where it is now, and how strong it is.
+  const GLOW = 7;
+  const glowAt = { tx: 0, ty: 0, x: 0, y: 0, on: 0, k: 0 };
   canvas.parentElement!.addEventListener('pointermove', (e) => {
-    const [x, y] = cellOf(e), key = `${x},${y}`;
-    if (key !== last && performance.now() - lastAt > 90) { last = key; lastAt = performance.now(); add(x, y); }
+    if (e.pointerType !== 'mouse') return;
+    const r = canvas.getBoundingClientRect();
+    glowAt.tx = (e.clientX - r.left) / S; glowAt.ty = (e.clientY - r.top) / S;
+    if (!glowAt.on) { glowAt.x = glowAt.tx; glowAt.y = glowAt.ty; }
+    glowAt.on = 1;
   });
+  canvas.parentElement!.addEventListener('pointerleave', () => { glowAt.on = 0; });
   canvas.parentElement!.addEventListener('pointerdown', (e) => {
     const [x, y] = cellOf(e);
     add(x, y, { speed: 40, life: 2.6, width: 4, k: 1.4 });
@@ -126,18 +136,16 @@ function field(reduced: boolean, fine: boolean) {
     add(msg.ox, msg.oy, { speed: 40, life: 2.6, width: 4, k: 1.4 });
     if (reduced) { requestAnimationFrame(draw); setTimeout(() => requestAnimationFrame(draw), (HOLD - 3) * 1000 + 50); }
   };
-  let idle = 0;
   // When the song preview plays, every kick sends a wave from somewhere new.
   onBeat((strength) => {
     if (reduced) return;
     add(Math.floor(cols * (0.4 + Math.random() * 0.55)), Math.floor(rows * (0.15 + Math.random() * 0.7)), { speed: 34, life: 1.6, width: 3.2, k: 0.8 + strength * 0.7 });
   });
   const draw = (now: number) => {
-    // The field keeps breathing on its own, on phones and when the pointer is still.
-    if (!reduced && now - idle > (fine ? 2400 : 1600)) {
-      idle = now;
-      add(Math.floor(cols * (0.45 + Math.random() * 0.5)), Math.floor(rows * Math.random()), { speed: 20, life: 2.4, width: 3, k: 0.7 });
-    }
+    // The glow trails a little behind the pointer and fades in and out.
+    glowAt.x += (glowAt.tx - glowAt.x) * 0.16; glowAt.y += (glowAt.ty - glowAt.y) * 0.16;
+    glowAt.k += (glowAt.on - glowAt.k) * 0.08;
+    const drift = reduced ? 4 : now / 2200;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const live = waves.filter((v) => (now - v.t0) / 1000 < v.life);
@@ -149,36 +157,49 @@ function field(reduced: boolean, fine: boolean) {
       for (let x = 0; x < cols; x++) {
         let I = 0;
         for (const v of live) {
-          const dx = x - v.x, dy = y - v.y;
-          if (Math.abs(dx) + Math.abs(dy) > v.speed * v.life + v.width) continue;
-          I = Math.max(I, ripple(dx, dy, (now - v.t0) / 1000, v) * v.k);
+          I = Math.max(I, ring(x - v.x, y - v.y, (now - v.t0) / 1000, v) * v.k);
         }
+        // The pointer's glow lights the dots around it and pushes them outward a little.
+        let px = (x + 0.5) * S, py = (y + 0.5) * S;
+        if (glowAt.k > 0.01) {
+          const gx = x + 0.5 - glowAt.x, gy = y + 0.5 - glowAt.y, d = Math.hypot(gx, gy);
+          if (d < GLOW * 3) {
+            const g = lens(d, GLOW) * glowAt.k;
+            I = Math.max(I, g * 0.72);
+            if (d > 0.01) { const push = lens(d, GLOW * 0.6) * glowAt.k * S * 0.7; px += (gx / d) * push; py += (gy / d) * push; }
+          }
+        }
+        const A = aurora(x, y, drift);
         let lit = 0;
         if (msg && msg.mask[y * cols + x]) {
-          const d = Math.abs(x - msg.ox) + Math.abs(y - msg.oy);
+          const d = Math.hypot(x - msg.ox, y - msg.oy);
           lit = Math.min(1, Math.max(0, (age * 45 - d) / 4)) * Math.min(1, Math.max(0, (HOLD - age) / 0.8));
           I = Math.max(I, lit * 1.05);
         }
         // Brighter toward the right, so the grid never fights the name on the left.
         // Waves still show on the dim side, so the opening sweep across the name is visible.
         const side = lit > 0 ? 1 : Math.max(Math.min(1, I) * 0.85, Math.min(1, Math.max(0.18, (x / cols - 0.1) * 1.5)));
-        const b = Math.round(Math.min(1, (0.24 + beat.level * 0.35 + 0.9 * Math.min(1, I)) * side) * 10);
+        const b = Math.round(Math.min(1, (0.12 + A * 0.9 + beat.level * 0.35 + 0.9 * Math.min(1, I)) * side) * 10);
         if (!b) continue;
-        const hue = (x / cols) * 0.75 + (y / rows) * 0.25 + Math.sin(t + x * 0.05 + y * 0.04) * 0.18 + I * 0.25;
+        const hue = (x / cols) * 0.75 + (y / rows) * 0.25 + Math.sin(t + x * 0.05 + y * 0.04) * 0.18 + I * 0.25 + A * 0.22;
         const band = Math.max(0, Math.min(BANDS - 1, Math.round(hue * (BANDS - 1))));
-        const big = lit > 0.5 ? 2 : I > 0.35 ? 1 : 0;
+        const big = lit > 0.5 ? 2 : I > 0.35 || A > 0.42 ? 1 : 0;
         const key = (band * 11 + b) * 3 + big;
         let arr = buckets.get(key);
         if (!arr) buckets.set(key, (arr = []));
-        arr.push((x + 0.5) * S * dpr, (y + 0.5) * S * dpr);
+        arr.push(px * dpr, py * dpr);
       }
     }
     for (const [key, pts] of buckets) {
       const big = key % 3, b = Math.floor(key / 3) % 11, band = Math.floor(Math.floor(key / 3) / 11);
       const [r, g, bl] = bandColour[band];
       ctx.fillStyle = `rgb(${r} ${g} ${bl} / ${b / 10})`;
-      const ds = [1.8, 3.2, 5.6][big] * dpr;
-      for (let i = 0; i < pts.length; i += 2) ctx.fillRect(pts[i] - ds / 2, pts[i + 1] - ds / 2, ds, ds);
+      const ds = [1.8, 3, 5.6][big] * dpr;
+      if (!big) { for (let i = 0; i < pts.length; i += 2) ctx.fillRect(pts[i] - ds / 2, pts[i + 1] - ds / 2, ds, ds); continue; }
+      // The brighter dots are round.
+      ctx.beginPath();
+      for (let i = 0; i < pts.length; i += 2) { ctx.moveTo(pts[i] + ds / 2, pts[i + 1]); ctx.arc(pts[i], pts[i + 1], ds / 2, 0, 6.2832); }
+      ctx.fill();
     }
     if (!reduced) requestAnimationFrame(draw);
   };
