@@ -152,6 +152,12 @@ export const site = {
       ],
     },
   ] as Array<{ repo: string; minor?: boolean; about: string; stars: number; prs: Array<{ n: number; state: 'merged' | 'open'; date: string; add: number; del: number; title: string }> }>,
+  /** Course certificates. The PDFs and previews live in /public/certificates. `verify` is the issuer's own check page. */
+  certificates: [
+    { title: 'Claude with the Anthropic API', issuer: 'Anthropic', icon: 'siAnthropic', issued: '2026-06-21', id: 'mjh69atmcmhc', slug: 'anthropic-claude-api', verify: 'https://verify.skilljar.com/c/mjh69atmcmhc' },
+    { title: 'Agents and Workflows', issuer: 'OpenAI Academy', icon: 'siOpenai', issued: '2026-06-20', id: 'xrx8wd1158', slug: 'openai-agents-and-workflows' },
+    { title: 'Applied AI Foundations', issuer: 'OpenAI Academy', icon: 'siOpenai', issued: '2026-06-20', id: 'c7xwlrvzfq', slug: 'openai-applied-ai-foundations' },
+  ] as Array<{ title: string; issuer: string; icon: string; issued: string; id: string; slug: string; verify?: string }>,
   /** Shown in the stack section; the projects that use each one are worked out from the case studies. */
   stack: [
     { name: 'TypeScript', icon: 'siTypescript' },
