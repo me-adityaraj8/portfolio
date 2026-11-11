@@ -28,60 +28,42 @@ export function motion(lenis: Lenis | null, pulse?: (x: number, y: number, pxPer
 }
 
 /**
- * The name is revealed by a BFS wave: one diamond-shaped front spreads from the start of
- * the name, the dots ripple with it, and the letters appear exactly where it has reached.
+ * The hero's entrance: the name's letters rise out of their own masks one after another
+ * while the dots ripple out from where the name starts, then the rest of the column follows.
  */
 function hero(pulse?: (x: number, y: number, pxPerSec: number, life: number) => void) {
   const h1 = document.querySelector<HTMLElement>('.hero h1');
   if (!h1) return;
   const r = h1.getBoundingClientRect();
-  const SPEED = 1100; // px per second, the same for the dots and the clip
-  const oy = r.height * 0.5, reach = r.width + oy;
-  const front = { d: 0 };
-  const clip = () => { h1.style.clipPath = `polygon(0px ${oy - front.d}px, ${front.d}px ${oy}px, 0px ${oy + front.d}px, ${-front.d}px ${oy}px)`; };
-  clip();
+  const split = SplitText.create(h1, { type: 'chars', mask: 'chars' });
+  // The masks would crop the name's glow into boxes, so it is off until the letters have landed.
+  h1.style.textShadow = 'none';
+  const land = () => { split.revert(); h1.style.textShadow = ''; };
   const tl = gsap.timeline({ defaults: { ease: EASE } });
   tl.from('.hero .kicker', { opacity: 0, duration: 0.6 })
-    .call(() => pulse?.(r.left, r.top + oy, SPEED, reach / SPEED + 0.6), [], 0.2)
-    .to(front, { d: reach, duration: reach / SPEED, ease: 'none', onUpdate: clip, onComplete: () => { h1.style.clipPath = ''; } }, 0.2)
-    .from(['.hero .lede', '.hero .meta', '.hero .actions > *'], { y: 14, opacity: 0, duration: 0.9, stagger: 0.05 }, '>-0.25')
-    .from('.hero-deck', { x: 40, opacity: 0, duration: 1.2, clearProps: 'transform,opacity' }, '<0.1')
-    .from(['.scroll-cue', '#scroll-down'], { opacity: 0, duration: 0.8 }, '<0.3');
+    .call(() => pulse?.(r.left, r.top + r.height / 2, 1100, r.width / 1100 + 0.8), [], 0.15)
+    .from(split.chars, { yPercent: 118, rotate: 7, duration: 1.15, stagger: 0.05, onComplete: land }, 0.15)
+    .from('.hero .roller', { y: 18, opacity: 0, duration: 0.9 }, '>-0.75')
+    .from(['.hero .lede', '.hero .meta', '.hero .actions > *'], { y: 14, opacity: 0, duration: 0.9, stagger: 0.05 }, '<0.12')
+    .from(['.scroll-cue', '#scroll-down'], { opacity: 0, duration: 0.8 }, '<0.3')
+    .call(roller);
 }
 
-/** The hero's stack of live projects: the front one rotates to the back every few seconds. */
-export function deck(reduced: boolean) {
-  const cards = gsap.utils.toArray<HTMLElement>('.deck-card');
-  const dots = gsap.utils.toArray<HTMLButtonElement>('.deck-dot');
-  const count = document.getElementById('deck-count');
-  if (!cards.length) return;
-  let front = 0, timer = 0, paused = false;
-  const place = (instant = false) => {
-    cards.forEach((c, i) => {
-      const rank = (i - front + cards.length) % cards.length;
-      const v = rank === 0 ? { x: 0, y: 0, scale: 1, rotate: 0, opacity: 1 }
-        : rank === 1 ? { x: -28, y: -24, scale: 0.95, rotate: -2.5, opacity: 0.5 }
-        : rank === 2 ? { x: -52, y: -46, scale: 0.9, rotate: -5, opacity: 0.22 }
-        : { x: -70, y: -64, scale: 0.86, rotate: -6, opacity: 0 };
-      c.style.zIndex = String(cards.length - rank);
-      c.inert = rank !== 0;
-      if (instant || reduced) gsap.set(c, v); else gsap.to(c, { ...v, duration: 0.9, ease: EASE });
-    });
-    dots.forEach((d, i) => d.setAttribute('aria-current', String(i === front)));
-    if (count) count.textContent = `${String(front + 1).padStart(2, '0')} / ${String(cards.length).padStart(2, '0')}`;
-  };
-  const go = (i: number) => { front = (i + cards.length) % cards.length; place(); };
-  const tick = () => { clearTimeout(timer); if (!reduced) timer = window.setTimeout(() => { if (!paused && !document.hidden) go(front + 1); tick(); }, 4800); };
-  place(true);
-  tick();
-  dots.forEach((d, i) => d.addEventListener('click', () => { go(i); tick(); }));
-  document.getElementById('deck-prev')?.addEventListener('click', () => { go(front - 1); tick(); });
-  document.getElementById('deck-next')?.addEventListener('click', () => { go(front + 1); tick(); });
-  const wrap = document.querySelector('.hero-deck')!;
-  wrap.addEventListener('pointerenter', () => { paused = true; });
-  wrap.addEventListener('pointerleave', () => { paused = false; });
-  wrap.addEventListener('focusin', () => { paused = true; });
-  wrap.addEventListener('focusout', () => { paused = false; });
+/** "I build ___": the words roll up through a one-line window, one every few seconds. */
+function roller() {
+  const words = gsap.utils.toArray<HTMLElement>('.roll-w');
+  if (words.length < 2) return;
+  let at = 0;
+  gsap.set(words, { yPercent: (i) => (i === 0 ? 0 : 110), y: 0 });
+  window.setInterval(() => {
+    if (document.hidden) return;
+    const next = (at + 1) % words.length;
+    gsap.to(words[at], { yPercent: -110, duration: 0.7, ease: 'expo.inOut' });
+    gsap.fromTo(words[next], { yPercent: 110 }, { yPercent: 0, duration: 0.7, ease: 'expo.inOut' });
+    words[at].setAttribute('aria-hidden', 'true');
+    words[next].removeAttribute('aria-hidden');
+    at = next;
+  }, 2600);
 }
 
 function titles() {

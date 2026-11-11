@@ -7,7 +7,8 @@ import { rank } from './palette';
 import { beat, listen, onBeat } from './beat';
 import { building, contest, growFrom, guestbook, liveStats, recruiter } from './extras';
 import { backToTop, glow, osMore, health, hirer, keyboard, perf, stackFilter, toMessage } from './more';
-import { deck, motion } from './motion';
+import { motion } from './motion';
+import { badge } from './badge';
 import { dm } from './dm';
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -26,7 +27,7 @@ export function start() {
   if (fine) { cursor(); spotlights(); }
   scrollEffects();
   motion(lenis, pulse);
-  deck(reduced);
+  badge(lenis, reduced, pulse);
   palette(lenis, [
     { label: 'Keyboard shortcuts', group: 'Help', run: () => $<HTMLDialogElement>('keys').showModal() },
     { label: 'Hire Aditya', group: 'Links', run: hire },
@@ -352,7 +353,7 @@ function demos(lenis: Lenis | null) {
     else await caseStudy(body, `/work/${slug}`);
     caseLink.hidden = !demo;
     if (push) history.pushState({ demo: slug }, '', `#${slug}`);
-    if (!dialog.open) { dialog.showModal(); opener = hit.closest('.card, .deck-card'); void growFrom(dialog, opener); }
+    if (!dialog.open) { dialog.showModal(); opener = hit.closest('.card'); void growFrom(dialog, opener); }
     body.focus({ preventScroll: true });
     lenis?.stop();
   };
@@ -366,7 +367,7 @@ function demos(lenis: Lenis | null) {
   };
 
   document.addEventListener('click', (e) => {
-    const hit = (e.target as Element).closest<HTMLAnchorElement>('.card-hit, .deck-hit');
+    const hit = (e.target as Element).closest<HTMLAnchorElement>('.card-hit');
     if (!hit || e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault();
     open(hit, true);
