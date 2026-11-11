@@ -735,7 +735,7 @@ main:focus { outline: none; }
 @media (prefers-reduced-motion: reduce) { .js .connect .thanks-line span { transform: none; } }
 
 /* ── GSAP: the hero stays hidden until its entrance starts (with a timeout in Base, in case scripts fail). */
-html.js[data-page='map']:not(.motion-ready) .hero-inner, html.js[data-page='map']:not(.motion-ready) .scroll-cue, html.js[data-page='map']:not(.motion-ready) .scroll-down { opacity: 0; }
+html.js[data-page='case']:not(.motion-ready) .case > :is(.kicker, h1, .lede, .case-meta), html.js[data-page='index']:not(.motion-ready) .index-page > :is(.kicker, h1, .lede), html.js[data-page='map']:not(.motion-ready) .hero-inner, html.js[data-page='map']:not(.motion-ready) .scroll-cue, html.js[data-page='map']:not(.motion-ready) .scroll-down { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { html.js:not(.motion-ready) .hero-inner, html.js:not(.motion-ready) .scroll-cue, html.js:not(.motion-ready) .scroll-down { opacity: 1; } }
 
 /* ── Personal page. */
@@ -933,3 +933,16 @@ html.js .hero .meta { display: none; }
 .glow-btn:focus-visible { outline: 2px solid #ddd6fe; outline-offset: 4px; }
 @media (prefers-reduced-motion: reduce) { .glow-btn { transition: none; } }
 .foot-brand .glow-btn { display: grid; width: fit-content; }
+
+/* ── Small touches: buttons give under a press, plain links redraw their underline, rows lean in. */
+.button:active, .pill:active, .dm-send:active, .os-toggle:active { scale: 0.97; }
+.actions a:not(.button) { text-decoration: none; background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat; padding-bottom: 3px; }
+.actions a:not(.button):hover { animation: redraw 0.65s var(--ease); }
+@keyframes redraw { 0% { background-size: 100% 1px; background-position: 100% 100%; } 45% { background-size: 0% 1px; background-position: 100% 100%; } 46% { background-size: 0% 1px; background-position: 0 100%; } 100% { background-size: 100% 1px; background-position: 0 100%; } }
+.foot-nav a { transition: color 0.2s, transform 0.35s var(--ease); }
+.foot-nav a:hover { transform: translateX(5px); }
+.os-title { transition: transform 0.35s var(--ease), color 0.2s; }
+.os-pr:hover .os-title { transform: translateX(5px); color: var(--ink); }
+.more a .more-name { transition: transform 0.35s var(--ease); }
+.more a:hover .more-name { transform: translateX(6px); }
+@media (prefers-reduced-motion: reduce) { .actions a:not(.button):hover { animation: none; } .foot-nav a:hover, .os-pr:hover .os-title, .more a:hover .more-name { transform: none; } }
