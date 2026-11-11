@@ -64,7 +64,23 @@ export function badge(lenis: Lenis | null, reduced: boolean, pulse?: (x: number,
     card.setAttribute('aria-pressed', String(back));
     wrap.classList.add('used');
     bob.vx += back ? 260 : -260;
+    if (back && !reduced) countUp();
     wake();
+  };
+  // The numbers on the back run up from zero each time it turns over.
+  const stats = [...card.querySelectorAll<HTMLElement>('.badge-stats b')].map((el) => ({ el, text: el.textContent ?? '' }));
+  const countUp = () => {
+    const begin = performance.now() + 300;
+    const tick = (t: number) => {
+      const k = clamp((t - begin) / 1100, 0, 1), e = 1 - (1 - k) ** 4;
+      for (const { el, text } of stats) {
+        const m = text.match(/^(\D*)(\d+)(\D*)$/);
+        el.textContent = m && k < 1 ? `${m[1]}${Math.round(Number(m[2]) * e)}${m[3]}` : text;
+      }
+      if (k < 1 && card.getAttribute('aria-pressed') === 'true') requestAnimationFrame(tick);
+      else for (const { el, text } of stats) el.textContent = text;
+    };
+    requestAnimationFrame(tick);
   };
   card.addEventListener('click', () => { if (moved < 6) flip(); moved = 0; });
 
