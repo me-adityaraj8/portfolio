@@ -1,0 +1,31 @@
+---
+// One repository in the open source section, with its pull requests listed like a git log.
+interface Props { r: { repo: string; about: string; stars: number; prs: Array<{ n: number; state: 'merged' | 'open'; date: string; add: number; del: number; title: string }> } }
+const { r } = Astro.props;
+const fmtStars = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 100000 ? 0 : 1)}k` : `${n}`);
+const fmtMonth = (d: string) => new Date(`${d}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+// GitHub-style five-square diff bar.
+const diffBar = (add: number, del: number) => {
+  const g = Math.round((add / Math.max(add + del, 1)) * 5);
+  return Array.from({ length: 5 }, (_, i) => (i < g ? 'a' : 'd'));
+};
+---
+<li class="os-repo">
+  <div class="os-head">
+    <a class="os-name" href={`https://github.com/${r.repo}`} target="_blank" rel="noopener"><span class="os-owner">{r.repo.split('/')[0]}/</span>{r.repo.split('/')[1]}</a>
+    {r.stars > 0 && <span class="os-stars"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .9l2.2 4.6 5 .7-3.6 3.5.9 5L8 12.3l-4.5 2.4.9-5L.8 6.2l5-.7z" /></svg>{fmtStars(r.stars)}<span class="sr-only"> stars</span></span>}
+  </div>
+  {r.about && <p class="os-about">{r.about}</p>}
+  <ul class="os-prs">
+    {r.prs.map((pr) => (
+      <li>
+        <a class="os-pr" href={`https://github.com/${r.repo}/pull/${pr.n}`} target="_blank" rel="noopener">
+          <span class={`os-state os-state--${pr.state}`}>{pr.state === 'merged' ? 'Merged' : 'Open'}</span>
+          <span class="os-title">{pr.title} <span class="os-n">#{pr.n}</span></span>
+          <span class="os-diff" aria-label={`${pr.add} lines added, ${pr.del} removed`}><span class="os-add">+{pr.add.toLocaleString('en-IN')}</span><span class="os-del">−{pr.del.toLocaleString('en-IN')}</span><span class="os-bar" aria-hidden="true">{diffBar(pr.add, pr.del).map((c) => <i class={c}></i>)}</span></span>
+          <time class="os-when" datetime={pr.date}>{fmtMonth(pr.date)}</time>
+        </a>
+      </li>
+    ))}
+  </ul>
+</li>

@@ -135,6 +135,7 @@ export const site = {
     },
     {
       repo: 'Namansingh3264/NexusEditor',
+      minor: true,
       about: 'A real-time collaborative rich-text editor on Next.js, Socket.io and Prisma.',
       stars: 0,
       prs: [
@@ -143,13 +144,14 @@ export const site = {
     },
     {
       repo: 'varun00077/selenograph',
+      minor: true,
       about: '',
       stars: 0,
       prs: [
         { n: 1, state: 'open', date: '2026-09-04', add: 3138, del: 1357, title: 'Frontend overhaul: fixed deploy-breaking config, restored workflow state, made it accessible' },
       ],
     },
-  ] as Array<{ repo: string; about: string; stars: number; prs: Array<{ n: number; state: 'merged' | 'open'; date: string; add: number; del: number; title: string }> }>,
+  ] as Array<{ repo: string; minor?: boolean; about: string; stars: number; prs: Array<{ n: number; state: 'merged' | 'open'; date: string; add: number; del: number; title: string }> }>,
   /** Shown in the stack section; the projects that use each one are worked out from the case studies. */
   stack: [
     { name: 'TypeScript', icon: 'siTypescript' },

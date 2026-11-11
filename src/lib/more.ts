@@ -148,3 +148,18 @@ export function glow() {
     });
   });
 }
+
+/** Open source: the "View more" button that folds the smaller contributions in and out. */
+export function osMore() {
+  const btn = document.getElementById('os-toggle');
+  const box = document.getElementById('os-extra');
+  if (!btn || !box) return;
+  btn.addEventListener('click', () => {
+    const open = btn.getAttribute('aria-expanded') !== 'true';
+    btn.setAttribute('aria-expanded', String(open));
+    box.classList.toggle('open', open);
+    box.toggleAttribute('inert', !open);
+    const label = btn.querySelector('.os-toggle-label');
+    if (label) label.textContent = open ? 'View less' : 'View more';
+  });
+}

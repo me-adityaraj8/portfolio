@@ -5,6 +5,7 @@ import HoverCard from '../components/HoverCard.astro';
 import Icon from '../components/Icon.astro';
 import ProblemSolving from '../components/ProblemSolving.astro';
 import Building from '../components/Building.astro';
+import OsRepo from '../components/OsRepo.astro';
 import cp from '../data/cp.json';
 import contrib from '../data/contrib.json';
 import { getWork } from '../lib/work';
@@ -28,15 +29,9 @@ const letterCount = thanks.join('').length;
 let letterAt = 0;
 const thanksLines = thanks.map((line) => [...line].map((ch) => ({ ch: ch === ' ' ? '\u00a0' : ch, i: letterAt, p: (letterAt++ / (letterCount - 1)) * 100 })));
 const deckProjects = featured.filter((p) => p.data.shot);
+const osMinor = site.openSource.filter((r) => r.minor);
 const osMerged = site.openSource.flatMap((r) => r.prs).filter((p) => p.state === 'merged').length;
 const osRepos = site.openSource.filter((r) => r.prs.some((p) => p.state === 'merged')).length;
-const fmtStars = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 100000 ? 0 : 1)}k` : `${n}`);
-const fmtMonth = (d: string) => new Date(`${d}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
-// GitHub-style five-square diff bar.
-const diffBar = (add: number, del: number) => {
-  const g = Math.round((add / Math.max(add + del, 1)) * 5);
-  return Array.from({ length: 5 }, (_, i) => (i < g ? 'a' : 'd'));
-};
 const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).map((w) => w[0]).join('').slice(0, 3);
 ---
 <Base>
@@ -119,30 +114,23 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
 
   <section class="section" data-reveal id="open-source" aria-labelledby="os-title">
     <h2 id="os-title" class="section-title">Open source</h2>
-    <p class="os-sum"><b>{osMerged}</b> pull requests merged into <b>{osRepos}</b> other people's projects, from a one-line curriculum fix at freeCodeCamp to a rebuild of a collaborative editor.</p>
+    <p class="os-sum"><b>{osMerged}</b> pull requests merged into <b>{osRepos}</b> other people's projects, including freeCodeCamp and the nanocoder terminal agent.</p>
     <ol class="os">
-      {site.openSource.map((r) => (
-        <li class="os-repo">
-          <div class="os-head">
-            <a class="os-name" href={`https://github.com/${r.repo}`} target="_blank" rel="noopener"><span class="os-owner">{r.repo.split('/')[0]}/</span>{r.repo.split('/')[1]}</a>
-            {r.stars > 0 && <span class="os-stars"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .9l2.2 4.6 5 .7-3.6 3.5.9 5L8 12.3l-4.5 2.4.9-5L.8 6.2l5-.7z" /></svg>{fmtStars(r.stars)}<span class="sr-only"> stars</span></span>}
-          </div>
-          {r.about && <p class="os-about">{r.about}</p>}
-          <ul class="os-prs">
-            {r.prs.map((pr) => (
-              <li>
-                <a class="os-pr" href={`https://github.com/${r.repo}/pull/${pr.n}`} target="_blank" rel="noopener">
-                  <span class={`os-state os-state--${pr.state}`}>{pr.state === 'merged' ? 'Merged' : 'Open'}</span>
-                  <span class="os-title">{pr.title} <span class="os-n">#{pr.n}</span></span>
-                  <span class="os-diff" aria-label={`${pr.add} lines added, ${pr.del} removed`}><span class="os-add">+{pr.add.toLocaleString('en-IN')}</span><span class="os-del">−{pr.del.toLocaleString('en-IN')}</span><span class="os-bar" aria-hidden="true">{diffBar(pr.add, pr.del).map((c) => <i class={c}></i>)}</span></span>
-                  <time class="os-when" datetime={pr.date}>{fmtMonth(pr.date)}</time>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </li>
-      ))}
+      {site.openSource.filter((r) => !r.minor).map((r) => <OsRepo r={r} />)}
     </ol>
+    {osMinor.length > 0 && (
+      <div class="os-more">
+        <button type="button" class="os-toggle" id="os-toggle" aria-expanded="false" aria-controls="os-extra">
+          <span class="os-toggle-label">View more</span><span class="os-toggle-n">{osMinor.length}</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6" /></svg>
+        </button>
+        <div class="os-extra" id="os-extra" inert>
+          <ol class="os os--extra">
+            {osMinor.map((r) => <OsRepo r={r} />)}
+          </ol>
+        </div>
+      </div>
+    )}
   </section>
 
   <section class="section" data-reveal id="education" aria-labelledby="edu-title">
