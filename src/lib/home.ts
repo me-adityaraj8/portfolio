@@ -318,7 +318,7 @@ function palette(lenis: Lenis | null, extra: Item[]) {
   const open = (url: string) => () => window.open(url, '_blank', 'noopener');
   const linkOf = (sel: string) => document.querySelector<HTMLAnchorElement>(sel)?.href ?? '';
   const items: Item[] = [
-    ...[['work', 'Proof of work'], ['experience', 'Experience'], ['open-source', 'Open source'], ['credentials', 'Credentials'], ['education', 'Education'], ['stack', 'Stack'], ['problem-solving', 'Problem solving'], ['ask', 'Ask about me'], ['now', 'Now'], ['contact', 'Contact']]
+    ...[['work', 'Proof of work'], ['experience', 'Experience'], ['open-source', 'Open source'], ['credentials', 'Credentials'], ['education', 'Education'], ['stack', 'Stack'], ['problem-solving', 'Problem solving'], ['ask', 'Ask my stand-in'], ['now', 'Now'], ['contact', 'Contact']]
       .map(([id, name]) => ({ label: `Go to ${name}`, group: 'Sections', run: go(id) })),
     ...[...document.querySelectorAll<HTMLAnchorElement>('.card-hit')].map((c) => ({ label: `Open ${c.dataset.title}`, group: 'Projects', run: () => c.click() })),
     { label: 'Copy email address', group: 'Links', run: async () => { const a = document.querySelector<HTMLAnchorElement>('[data-copy]'); if (a) await navigator.clipboard.writeText(a.dataset.copy!).catch(() => {}); } },
