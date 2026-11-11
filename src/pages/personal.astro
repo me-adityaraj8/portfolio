@@ -173,12 +173,38 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
       <div class="ch-body ch-body--center">{p.singing.body.map((t) => <p>{t}</p>)}</div>
     </section>
 
-    <!-- 04 Sports. -->
+    <!-- 04 Sports: a badminton rally that never ends, and a bar that always takes one more plate. -->
     <section class="ch ch-sports" id="sports" aria-labelledby="h-sports" data-reveal-ch>
-      <div class="ch-head">
+      <div class="sports-copy">
         <span class="ch-no">{no('sports')}</span>
         <h2 id="h-sports">{p.sports.title}</h2>
         <div class="ch-body">{p.sports.body.map((t) => <p>{t}</p>)}</div>
+      </div>
+      <div class="court" id="court">
+        <p class="court-top"><span>Rally</span><b id="rally">000</b><span class="court-smash" id="smash" aria-hidden="true">Smash!</span></p>
+        <button type="button" class="court-play" id="court-play" aria-label="A badminton rally. Press to smash.">
+          <svg viewBox="0 0 400 210" aria-hidden="true">
+            <path class="court-floor" d="M0 178 H400 V210 H0 Z" />
+            <path class="court-line" d="M0 178 H400 M56 178 V210 M344 178 V210" />
+            <g class="court-net"><path d="M200 96 V178" /><path class="mesh" d="M184 100 H216 M184 112 H216 M184 124 H216 M184 136 H216 M184 148 H216 M184 160 H216 M184 172 H216 M184 96 V178 M216 96 V178 M192 96 V178 M208 96 V178" /><path class="tape" d="M182 96 H218" /></g>
+            <g class="racket racket-l"><path d="M44 176 L62 132" /><ellipse cx="70" cy="112" rx="17" ry="24" transform="rotate(22 70 112)" /></g>
+            <g class="racket racket-r"><path d="M356 176 L338 132" /><ellipse cx="330" cy="112" rx="17" ry="24" transform="rotate(-22 330 112)" /></g>
+            <g class="fly-x" id="fly-x"><g class="fly-y"><g class="fly-turn">
+              <path class="feathers" d="M-4 0 L-26 -11 L-24 -4 L-27 0 L-24 4 L-26 11 Z" /><circle class="cork" r="6.5" />
+            </g></g></g>
+          </svg>
+        </button>
+        <div class="lift">
+          <button type="button" class="lift-bar" id="lift" data-n="2" aria-label="A barbell. Press to add a plate.">
+            <svg viewBox="0 0 400 76" aria-hidden="true">
+              <path class="bar" d="M24 38 H376" /><path class="bar-end" d="M24 30 V46 M376 30 V46" />
+              {[0, 1, 2, 3, 4].map((i) => <rect class="plate" style={`--i:${i}`} x={112 - i * 15} y={10 + i * 3} width="11" height={56 - i * 6} rx="3" />)}
+              {[0, 1, 2, 3, 4].map((i) => <rect class="plate" style={`--i:${i}`} x={277 + i * 15} y={10 + i * 3} width="11" height={56 - i * 6} rx="3" />)}
+            </svg>
+          </button>
+          <p class="lift-text" id="lift-text" aria-live="polite">Two plates a side. Tap the bar, there's always room for one more.</p>
+        </div>
+        <ul class="court-tags"><li>Gym</li><li>Bodybuilding</li><li>Badminton</li><li>Cricket, sometimes</li></ul>
       </div>
     </section>
 
@@ -305,7 +331,33 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
     <section class="ch ch-side" id="side-quests" aria-labelledby="h-side" data-reveal-ch>
       <span class="ch-no">{no('side-quests')}</span>
       <h2 id="h-side" class="kicker-title">{p.side.title}</h2>
-      <p class="quests">{p.side.list.map((q) => <span>{q}</span>)}</p>
+      <ul class="quests">
+        <li class="quest quest-garden">
+          <svg viewBox="0 0 240 150" aria-hidden="true">
+            <path class="q-ground" d="M20 132 H220" />
+            <path class="q-stem" pathLength="1" d="M120 118 C120 96 112 84 120 62 C126 46 118 36 120 26" />
+            <path class="q-leaf" style="--i:0" d="M119 98 C98 96 88 82 86 70 C104 70 116 80 119 98 Z" />
+            <path class="q-leaf" style="--i:1" d="M121 78 C142 76 152 62 154 50 C136 50 124 60 121 78 Z" />
+            <path class="q-leaf" style="--i:2" d="M119 58 C102 56 94 46 92 36 C106 36 116 44 119 58 Z" />
+            <g class="q-bloom"><circle cx="120" cy="22" r="11" /><circle class="q-eye" cx="120" cy="22" r="4.5" /></g>
+            <path class="q-pot" d="M92 118 H148 L142 146 H98 Z" /><path class="q-rim" d="M88 112 H152 V120 H88 Z" />
+          </svg>
+          <b>{p.side.list[0]}</b>
+        </li>
+        <li class="quest quest-travel">
+          <svg viewBox="0 0 240 150" aria-hidden="true">
+            <path class="q-route" id="q-route" d="M30 118 C70 20 170 20 210 110" />
+            <g class="q-pin"><path d="M30 118 C20 104 18 98 18 92 A12 12 0 0 1 42 92 C42 98 40 104 30 118 Z" /><circle cx="30" cy="92" r="4" /></g>
+            <g class="q-pin q-pin2"><path d="M210 110 C200 96 198 90 198 84 A12 12 0 0 1 222 84 C222 90 220 96 210 110 Z" /><circle cx="210" cy="84" r="4" /></g>
+            <g class="q-plane"><path d="M-14 -9 L16 0 L-14 9 L-8 0 Z" /><animateMotion dur="3.6s" repeatCount="indefinite" rotate="auto" calcMode="spline" keyTimes="0;1" keySplines="0.45 0 0.55 1"><mpath href="#q-route" /></animateMotion></g>
+          </svg>
+          <b>{p.side.list[1]}</b>
+        </li>
+        <li class="quest quest-social">
+          <div class="q-chat" aria-hidden="true"><span style="--i:0"></span><span style="--i:1"></span><span style="--i:2"><i></i><i></i><i></i></span></div>
+          <b>{p.side.list[2]}</b>
+        </li>
+      </ul>
       <div class="ch-body ch-body--center">{p.side.body.map((t) => <p>{t}</p>)}</div>
     </section>
 
@@ -327,6 +379,27 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
 
     // Drawings only move while their chapter is on screen.
     const io = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle('on', e.isIntersecting)), { rootMargin: '0px 0px -15% 0px' });
+    // Sports: every time the shuttle crosses the net the rally goes up by one. A tap is a smash:
+    // the whole rally runs at double speed for a moment. The bar takes one more plate per tap.
+    const court = document.getElementById('court'), rally = document.getElementById('rally');
+    let rallyCount = 0, smashTimer = 0;
+    document.getElementById('fly-x')?.addEventListener('animationiteration', () => { rally!.textContent = String(++rallyCount % 1000).padStart(3, '0'); });
+    document.getElementById('court-play')?.addEventListener('click', (e) => {
+      const anims = (e.currentTarget as HTMLElement).getAnimations({ subtree: true });
+      anims.forEach((a) => { a.playbackRate = 2.6; });
+      court!.classList.add('smashing');
+      clearTimeout(smashTimer);
+      smashTimer = window.setTimeout(() => { anims.forEach((a) => { a.playbackRate = 1; }); court!.classList.remove('smashing'); }, 1600);
+    });
+    const lift = document.getElementById('lift'), liftText = document.getElementById('lift-text');
+    const words = ['One', 'Two', 'Three', 'Four', 'Five'];
+    lift?.addEventListener('click', () => {
+      const n = (Number(lift.dataset.n) % 5) + 1;
+      lift.dataset.n = String(n);
+      liftText!.textContent = n === 5 ? "Five plates a side. That's the whole rack, tap to strip it." : n === 1 ? 'One plate a side. Warming up.' : `${words[n - 1]} plates a side. Tap the bar, there's always room for one more.`;
+      lift.classList.add('up');
+      setTimeout(() => lift.classList.remove('up'), 420);
+    });
     // The biryani pot: a tap puts the lid back on, another lifts it again.
     const pot = document.getElementById('pot'), fav = document.getElementById('fav');
     pot?.addEventListener('click', () => {
@@ -383,7 +456,7 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
         ['.shelf .poster', { y: 80, opacity: 0, rotate: 6 }],
         ['.track', { y: 18, opacity: 0 }],
         ['.spread .sp', { y: 70, opacity: 0, scale: 0.96 }],
-        ['.quests span', { y: 40, opacity: 0 }],
+        ['.quest', { y: 50, opacity: 0, scale: 0.96 }],
       ];
       for (const [sel, from] of groups) {
         const items = gsap.utils.toArray<HTMLElement>(sel);
@@ -395,7 +468,7 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
         const d = Number(el.dataset.depth ?? 0.5);
         gsap.to(el, { y: () => -innerHeight * 0.6 * d, rotate: d * 40, ease: 'none', scrollTrigger: { trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: 0.6 } });
       });
-      for (const sel of ['.deck', '.fav', '.term', '.pp-end']) {
+      for (const sel of ['.deck', '.court', '.fav', '.term', '.pp-end']) {
         gsap.from(sel, { y: 60, opacity: 0, scale: 0.97, duration: 1.2, ease: EASE, clearProps: 'transform,opacity', scrollTrigger: { trigger: sel, start: 'top 88%', once: true } });
       }
       // Photos drift gently against the scroll.
@@ -781,10 +854,91 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
 
     /* 09 Side quests. */
     .ch-side { text-align: center; }
-    .quests { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 6px 28px; margin: 22px 0 26px; }
-    .quests span { font: 700 clamp(30px, 5.4vw, 72px)/1 var(--display); letter-spacing: -0.035em; text-transform: uppercase; }
-    .quests span:nth-child(1) { color: #34d399; } .quests span:nth-child(2) { color: #38bdf8; } .quests span:nth-child(3) { color: #f472b6; }
-    .quests .quests-more { font: 400 20px var(--sans); letter-spacing: 0; text-transform: none; color: var(--ink-3); }
+    /* Side quests: three small scenes. A plant that grows, a plane on its route, a chat that keeps going. */
+    .quests { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin: 26px 0 30px; padding: 0; list-style: none; text-align: left; }
+    .quest { --c: #34d399; position: relative; display: grid; gap: 6px; padding: 22px 22px 20px; border-radius: 22px; overflow: hidden; background: linear-gradient(180deg, color-mix(in srgb, var(--c) 16%, #0d0c16), #0d0c16 78%); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 32%, transparent), 0 24px 60px rgb(0 0 0 / 0.4); transition: transform 0.5s var(--ease); }
+    .quest:hover { transform: translateY(-6px); }
+    .quest b { font: 700 clamp(20px, 2.3vw, 30px)/1 var(--display); letter-spacing: -0.03em; text-transform: uppercase; color: var(--c); }
+    .quest svg, .q-chat { display: block; width: 100%; height: 150px; }
+    .quest-travel { --c: #38bdf8; } .quest-social { --c: #f472b6; }
+    .q-ground { fill: none; stroke: rgb(255 255 255 / 0.14); stroke-width: 2; stroke-dasharray: 3 7; stroke-linecap: round; }
+    .q-pot { fill: #c2703a; } .q-rim { fill: #e08f55; }
+    .q-stem { fill: none; stroke: #34d399; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: -1; transition: stroke-dashoffset 1.4s cubic-bezier(0.5, 0, 0.2, 1); }
+    .q-leaf { fill: #34d399; transform-box: fill-box; transform-origin: 100% 100%; scale: 0; transition: scale 0.7s cubic-bezier(0.3, 1.6, 0.4, 1) calc(var(--i) * 0.28s + 0.45s); }
+    .q-leaf:nth-of-type(3) { transform-origin: 0% 100%; }
+    .q-bloom { transform-box: fill-box; transform-origin: center; scale: 0; transition: scale 0.8s cubic-bezier(0.3, 1.8, 0.4, 1) 1.5s; }
+    .q-bloom circle { fill: #fde047; } .q-bloom .q-eye { fill: #f97316; }
+    .ch-side.on .q-stem { stroke-dashoffset: 0; }
+    .ch-side.on .q-leaf, .ch-side.on .q-bloom { scale: 1; }
+    .ch-side.on .quest-garden svg { animation: breeze 3.6s ease-in-out 2.4s infinite alternate; transform-origin: 50% 90%; }
+    @keyframes breeze { from { rotate: -2.5deg; } to { rotate: 2.5deg; } }
+    .q-route { fill: none; stroke: rgb(56 189 248 / 0.5); stroke-width: 2.5; stroke-dasharray: 2 9; stroke-linecap: round; }
+    .q-pin path { fill: #38bdf8; } .q-pin circle { fill: #0d0c16; }
+    .q-pin { transform-box: fill-box; transform-origin: 50% 100%; scale: 0; transition: scale 0.7s cubic-bezier(0.3, 1.7, 0.4, 1) 0.2s; }
+    .q-pin2 { transition-delay: 0.6s; }
+    .ch-side.on .q-pin { scale: 1; }
+    .q-plane path { fill: #e0f2fe; }
+    .q-chat { position: relative; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+    .q-chat span { width: 62%; height: 30px; border-radius: 16px 16px 16px 5px; background: rgb(244 114 182 / 0.28); transform-origin: 0 100%; scale: 0; }
+    .q-chat span:nth-child(2) { align-self: flex-end; width: 48%; border-radius: 16px 16px 5px 16px; background: #f472b6; transform-origin: 100% 100%; }
+    .q-chat span:nth-child(3) { display: flex; align-items: center; justify-content: center; gap: 5px; width: 64px; }
+    .q-chat i { width: 6px; height: 6px; border-radius: 50%; background: #fbcfe8; }
+    .ch-side.on .q-chat span { animation: bubble 5s cubic-bezier(0.3, 1.5, 0.4, 1) calc(var(--i) * 0.7s) infinite both; }
+    .ch-side.on .q-chat i { animation: dots 1s ease-in-out infinite; } .q-chat i:nth-child(2) { animation-delay: 0.15s !important; } .q-chat i:nth-child(3) { animation-delay: 0.3s !important; }
+    @keyframes bubble { 0% { scale: 0; } 10%, 78% { scale: 1; } 88%, 100% { scale: 0; } }
+    @keyframes dots { 0%, 100% { translate: 0 0; } 40% { translate: 0 -5px; } }
+
+    /* Sports: the court card. */
+    .ch-sports { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr); gap: 64px; align-items: center; }
+    .sports-copy .ch-body { margin-top: 20px; }
+    .court { position: relative; padding: 24px 24px 22px; border-radius: 26px; overflow: hidden; color: #dcfce7; background: radial-gradient(80% 60% at 50% 30%, rgb(132 204 22 / 0.2), transparent 70%), linear-gradient(170deg, #0b2a22, #04130f); box-shadow: 0 30px 70px rgb(0 0 0 / 0.5), inset 0 0 0 1px rgb(163 230 53 / 0.25); }
+    .court-top { display: flex; align-items: baseline; gap: 12px; margin: 0; font: 600 12px var(--cond); letter-spacing: 0.2em; text-transform: uppercase; color: #a3e635; }
+    .court-top b { font: 700 clamp(30px, 3.6vw, 46px)/1 var(--display); letter-spacing: -0.02em; color: #f7fee7; font-variant-numeric: tabular-nums; }
+    .court-smash { margin-left: auto; padding: 4px 12px; border-radius: 999px; background: #a3e635; color: #04130f; font-weight: 700; scale: 0; transition: scale 0.35s cubic-bezier(0.3, 1.8, 0.4, 1); }
+    .court.smashing .court-smash { scale: 1; }
+    .court-play, .lift-bar { display: block; width: 100%; padding: 0; cursor: pointer; border-radius: 14px; }
+    .court-play:focus-visible, .lift-bar:focus-visible { outline: 2px solid #a3e635; outline-offset: 4px; }
+    .court-play svg, .lift-bar svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .court-floor { fill: rgb(163 230 53 / 0.12); }
+    .court-line { fill: none; stroke: rgb(236 252 203 / 0.7); stroke-width: 2.5; }
+    .court-net path { fill: none; stroke: #f7fee7; stroke-width: 3; stroke-linecap: round; }
+    .court-net .mesh { stroke: rgb(247 254 231 / 0.3); stroke-width: 1; }
+    .court-net .tape { stroke-width: 5; }
+    .racket path { fill: none; stroke: #fb923c; stroke-width: 5; stroke-linecap: round; }
+    .racket ellipse { fill: rgb(251 146 60 / 0.14); stroke: #fb923c; stroke-width: 4; }
+    .racket { transform-box: fill-box; }
+    .racket-l { transform-origin: 0% 100%; } .racket-r { transform-origin: 100% 100%; }
+    .feathers { fill: #f7fee7; } .cork { fill: #fb923c; }
+    .fly-x { transform: translate(76px, 150px); }
+    .ch-sports.on .fly-x { animation: fly-x 1.15s linear infinite alternate; }
+    .ch-sports.on .fly-y { animation: fly-y 0.575s cubic-bezier(0.3, 0.55, 0.6, 1) infinite alternate; }
+    .ch-sports.on .fly-turn { animation: fly-turn 2.3s steps(1) infinite; }
+    .ch-sports.on .racket-l { animation: swing-l 2.3s ease-out infinite; }
+    .ch-sports.on .racket-r { animation: swing-r 2.3s ease-out infinite; }
+    @keyframes fly-x { from { transform: translate(76px, 150px); } to { transform: translate(324px, 150px); } }
+    @keyframes fly-y { from { transform: translateY(-38px); } to { transform: translateY(-128px); } }
+    @keyframes fly-turn { 0% { transform: rotate(0deg); } 50% { transform: rotate(180deg); } }
+    @keyframes swing-l { 0% { rotate: 26deg; } 12% { rotate: -8deg; } 40%, 100% { rotate: 0deg; } }
+    @keyframes swing-r { 0%, 46% { rotate: 0deg; } 50% { rotate: -26deg; } 62% { rotate: 8deg; } 90%, 100% { rotate: 0deg; } }
+    .lift { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px dashed rgb(163 230 53 / 0.3); }
+    .lift-bar { transition: translate 0.5s cubic-bezier(0.3, 1.6, 0.4, 1); }
+    .lift-bar.up { translate: 0 -10px; }
+    .bar, .bar-end { fill: none; stroke: #d4d4d8; stroke-width: 6; stroke-linecap: round; }
+    .plate { fill: #a3e635; transform-box: fill-box; transform-origin: center; scale: 1 0; transition: scale 0.45s cubic-bezier(0.3, 1.8, 0.4, 1); }
+    .plate:nth-of-type(odd) { fill: #fb923c; }
+    .lift-bar[data-n='1'] .plate:nth-of-type(5n + 1), .lift-bar[data-n='2'] .plate:nth-of-type(5n + 1), .lift-bar[data-n='3'] .plate:nth-of-type(5n + 1), .lift-bar[data-n='4'] .plate:nth-of-type(5n + 1), .lift-bar[data-n='5'] .plate:nth-of-type(5n + 1),
+    .lift-bar[data-n='2'] .plate:nth-of-type(5n + 2), .lift-bar[data-n='3'] .plate:nth-of-type(5n + 2), .lift-bar[data-n='4'] .plate:nth-of-type(5n + 2), .lift-bar[data-n='5'] .plate:nth-of-type(5n + 2),
+    .lift-bar[data-n='3'] .plate:nth-of-type(5n + 3), .lift-bar[data-n='4'] .plate:nth-of-type(5n + 3), .lift-bar[data-n='5'] .plate:nth-of-type(5n + 3),
+    .lift-bar[data-n='4'] .plate:nth-of-type(5n + 4), .lift-bar[data-n='5'] .plate:nth-of-type(5n + 4),
+    .lift-bar[data-n='5'] .plate:nth-of-type(5n + 5) { scale: 1 1; }
+    .lift-text { margin: 0; font-size: 14.5px; line-height: 1.45; color: #bbf7d0; }
+    .court-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; padding: 0; list-style: none; }
+    .court-tags li { padding: 5px 12px; border-radius: 999px; font: 600 12px var(--cond); letter-spacing: 0.14em; text-transform: uppercase; color: #d9f99d; box-shadow: inset 0 0 0 1px rgb(163 230 53 / 0.4); }
+    @media (prefers-reduced-motion: reduce) {
+      .ch-sports.on .fly-x, .ch-sports.on .fly-y, .ch-sports.on .fly-turn, .ch-sports.on .racket, .ch-side.on .quest-garden svg, .ch-side.on .q-chat span, .ch-side.on .q-chat i { animation: none; }
+      .fly-x { transform: translate(140px, 70px); } .q-chat span { scale: 1; }
+      .q-stem, .q-leaf, .q-bloom, .q-pin, .plate, .lift-bar, .quest { transition: none; }
+    }
 
     /* End. */
     .pp-end { margin-top: 140px; padding: 90px 32px; border: 1px solid var(--hair-2); border-radius: 26px; text-align: center;
@@ -794,7 +948,11 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
     .pp-links { display: flex; justify-content: center; align-items: center; gap: 22px; margin-top: 30px !important; }
 
     @media (max-width: 1099px) {
-      .ch-cooking, .ch-coding, .ch-reading { grid-template-columns: 1fr; gap: 40px; }
+      .ch-cooking, .ch-coding, .ch-reading, .ch-sports { grid-template-columns: 1fr; gap: 40px; }
+      .quests { grid-template-columns: 1fr; }
+      .quest svg, .q-chat { height: 130px; }
+      .lift { grid-template-columns: 1fr; gap: 10px; }
+      .court { padding: 20px 18px 18px; }
       .book-wrap { order: 2; height: 280px; }
     }
     @media (max-width: 899px) {
