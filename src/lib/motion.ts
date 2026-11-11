@@ -46,7 +46,7 @@ function hero(pulse?: (x: number, y: number, pxPerSec: number, life: number) => 
     .call(() => pulse?.(r.left, r.top + r.height / 2, 1100, r.width / 1100 + 0.8), [], 0.15)
     .from(split.chars, { yPercent: 118, rotate: 7, duration: 1.15, stagger: 0.05, onComplete: land }, 0.15)
     .from('.hero .roller', { y: 18, opacity: 0, duration: 0.9 }, '>-0.75')
-    .from(['.hero .lede', '.hero .meta', '.hero .actions > *'], { y: 14, opacity: 0, duration: 0.9, stagger: 0.05 }, '<0.12')
+    .from(['.hero .lede', '.hero .meta', '.hero .hero-cta > *'], { y: 14, opacity: 0, duration: 0.9, stagger: 0.05 }, '<0.12')
     .from(['.scroll-cue', '#scroll-down'], { opacity: 0, duration: 0.8 }, '<0.3')
     .call(roller);
 }

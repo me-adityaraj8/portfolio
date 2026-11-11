@@ -62,7 +62,7 @@ function openSource() {
 
 /** Buttons lean towards the pointer and spring back when it leaves. */
 function magnetic() {
-  for (const el of document.querySelectorAll<HTMLElement>('.hero .button, .glow-btn, .os-toggle, .dm-send')) {
+  for (const el of document.querySelectorAll<HTMLElement>('.hero .cta, .glow-btn, .os-toggle, .dm-send')) {
     const toX = gsap.quickTo(el, 'x', { duration: 0.5, ease: 'power3.out' });
     const toY = gsap.quickTo(el, 'y', { duration: 0.5, ease: 'power3.out' });
     el.addEventListener('pointermove', (e) => {

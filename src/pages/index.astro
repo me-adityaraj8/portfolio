@@ -52,12 +52,18 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
       <p class="roller"><span class="roller-k">I build</span><span class="roll" id="roll">{rollWords.map((w, i) => <span class="roll-w" aria-hidden={i > 0 ? 'true' : undefined}>{w}</span>)}</span></p>
       <p class="lede">{site.line}</p>
       <p class="meta">B.Tech CSE at IIIT Bhagalpur</p>
-      <p class="actions">
-        <a href="#work" class="button">See the work</a>
-        <a href={site.resume} target="_blank" rel="noopener">Resume</a>
-        <a href={site.github} rel="noopener">GitHub</a>
-        <a href="#contact" data-message>Message me</a>
-      </p>
+      <div class="hero-cta">
+        <a href="#work" class="cta">
+          <span class="cta-roll"><span>See the work</span><span aria-hidden="true">Scroll down</span></span>
+          <span class="cta-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" /></svg><svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" /></svg></span>
+        </a>
+        <div class="dock" id="dock">
+          <span class="dock-glow" aria-hidden="true"></span>
+          <a href={site.resume} target="_blank" rel="noopener" style="--c:#fbbf24"><Icon name="resume" size={16} /><span>Resume</span></a>
+          <a href={site.github} rel="noopener" style="--c:#a79bff"><Icon name="siGithub" size={16} /><span>GitHub</span></a>
+          <a href="#contact" data-message style="--c:#34d399"><Icon name="mail" size={16} /><span>Message me</span></a>
+        </div>
+      </div>
     </div>
     <div class="hero-badge" id="badge">
       <svg class="lanyard" id="lanyard" aria-hidden="true"><path id="strap-l" /><path id="strap-r" /></svg>
