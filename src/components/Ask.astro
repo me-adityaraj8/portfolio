@@ -2,7 +2,9 @@
 import { getCollection } from 'astro:content';
 import cp from '../data/cp.json';
 import { site } from '../data/site';
+import { personal } from '../data/personal';
 import { SOURCES } from '../lib/ask';
+import { SPINES } from '../lib/standin';
 
 // Ready answers for the suggested questions, written from the same data as the page.
 // They work even when the live assistant is switched off.
@@ -22,22 +24,22 @@ const kalaa = site.experience[0];
 
 const ready = [
   {
-    q: 'What has he built?',
+    q: 'What has he built?', icon: 'build', color: '#a78bfa', hint: top.map((p) => p.data.title).join(' · '),
     answer: `His main projects are ${list(top.map((p) => `${p.data.title}, ${lower(p.data.summary)}`))}. ${top.every((p) => p.data.role?.startsWith('Solo')) ? 'He built each one solo, end to end. ' : ''}${top.every((p) => p.data.architecture) ? 'Each has a case study with an architecture diagram.' : 'Each has a case study on the site.'}`,
     sources: ['/#work', ...projects.slice(0, 2).map((p) => `/work/${p.id}`)],
   },
   {
-    q: 'Any open source work?',
+    q: 'Any open source work?', icon: 'merge', color: '#38bdf8', hint: `${merged.length} merged pull requests`,
     answer: `He has had ${merged.length} pull requests merged into ${repos} other people's projects. ${nanoRepo && nano.length ? `In nanocoder, a ${nanoRepo.stars.toLocaleString('en-US')}-star terminal coding agent, ${count} of his changes landed: ${nano.map((p) => lower(p.title)).join(', and ')}. ` : ''}${fcc ? `He also fixed curriculum text in freeCodeCamp, a ${Math.round(fcc.stars / 1000)}k-star repo.` : ''}`,
     sources: ['/#open-source'],
   },
   {
-    q: 'How strong is his DSA?',
+    q: 'How strong is his DSA?', icon: 'chart', color: '#fb7185', hint: `${co.solved} solved · ${cf.rating} on Codeforces`,
     answer: `He has solved ${co.solved} problems across Codeforces and LeetCode and taken part in ${co.contests} rated contests. His Codeforces rating is ${cf.rating} (${cf.rank}), with a peak of ${cf.maxRating} (${cf.maxRank}), and his LeetCode contest rating is ${lc.rating}, in the top ${lc.top.toFixed(1)}%.`,
     sources: ['/#problem-solving'],
   },
   {
-    q: 'Is he open to an internship?',
+    q: 'Is he open to an internship?', icon: 'case', color: '#4ade80', hint: site.status,
     answer: `Yes. He is ${lower(site.status)} and is a third-year B.Tech CSE student at IIIT Bhagalpur. He is also co-founder of ${kalaa.org}. The quickest way to reach him is ${site.email}, and his resume is one click away.`,
     sources: ['/resume.pdf', '/#experience'],
   },
@@ -45,50 +47,146 @@ const ready = [
 const labels = Object.fromEntries(SOURCES.map((s) => [s.href, s.label]));
 const titles = Object.fromEntries((await getCollection('projects')).map((p) => [`/work/${p.id}`, p.data.title]));
 const hints = ['What did he build Rys with?', 'Which nanocoder bug did he fix?', 'What is Kalaa SkillTech?', 'Which courses is he taking now?', 'What does he do outside code?'];
+const all = (await getCollection('projects')).filter((p) => !p.data.private);
+const library = `Its whole library: ${all.length} projects, ${site.openSource.flatMap((r) => r.prs).length} pull requests, ${site.certificates.length} certificates, ${site.education[0].courses.length} courses and the rest of this site.`;
+// What it says when poked. The fifth one is a real fact from the personal page.
+const quips = ['Boop received.', 'That tickles.', "I'm working here.", 'Ask me something instead.', `Fine, a secret: his favourite thing to cook is ${personal.cooking.favourite.name.toLowerCase()}.`, "Okay, that's enough poking."];
+const icons: Record<string, string> = {
+  build: 'M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3zM4 7.5l8 4.5 8-4.5M12 12v9',
+  merge: 'M6 7.4v9.2M6 7.4c0 3.2 3.2 4.6 9.6 4.6M6 3a2.2 2.2 0 1 0 0 4.4A2.2 2.2 0 0 0 6 3zM6 16.6A2.2 2.2 0 1 0 6 21a2.2 2.2 0 0 0 0-4.4zM18 9.8a2.2 2.2 0 1 0 0 4.4 2.2 2.2 0 0 0 0-4.4z',
+  chart: 'M5 20v-8M12 20V4M19 20v-5',
+  case: 'M4 8h16v11H4zM9 8V5h6v3M4 13h16',
+};
+const greeting = "Hi, I'm Aditya's stand-in. I've read this whole site, so ask me about his projects, open source work, problem solving, studies or the startup he co-founded.";
 ---
 <section class="section ask-sec" data-reveal id="ask" aria-labelledby="ask-title">
-  <h2 id="ask-title" class="section-title">Ask about me</h2>
-  <p class="ask-sum">Short on time? Ask anything about my work. Answers come only from what's on this site, with links to where it says so.</p>
+  <h2 id="ask-title" class="section-title">Ask my stand-in</h2>
+  <p class="ask-sum">Skip the screening call. It has read every page here, answers only from what it found, and shows you which page it came from.</p>
 
-  <div class="ask" id="ask-panel" data-ready={JSON.stringify(ready)} data-labels={JSON.stringify({ ...labels, ...titles })} data-hints={JSON.stringify(hints)} data-email={site.email}>
-    <div class="ask-bar">
-      <span class="ask-orb" aria-hidden="true"><span></span></span>
-      <span class="ask-who">
-        <b>Aditya's site assistant</b>
-        <span class="ask-status"><span class="ask-dot"></span><span id="ask-state">Reads only this site</span></span>
-      </span>
-      <button type="button" class="ask-reset" id="ask-reset" hidden>New chat</button>
-    </div>
+  <div class="ask" id="ask-panel"
+    data-ready={JSON.stringify(ready.map(({ q, answer, sources }) => ({ q, answer, sources })))}
+    data-labels={JSON.stringify({ ...labels, ...titles })} data-hints={JSON.stringify(hints)} data-quips={JSON.stringify(quips)} data-email={site.email}>
 
-    <div class="ask-log" id="ask-log" role="log" aria-live="polite" aria-label="Conversation">
-      <div class="msg msg--bot">
-        <p>Hi. I can tell you about Aditya's projects, open source work, problem solving, studies and the startup he co-founded. Pick a question or type your own.</p>
+    <div class="ask-stage">
+      <div class="ask-id">
+        <b>The stand-in</b>
+        <span class="ask-status"><span class="ask-dot"></span><span id="ask-state">Has read this whole site</span></span>
       </div>
+
+      <div class="si-wrap">
+        <p class="si-quip" id="si-quip" aria-live="polite"></p>
+        <button type="button" class="si" id="standin" data-mood="idle" aria-label="Poke the stand-in">
+          <svg class="si-svg" viewBox="0 0 240 236" aria-hidden="true">
+            <defs>
+              <radialGradient id="si-body" cx="38%" cy="28%" r="82%">
+                <stop offset="0" stop-color="#d5ccff" /><stop offset="0.36" stop-color="#8a78f6" /><stop offset="0.74" stop-color="#3d2e97" /><stop offset="1" stop-color="#191243" />
+              </radialGradient>
+              <linearGradient id="si-ringg" x1="0" x2="1"><stop offset="0" stop-color="#f472b6" /><stop offset="0.5" stop-color="#c4b5fd" /><stop offset="1" stop-color="#38bdf8" /></linearGradient>
+              <clipPath id="si-clip"><circle cx="120" cy="112" r="62" /></clipPath>
+              <clipPath id="si-back"><rect x="-130" y="-80" width="260" height="80" /></clipPath>
+              <clipPath id="si-front"><rect x="-130" y="0" width="260" height="80" /></clipPath>
+              <filter id="si-blur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="13" /></filter>
+            </defs>
+            <ellipse class="si-shadow" cx="120" cy="222" rx="46" ry="6.5" />
+            <g class="si-float"><g class="si-squash"><g id="si-tilt">
+              <g transform="translate(120 118) rotate(-14)"><g clip-path="url(#si-back)">
+                <ellipse class="si-ringline" rx="98" ry="27" /><g class="si-moon"><circle r="6.5" /></g>
+              </g></g>
+              <circle cx="120" cy="112" r="62" fill="url(#si-body)" />
+              <g clip-path="url(#si-clip)">
+                <g class="si-aurora" filter="url(#si-blur)">
+                  <circle class="si-a1" cx="88" cy="146" r="34" fill="#f472b6" />
+                  <circle class="si-a2" cx="158" cy="150" r="30" fill="#38bdf8" />
+                  <circle class="si-a3" cx="126" cy="74" r="24" fill="#c4b5fd" />
+                </g>
+                <ellipse cx="97" cy="72" rx="33" ry="18" fill="#fff" opacity="0.2" transform="rotate(-26 97 72)" />
+                <ellipse cx="88" cy="64" rx="9" ry="5" fill="#fff" opacity="0.55" transform="rotate(-30 88 64)" />
+              </g>
+              <circle class="si-rim" cx="120" cy="112" r="61.3" />
+              <g id="si-face">
+                <ellipse class="si-cheek" cx="87" cy="127" rx="9" ry="5" /><ellipse class="si-cheek" cx="153" cy="127" rx="9" ry="5" />
+                <g id="si-eyes">
+                  <g transform="translate(101 106)">
+                    <rect class="si-eye si-eye--l" x="-6.5" y="-12" width="13" height="24" rx="6.5" />
+                    <path class="si-alt si-arc" d="M-8 4q8-11 16 0" /><path class="si-alt si-shut" d="M-8 2h16" /><path class="si-alt si-wince" d="M-6-7l11 7-11 7" />
+                  </g>
+                  <g transform="translate(139 106)">
+                    <rect class="si-eye si-eye--r" x="-6.5" y="-12" width="13" height="24" rx="6.5" />
+                    <path class="si-alt si-arc" d="M-8 4q8-11 16 0" /><path class="si-alt si-shut" d="M-8 2h16" /><path class="si-alt si-wince" d="M6-7l-11 7 11 7" />
+                  </g>
+                </g>
+                <g transform="translate(120 134)">
+                  <path class="si-mouth si-smile" d="M-7 0q7 6.5 14 0" />
+                  <path class="si-mouth si-grin" d="M-10-1q10 13 20 0z" />
+                  <ellipse class="si-mouth si-talk" rx="5.5" ry="5.5" />
+                  <circle class="si-mouth si-ooh" cx="0" cy="1" r="3.4" />
+                  <path class="si-mouth si-flat" d="M-5 1h10" />
+                  <path class="si-mouth si-wavy" d="M-9 1q3-4 6 0t6 0 6 0" />
+                </g>
+              </g>
+              <g transform="translate(120 118) rotate(-14)"><g clip-path="url(#si-front)">
+                <ellipse class="si-ringline" rx="98" ry="27" /><g class="si-moon"><circle r="6.5" /></g>
+              </g></g>
+            </g></g></g>
+            <g class="si-thought"><circle cx="176" cy="50" r="3.2" /><circle cx="189" cy="37" r="4.6" /><circle cx="205" cy="22" r="6.2" /></g>
+            <g class="si-zzz"><text x="176" y="56">z</text><text x="190" y="40">z</text><text x="206" y="24">Z</text></g>
+            <path class="si-sweat" d="M176 62c5 7 7 10 7 13a7 7 0 0 1-14 0c0-3 2-6 7-13z" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="shelf" id="ask-shelf" aria-label="The pages it answers from">
+        {SPINES.map((b, i) => (
+          <a class={`spine${'lean' in b ? ' spine--lean' : ''}`} href={b.href} data-src={b.href} target={b.href.endsWith('.pdf') ? '_blank' : undefined}
+            style={`--h:${b.h}px; --c:${b.color}; --i:${i}; --lean:${'lean' in b ? b.lean : 0}deg`}><span>{b.label}</span></a>
+        ))}
+      </div>
+      <p class="shelf-cap">{library}</p>
     </div>
 
-    <div class="ask-chips" id="ask-chips" role="group" aria-label="Suggested questions">
-      {ready.map((r, i) => <button type="button" class="ask-chip" data-i={i} style={`--i:${i}`}>{r.q}</button>)}
-    </div>
+    <div class="ask-talk">
+      <button type="button" class="ask-reset" id="ask-reset" hidden>New chat</button>
+      <div class="ask-log" id="ask-log" role="log" aria-live="polite" aria-label="Conversation">
+        <div class="msg msg--bot"><p>{greeting}</p></div>
+        <div class="ask-choices" role="group" aria-label="Suggested questions">
+          {ready.map((r, i) => (
+            <button type="button" class="ask-choice" data-i={i} style={`--i:${i}; --c:${r.color}`}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d={icons[r.icon]} /></svg>
+              <b>{r.q}</b>
+              <span>{r.hint}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
-    <form class="ask-form" id="ask-form" autocomplete="off">
-      <label class="sr-only" for="ask-input">Your question</label>
-      <input id="ask-input" name="q" maxlength="600" placeholder={hints[0]} enterkeyhint="send" />
-      <button type="submit" class="ask-send" aria-label="Ask">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" /></svg>
-      </button>
-    </form>
+      <div class="ask-chips" id="ask-chips" role="group" aria-label="Suggested questions" hidden>
+        {ready.map((r, i) => <button type="button" class="ask-chip" data-i={i}>{r.q}</button>)}
+      </div>
+
+      <form class="ask-form" id="ask-form" autocomplete="off">
+        <label class="sr-only" for="ask-input">Your question</label>
+        <input id="ask-input" name="q" maxlength="600" placeholder={hints[0]} enterkeyhint="send" />
+        <button type="submit" class="ask-send" aria-label="Ask">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" /></svg>
+        </button>
+      </form>
+    </div>
   </div>
 </section>
 
 <script>
+  import { gaze, litSpines } from '../lib/standin';
+
   type Msg = { role: 'user' | 'assistant'; content: string };
   type Reply = { answer: string; sources: string[] };
 
-  const panel = document.getElementById('ask-panel');
-  if (panel) {
+  const root = document.getElementById('ask-panel');
+  if (root) {
+    const panel: HTMLElement = root;
     const ready = JSON.parse(panel.dataset.ready!) as Array<{ q: string } & Reply>;
     const labels = JSON.parse(panel.dataset.labels!) as Record<string, string>;
     const hints = JSON.parse(panel.dataset.hints!) as string[];
+    const quips = JSON.parse(panel.dataset.quips!) as string[];
     const email = panel.dataset.email!;
     const log = document.getElementById('ask-log')!;
     const form = document.getElementById('ask-form') as HTMLFormElement;
@@ -96,11 +194,109 @@ const hints = ['What did he build Rys with?', 'Which nanocoder bug did he fix?',
     const chips = document.getElementById('ask-chips')!;
     const reset = document.getElementById('ask-reset')!;
     const state = document.getElementById('ask-state')!;
+    const si = document.getElementById('standin') as HTMLButtonElement;
+    const quip = document.getElementById('si-quip')!;
+    const spines = [...panel.querySelectorAll<HTMLAnchorElement>('.spine')];
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const first = log.innerHTML;
     let history: Msg[] = [];
     let busy = false;
 
+    // ---- The stand-in: what it feels, and where it looks ----
+    const STATE = { idle: 'Has read this whole site', listen: 'Listening', think: 'Checking the shelf', talk: 'Answering', happy: 'Answered', oops: 'Hmm', sleep: 'Dozing', poke: 'Hey' };
+    type Mood = keyof typeof STATE;
+    let mood: Mood = 'idle';
+    let moodTimer = 0, quipTimer = 0, pokes = 0;
+    let talkEl: HTMLElement | null = null;
+    let lastActive = performance.now();
+    let inView = false;
+    const ptr = { x: 0, y: 0, t: -1e9 };
+
+    const rest = (): Mood => (busy ? (talkEl ? 'talk' : 'think') : document.activeElement === input ? 'listen' : 'idle');
+    function setMood(m: Mood, ms = 0) {
+      mood = m;
+      si.dataset.mood = m;
+      state.textContent = STATE[m];
+      clearTimeout(moodTimer);
+      if (ms) moodTimer = window.setTimeout(() => setMood(rest()), ms);
+    }
+    const awake = () => {
+      lastActive = performance.now();
+      if (mood === 'sleep') setMood(rest());
+    };
+
+    const tilt = si.querySelector('#si-tilt')!, face = si.querySelector('#si-face')!, eyes = si.querySelector('#si-eyes')!;
+    const moons = si.querySelectorAll('.si-moon');
+    const moon = (a: number) => {
+      const t = `translate(${(Math.cos(a) * 98).toFixed(1)} ${(Math.sin(a) * 27).toFixed(1)}) scale(${(0.85 + 0.3 * Math.sin(a)).toFixed(2)})`;
+      moons.forEach((m) => m.setAttribute('transform', t));
+    };
+    moon(0.7);
+
+    function target(now: number) {
+      if (mood === 'think') return { x: -0.4 + Math.sin(now / 520) * 0.22, y: -0.8 };
+      if (mood === 'sleep') return { x: 0, y: 0.4 };
+      if (mood === 'poke' || mood === 'happy') return { x: 0, y: 0 };
+      const r = si.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height * 0.47;
+      if (mood === 'talk' && talkEl) {
+        const b = talkEl.getBoundingClientRect();
+        return gaze(cx, cy, b.left + Math.min(b.width, 160), b.top + b.height / 2, 260);
+      }
+      if (mood === 'listen') {
+        const b = input.getBoundingClientRect();
+        return gaze(cx, cy, b.left + Math.min(b.width, 14 + input.value.length * 8.5), b.top + b.height / 2, 260);
+      }
+      if (now - ptr.t < 3200) return gaze(cx, cy, ptr.x, ptr.y);
+      return { x: Math.sin(now / 2600) * 0.38, y: Math.cos(now / 3400) * 0.2 };
+    }
+
+    let raf = 0, prev = 0, gx = 0, gy = 0, ang = 0.7;
+    function frame(now: number) {
+      const dt = Math.min(0.05, (now - prev) / 1000 || 0);
+      prev = now;
+      const t = target(now), k = Math.min(1, dt * 7);
+      gx += (t.x - gx) * k;
+      gy += (t.y - gy) * k;
+      tilt.setAttribute('transform', `rotate(${(gx * 5).toFixed(2)} 120 112)`);
+      face.setAttribute('transform', `translate(${(gx * 13).toFixed(2)} ${(gy * 10).toFixed(2)})`);
+      eyes.setAttribute('transform', `translate(${(gx * 3.5).toFixed(2)} ${(gy * 2.5).toFixed(2)})`);
+      ang += dt * (mood === 'think' ? 5.4 : mood === 'sleep' ? 0.25 : 0.9);
+      moon(ang);
+      raf = requestAnimationFrame(frame);
+    }
+    new IntersectionObserver(([e]) => {
+      inView = e.isIntersecting;
+      cancelAnimationFrame(raf);
+      if (inView && !reduced) raf = requestAnimationFrame(frame);
+      if (inView) awake();
+    }, { threshold: 0.05 }).observe(panel);
+
+    addEventListener('pointermove', (e) => {
+      ptr.x = e.clientX; ptr.y = e.clientY; ptr.t = performance.now();
+      if (inView) awake();
+    }, { passive: true });
+    setInterval(() => {
+      if (inView && mood === 'idle' && performance.now() - lastActive > 30000) setMood('sleep');
+    }, 2000);
+
+    si.addEventListener('click', () => {
+      awake();
+      quip.textContent = quips[pokes++ % quips.length];
+      quip.classList.add('on');
+      clearTimeout(quipTimer);
+      quipTimer = window.setTimeout(() => quip.classList.remove('on'), 2400);
+      if (busy) return;
+      setMood('poke', 750);
+      si.classList.remove('boop');
+      void si.offsetWidth;
+      si.classList.add('boop');
+    });
+    input.addEventListener('focus', () => { awake(); if (!busy) setMood('listen'); });
+    input.addEventListener('blur', () => { if (!busy && mood === 'listen') setMood('idle'); });
+    input.addEventListener('input', awake);
+
+    // ---- The conversation ----
     const scroll = () => log.scrollTo({ top: log.scrollHeight, behavior: reduced ? 'auto' : 'smooth' });
     const add = (cls: string, text = '') => {
       const el = document.createElement('div');
@@ -112,12 +308,6 @@ const hints = ['What did he build Rys with?', 'Which nanocoder bug did he fix?',
       scroll();
       return el;
     };
-    const setBusy = (on: boolean) => {
-      busy = on;
-      panel.classList.toggle('thinking', on);
-      state.textContent = on ? 'Looking it up' : 'Reads only this site';
-      log.setAttribute('aria-busy', String(on));
-    };
 
     async function type(el: HTMLElement, r: Reply) {
       const p = el.querySelector('p')!;
@@ -125,13 +315,17 @@ const hints = ['What did he build Rys with?', 'Which nanocoder bug did he fix?',
       if (reduced) p.textContent = r.answer;
       else for (let i = 0; i < words.length; i++) {
         p.textContent += words[i];
-        if (i % 2 === 0) { await new Promise((ok) => setTimeout(ok, 18 + Math.random() * 26)); if (i % 12 === 0) scroll(); }
+        if (i % 2 === 0) {
+          si.style.setProperty('--m', (0.25 + Math.random()).toFixed(2));
+          await new Promise((ok) => setTimeout(ok, 18 + Math.random() * 26));
+          if (i % 12 === 0) scroll();
+        }
       }
       const links = r.sources.filter((s) => labels[s]);
       if (links.length) {
         const row = document.createElement('div');
         row.className = 'msg-src';
-        row.innerHTML = '<span>Sources</span>';
+        row.innerHTML = '<span>From</span>';
         links.forEach((s, i) => {
           const a = document.createElement('a');
           a.href = s;
@@ -147,39 +341,60 @@ const hints = ['What did he build Rys with?', 'Which nanocoder bug did he fix?',
 
     async function ask(q: string, preset?: Reply) {
       if (busy || !q.trim()) return;
+      awake();
+      log.querySelector('.ask-choices')?.remove();
+      chips.hidden = false;
       add('msg--me', q);
       history.push({ role: 'user', content: q });
       reset.hidden = false;
+      panel.classList.add('has-chat');
       const bot = add('msg--bot msg--wait');
-      setBusy(true);
-      let r: Reply;
+      busy = true;
+      talkEl = null;
+      panel.classList.add('busy', 'thinking');
+      log.setAttribute('aria-busy', 'true');
+      spines.forEach((s) => s.classList.remove('lit'));
+      setMood('think');
+
+      let r: Reply, ok = true;
       if (preset) {
-        await new Promise((ok) => setTimeout(ok, reduced ? 0 : 650));
+        await new Promise((done) => setTimeout(done, reduced ? 0 : 900));
         r = preset;
       } else {
+        ok = false;
         try {
           const res = await fetch('/api/ask', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ messages: history }) });
           const data = await res.json().catch(() => ({}));
-          if (res.ok && data.answer) r = data;
-          else if (res.status === 429) r = { answer: "That's a lot of questions in a short time. Give it a few minutes, or email him directly at " + email + '.', sources: [] };
+          if (res.ok && data.answer) { r = data; ok = true; }
+          else if (res.status === 429) r = { answer: `That's a lot of questions in a short time. Give it a few minutes, or email him directly at ${email}.`, sources: [] };
           else if (res.status === 503 || res.status === 404) r = { answer: `The live assistant is switched off right now, so I can only answer the suggested questions. For anything else, email him at ${email}.`, sources: ['/resume.pdf'] };
           else r = { answer: `I couldn't answer that one. Try asking it another way, or email him at ${email}.`, sources: [] };
         } catch {
           r = { answer: `I couldn't reach the server. Check your connection, or email him at ${email}.`, sources: [] };
         }
       }
+
       bot.classList.remove('msg--wait');
-      setBusy(false);
+      panel.classList.remove('thinking');
+      talkEl = bot;
+      setMood('talk');
+      const lit = litSpines(r.sources);
+      spines.forEach((s) => s.classList.toggle('lit', lit.includes(s.dataset.src!)));
       await type(bot, r);
       history.push({ role: 'assistant', content: r.answer });
+      busy = false;
+      talkEl = null;
+      panel.classList.remove('busy');
+      log.setAttribute('aria-busy', 'false');
+      setMood(ok ? 'happy' : 'oops', ok ? 1500 : 2600);
     }
 
-    chips.addEventListener('click', (e) => {
-      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.ask-chip');
+    panel.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-i]');
       if (!b || busy) return;
-      const r = ready[Number(b.dataset.i)];
-      b.disabled = true;
-      ask(r.q, r);
+      const i = b.dataset.i!;
+      chips.querySelector<HTMLButtonElement>(`[data-i="${i}"]`)!.disabled = true;
+      ask(ready[Number(i)].q, ready[Number(i)]);
     });
     form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -192,8 +407,11 @@ const hints = ['What did he build Rys with?', 'Which nanocoder bug did he fix?',
       if (busy) return;
       history = [];
       log.innerHTML = first;
+      chips.hidden = true;
       chips.querySelectorAll('button').forEach((b) => (b.disabled = false));
+      spines.forEach((s) => s.classList.remove('lit'));
       reset.hidden = true;
+      panel.classList.remove('has-chat');
       input.focus();
     });
 
