@@ -190,11 +190,46 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
         <div class="ch-body">{p.cooking.body.map((t) => <p>{t}</p>)}</div>
         <p class="also">Also a regular in my kitchen: {p.cooking.also.join(', ').toLowerCase()}.</p>
       </div>
-      <div class="fav">
+      <div class="fav" id="fav">
         <span class="fav-badge">All-time favourite</span>
         <p class="fav-name">{p.cooking.favourite.name}</p>
+        <div class="pot-stage">
+          <ul class="pot-chips" aria-label="What goes in">
+            {p.cooking.favourite.inside.map((t, i) => <li style={`--i:${i}`}>{t}</li>)}
+          </ul>
+          <button type="button" class="pot" id="pot" aria-pressed="true" aria-label="Biryani pot. Press to put the lid back on, or lift it again.">
+            <svg viewBox="0 0 320 250" aria-hidden="true">
+              <defs>
+                <linearGradient id="pot-copper" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6b272" /><stop offset="0.5" stop-color="#b9601f" /><stop offset="1" stop-color="#6e2d0c" /></linearGradient>
+                <linearGradient id="pot-lid" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd0a0" /><stop offset="0.6" stop-color="#c76f2b" /><stop offset="1" stop-color="#8a3c12" /></linearGradient>
+                <radialGradient id="pot-rice" cx="0.5" cy="0.3" r="0.8"><stop offset="0" stop-color="#fff3c4" /><stop offset="1" stop-color="#f5b83d" /></radialGradient>
+              </defs>
+              <ellipse class="pot-shadow" cx="160" cy="232" rx="118" ry="12" />
+              <g class="pot-steam">
+                <path d="M118 96 C104 76 132 62 118 40 C108 24 124 14 120 2" />
+                <path d="M160 92 C146 70 176 54 160 30 C150 14 168 6 162 -8" />
+                <path d="M202 96 C190 78 216 62 202 42 C192 26 208 16 204 4" />
+              </g>
+              <path class="pot-handle" d="M62 134 C26 130 26 172 66 168" /><path class="pot-handle" d="M258 134 C294 130 294 172 254 168" />
+              <path d="M56 118 C44 176 78 226 160 226 C242 226 276 176 264 118 Z" fill="url(#pot-copper)" />
+              <path class="pot-band" d="M58 150 C96 166 224 166 262 150" /><path class="pot-band" d="M64 172 C100 188 220 188 256 172" />
+              <path class="pot-shine" d="M82 132 C76 168 88 196 112 210" />
+              <ellipse cx="160" cy="118" rx="106" ry="17" fill="#4a1d07" />
+              <ellipse cx="160" cy="116" rx="94" ry="12.5" fill="url(#pot-rice)" />
+              <g class="pot-bits">
+                <circle cx="112" cy="114" r="3" fill="#ea580c" /><circle cx="140" cy="110" r="2.4" fill="#16a34a" /><circle cx="168" cy="119" r="3" fill="#92400e" /><circle cx="196" cy="112" r="2.6" fill="#ea580c" />
+                <circle cx="222" cy="117" r="2.4" fill="#16a34a" /><circle cx="128" cy="121" r="2.4" fill="#92400e" /><circle cx="182" cy="108" r="2.2" fill="#16a34a" /><circle cx="152" cy="122" r="2.2" fill="#ea580c" />
+              </g>
+              <g class="pot-lid">
+                <path d="M52 118 C64 76 256 76 268 118 C232 132 88 132 52 118 Z" fill="url(#pot-lid)" />
+                <path class="pot-shine" d="M92 100 C112 88 144 84 170 84" />
+                <rect x="148" y="66" width="24" height="16" rx="5" fill="#8a3c12" /><ellipse cx="160" cy="66" rx="19" ry="8" fill="#ffd0a0" />
+              </g>
+            </svg>
+          </button>
+        </div>
         <p class="fav-note">{p.cooking.favourite.note}</p>
-        <span class="steam" aria-hidden="true"><i></i><i></i><i></i></span>
+        <p class="pot-hint" aria-hidden="true">Tap the pot</p>
       </div>
     </section>
 
@@ -292,6 +327,12 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
 
     // Drawings only move while their chapter is on screen.
     const io = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle('on', e.isIntersecting)), { rootMargin: '0px 0px -15% 0px' });
+    // The biryani pot: a tap puts the lid back on, another lifts it again.
+    const pot = document.getElementById('pot'), fav = document.getElementById('fav');
+    pot?.addEventListener('click', () => {
+      const shut = fav!.classList.toggle('shut');
+      pot.setAttribute('aria-pressed', String(!shut));
+    });
     document.querySelectorAll('[data-reveal-ch]').forEach((c) => io.observe(c));
 
     // Same motion as the home page: smooth scrolling, titles that rise letter by letter,
@@ -635,16 +676,45 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
     /* 05 Cooking. */
     .ch-cooking { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: 64px; align-items: center; }
     .cook-copy .ch-body { margin-top: 20px; }
-    .fav { position: relative; padding: 46px 42px 42px; border-radius: 22px; overflow: hidden; color: #2a1608;
-      background: radial-gradient(500px 300px at 100% 0%, rgb(251 146 60 / 0.55), transparent 60%), linear-gradient(160deg, #fde68a, #fbbf24 55%, #f59e0b); box-shadow: 0 30px 70px rgb(0 0 0 / 0.45); }
-    .fav-badge { display: inline-block; padding: 6px 12px; border: 1.5px solid #7c2d12; border-radius: 999px; font: 700 11px var(--cond); letter-spacing: 0.2em; text-transform: uppercase; color: #7c2d12; }
-    .fav-name { margin: 22px 0 0; font: 700 clamp(48px, 7vw, 96px)/0.9 var(--display); letter-spacing: -0.045em; text-transform: uppercase; color: #1c0f04; }
-    .fav-note { margin: 18px 0 0; max-width: 30ch; font-size: 18px; line-height: 1.5; color: #4a2a0f; }
-    .steam { position: absolute; right: 40px; top: 36px; display: flex; gap: 10px; }
-    .steam i { width: 4px; height: 46px; border-radius: 4px; background: linear-gradient(transparent, rgb(124 45 18 / 0.35)); }
-    .ch-cooking.on .steam i { animation: steam 2.4s ease-in-out infinite; }
-    .steam i:nth-child(2) { animation-delay: -0.8s !important; } .steam i:nth-child(3) { animation-delay: -1.6s !important; }
-    @keyframes steam { 0% { transform: translateY(10px) scaleY(0.6); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-16px) scaleY(1.1); opacity: 0; } }
+    /* The favourite: a copper handi. When the chapter comes into view the lid lifts, steam rises and what's inside flies out. */
+    .fav { position: relative; padding: 34px 34px 30px; border-radius: 26px; overflow: hidden; color: #f6e3c8; isolation: isolate;
+      background: radial-gradient(70% 55% at 50% 74%, rgb(249 115 22 / 0.38), transparent 70%), linear-gradient(170deg, #2b1307, #150903); box-shadow: 0 30px 70px rgb(0 0 0 / 0.5), inset 0 0 0 1px rgb(251 191 36 / 0.22); }
+    .fav::before { content: ''; position: absolute; inset: 0; z-index: -1; opacity: 0.5; background: radial-gradient(rgb(251 191 36 / 0.22) 1px, transparent 1.4px) 0 0 / 16px 16px; mask-image: linear-gradient(180deg, #000, transparent 60%); -webkit-mask-image: linear-gradient(180deg, #000, transparent 60%); }
+    .fav-badge { display: inline-block; padding: 6px 12px; border: 1.5px solid rgb(251 191 36 / 0.7); border-radius: 999px; font: 700 11px var(--cond); letter-spacing: 0.2em; text-transform: uppercase; color: #fbbf24; }
+    .fav-name { margin: 16px 0 0; font: 700 clamp(44px, 6.4vw, 88px)/0.9 var(--display); letter-spacing: -0.045em; text-transform: uppercase; color: #fbbf24; }
+    .fav-note { margin: 6px 0 0; max-width: 30ch; font-size: 17px; line-height: 1.5; color: #e7cba6; }
+    .pot-hint { position: absolute; right: 26px; bottom: 26px; margin: 0; font: 600 11px var(--cond); letter-spacing: 0.2em; text-transform: uppercase; color: rgb(251 191 36 / 0.6); }
+    .pot-stage { position: relative; height: clamp(230px, 26vw, 300px); margin: 6px -10px 0; }
+    .pot { position: absolute; left: 50%; bottom: 0; width: min(64%, 300px); translate: -50% 0; padding: 0; border-radius: 20px; cursor: pointer; transition: scale 0.5s var(--ease); }
+    .pot:hover { scale: 1.03; } .pot:active { scale: 0.98; }
+    .pot:focus-visible { outline: 2px solid #fbbf24; outline-offset: 6px; }
+    .pot svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .pot-shadow { fill: rgb(0 0 0 / 0.5); }
+    .pot-handle { fill: none; stroke: #8a3c12; stroke-width: 10; stroke-linecap: round; }
+    .pot-band { fill: none; stroke: rgb(255 214 170 / 0.35); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 2 9; }
+    .pot-shine { fill: none; stroke: rgb(255 255 255 / 0.4); stroke-width: 5; stroke-linecap: round; }
+    .pot-lid { transform-box: fill-box; transform-origin: 20% 100%; transition: transform 1s cubic-bezier(0.3, 1.4, 0.4, 1); }
+    .pot-bits circle { transform-box: fill-box; transform-origin: center; }
+    .pot-steam path { fill: none; stroke: rgb(255 236 210 / 0.75); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 56 170; stroke-dashoffset: 56; opacity: 0; }
+    .pot-chips { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; pointer-events: none; }
+    .pot-chips li { position: absolute; left: var(--x); top: var(--y); padding: 6px 12px; border-radius: 999px; white-space: nowrap; font: 600 13px var(--sans); color: #2b1307; background: var(--c, #fde9c4); box-shadow: 0 8px 20px rgb(0 0 0 / 0.4);
+      opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.3) rotate(0deg); transition: transform 0.9s cubic-bezier(0.3, 1.5, 0.4, 1), opacity 0.4s; }
+    .pot-chips li:nth-child(1) { --x: 2%; --y: 16%; --dx: 110px; --dy: 70px; --r: -9deg; }
+    .pot-chips li:nth-child(2) { --x: 70%; --y: 8%; --dx: -90px; --dy: 80px; --r: 7deg; --c: #fdba74; }
+    .pot-chips li:nth-child(3) { --x: 0%; --y: 50%; --dx: 120px; --dy: 0px; --r: 5deg; --c: #e0b48a; }
+    .pot-chips li:nth-child(4) { --x: 80%; --y: 42%; --dx: -110px; --dy: 20px; --r: -8deg; --c: #bbf7d0; }
+    .pot-chips li:nth-child(5) { --x: 3%; --y: 82%; --dx: 110px; --dy: -70px; --r: -4deg; --c: #fde68a; }
+    .pot-chips li:nth-child(6) { --x: 76%; --y: 76%; --dx: -100px; --dy: -60px; --r: 6deg; }
+    /* Open: only while the chapter is on screen and the lid hasn't been put back. */
+    .ch-cooking.on .fav:not(.shut) .pot-lid { transform: translate(-26px, -64px) rotate(-16deg); }
+    .ch-cooking.on .fav:not(.shut) .pot-chips li { opacity: 1; transform: rotate(var(--r)); transition-delay: calc(var(--i) * 80ms + 350ms); }
+    .ch-cooking.on .fav:not(.shut) .pot-steam path { animation: steam 2.8s ease-in-out infinite; }
+    .ch-cooking.on .fav:not(.shut) .pot-steam path:nth-child(2) { animation-delay: -0.9s; }
+    .ch-cooking.on .fav:not(.shut) .pot-steam path:nth-child(3) { animation-delay: -1.8s; }
+    .ch-cooking.on .fav:not(.shut) .pot-bits circle { animation: simmer 1.6s ease-in-out infinite alternate; animation-delay: calc(var(--i, 0) * -0.2s); }
+    @keyframes steam { 0% { stroke-dashoffset: 56; opacity: 0; } 30% { opacity: 0.95; } 100% { stroke-dashoffset: -150; opacity: 0; } }
+    @keyframes simmer { to { transform: translateY(-2.5px) scale(1.15); } }
+    @media (prefers-reduced-motion: reduce) { .pot-lid, .pot-chips li, .pot { transition: none; } .ch-cooking.on .fav:not(.shut) .pot-steam path, .ch-cooking.on .fav:not(.shut) .pot-bits circle { animation: none; } .ch-cooking.on .fav:not(.shut) .pot-steam path { opacity: 0.6; stroke-dashoffset: -40; } }
 
     /* 06 Photo spread. */
     .spread { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: 120px; gap: 16px; margin: 0; padding: 0; list-style: none; }
@@ -744,7 +814,9 @@ const bars = Array.from({ length: 64 }, (_, i) => 0.18 + Math.abs(Math.sin(i * 0
       /* On phones the fan becomes a loose, tilted 3 x 3 pile instead of tiny slivers. */
       .shelf { flex-wrap: wrap; gap: 14px 10px; padding: 10px 2px 0; }
       .shelf li { --w: calc((100cqi - 24px) / 3); max-width: none; margin-right: 0; z-index: auto; transform: rotate(calc((var(--i) % 3 - 1) * 2.5deg)) translateY(calc((var(--i) % 2) * 6px)); }
-      .fav { padding: 36px 26px 30px; }
+      .fav { padding: 28px 20px 24px; }
+      .pot-chips li { padding: 5px 10px; font-size: 12px; }
+      .pot-hint { right: 20px; bottom: 20px; }
       .spread { grid-template-columns: 1fr 1fr; grid-auto-rows: auto; }
       .sp { grid-column: auto !important; grid-row: auto !important; }
       .sp0 { grid-column: 1 / -1 !important; }
