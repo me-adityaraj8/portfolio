@@ -33,6 +33,15 @@ const osMinor = site.openSource.filter((r) => r.minor);
 const osMerged = site.openSource.flatMap((r) => r.prs).filter((p) => p.state === 'merged').length;
 const osRepos = site.openSource.filter((r) => r.prs.some((p) => p.state === 'merged')).length;
 const rollWords = ['full-stack products', 'Chrome extensions', 'AI-powered tools', 'a funded startup'];
+const strapText = Array(4).fill(`${site.name.toUpperCase()}  ·  ${site.status.toUpperCase()}  ·  `).join('');
+// The fine looping lines printed on passports and banknotes: one wavy ring, drawn again and again a little turned.
+const rosette = Array.from({ length: 16 }, (_, k) => {
+  const pts = Array.from({ length: 181 }, (_, i) => {
+    const a = (i / 180) * Math.PI * 2, r = 62 + 26 * Math.sin(7 * a + (k / 16) * Math.PI * 2);
+    return `${(Math.cos(a) * r).toFixed(1)} ${(Math.sin(a) * r).toFixed(1)}`;
+  });
+  return `M${pts.join('L')}Z`;
+});
 const badgeStats = [
   { value: String(cp.codeforces.rating), label: 'Codeforces rating' },
   { value: String(cp.codolio.solved), label: 'Problems solved' },
@@ -66,15 +75,23 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
       </div>
     </div>
     <div class="hero-badge" id="badge">
-      <svg class="lanyard" id="lanyard" aria-hidden="true"><path id="strap-l" /><path id="strap-r" /></svg>
+      <svg class="lanyard" id="lanyard" aria-hidden="true">
+        <path id="strap-l" /><path id="strap-r" />
+        <text class="strap-text"><textPath href="#strap-l" startOffset="14">{strapText}</textPath></text>
+        <text class="strap-text"><textPath href="#strap-r" startOffset="40">{strapText}</textPath></text>
+      </svg>
       <div class="badge-hang" id="badge-hang">
         <span class="badge-clip" aria-hidden="true"></span>
         <div class="badge-tilt" id="badge-tilt">
           <button type="button" class="badge-card" id="badge-card" aria-pressed="false" aria-label="Aditya's ID badge. Press to flip it over, or drag it to swing it.">
             <span class="badge-face badge-front">
-              <span class="badge-band"><span>All access</span><span class="badge-slot"></span><span>2026</span></span>
-              <span class="badge-mono" aria-hidden="true">AR</span>
-              <span class="badge-name">{site.name}</span>
+              <svg class="badge-pattern" viewBox="-100 -100 200 200" aria-hidden="true">{rosette.map((d) => <path d={d} />)}</svg>
+              <span class="badge-head">
+                <span class="badge-mark" aria-hidden="true">AR</span>
+                <span class="badge-kind">Engineer pass<b>All access · 2026</b></span>
+                <span class="badge-holo" aria-hidden="true"></span>
+              </span>
+              <span class="badge-name">Aditya<br />Raj</span>
               <span class="badge-role">Software engineer · Co-founder</span>
               <span class="badge-rows">
                 <span><i>School</i>IIIT Bhagalpur, CSE</span>
@@ -85,6 +102,7 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
               <span class="badge-foil" aria-hidden="true"></span>
             </span>
             <span class="badge-face badge-back">
+              <svg class="badge-pattern" viewBox="-100 -100 200 200" aria-hidden="true">{rosette.map((d) => <path d={d} />)}</svg>
               <span class="badge-back-h">The numbers</span>
               <span class="badge-stats">
                 {badgeStats.map((st) => <span><b>{st.value}</b><i>{st.label}</i></span>)}
