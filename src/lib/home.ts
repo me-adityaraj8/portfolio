@@ -179,11 +179,11 @@ function field(reduced: boolean) {
         // Brighter toward the right, so the grid never fights the name on the left.
         // Waves still show on the dim side, so the opening sweep across the name is visible.
         const side = lit > 0 ? 1 : Math.max(Math.min(1, I) * 0.85, Math.min(1, Math.max(0.18, (x / cols - 0.1) * 1.5)));
-        const b = Math.round(Math.min(1, (0.12 + A * 0.9 + beat.level * 0.35 + 0.9 * Math.min(1, I)) * side) * 10);
+        const b = Math.round(Math.min(1, (0.1 + A * 1.35 + beat.level * 0.35 + 0.9 * Math.min(1, I)) * side) * 10);
         if (!b) continue;
         const hue = (x / cols) * 0.75 + (y / rows) * 0.25 + Math.sin(t + x * 0.05 + y * 0.04) * 0.18 + I * 0.25 + A * 0.22;
         const band = Math.max(0, Math.min(BANDS - 1, Math.round(hue * (BANDS - 1))));
-        const big = lit > 0.5 ? 2 : I > 0.35 || A > 0.42 ? 1 : 0;
+        const big = lit > 0.5 ? 2 : I > 0.35 || A > 0.28 ? 1 : 0;
         const key = (band * 11 + b) * 3 + big;
         let arr = buckets.get(key);
         if (!arr) buckets.set(key, (arr = []));
