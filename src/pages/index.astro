@@ -6,6 +6,7 @@ import Icon from '../components/Icon.astro';
 import ProblemSolving from '../components/ProblemSolving.astro';
 import Building from '../components/Building.astro';
 import OsRepo from '../components/OsRepo.astro';
+import Credentials from '../components/Credentials.astro';
 import cp from '../data/cp.json';
 import contrib from '../data/contrib.json';
 import { getWork } from '../lib/work';
@@ -172,6 +173,8 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
       </div>
     )}
   </section>
+
+  <Credentials />
 
   <section class="section" data-reveal id="education" aria-labelledby="edu-title">
     <h2 id="edu-title" class="section-title">Education</h2>
@@ -369,7 +372,7 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
           )}
         </div>
         <nav class="foot-nav" aria-label="Footer">
-          <div><p class="foot-h">Explore</p><a href="#work">Work</a><a href="#open-source">Open source</a><a href="#problem-solving">DSA</a><a href="/work">All projects</a></div>
+          <div><p class="foot-h">Explore</p><a href="#work">Work</a><a href="#open-source">Open source</a><a href="#credentials">Credentials</a><a href="#problem-solving">DSA</a><a href="/work">All projects</a></div>
           <div><p class="foot-h">About</p>{hasPersonal && <a href="/personal">Personal</a>}<a href={site.resume} target="_blank" rel="noopener">Resume</a><a href="#contact" data-message>Message me</a></div>
           <div><p class="foot-h">Elsewhere</p><a href={site.github} rel="noopener" target="_blank">GitHub</a><a href={site.linkedin} rel="noopener" target="_blank">LinkedIn</a><a href={site.spotify} rel="noopener" target="_blank">Spotify</a></div>
         </nav>
