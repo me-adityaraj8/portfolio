@@ -7,6 +7,7 @@ import type Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
+import { polish } from './polish';
 
 const EASE = 'expo.out';
 // Transitions in the CSS would fight GSAP every frame, so they're off while a tween runs.
@@ -25,6 +26,7 @@ export function motion(lenis: Lenis | null, pulse?: (x: number, y: number, pxPer
   batches();
   counters();
   bars();
+  polish(matchMedia('(hover: hover) and (pointer: fine)').matches);
 }
 
 /**
@@ -87,6 +89,10 @@ function batches() {
     ['.gh-grid > *, .langs', { y: 30, opacity: 0 }],
     ['.more li', { x: -20, opacity: 0 }],
     ['.pills > li', { y: 20, opacity: 0, scale: 0.94 }],
+    ['.os:not(.os--extra) > .os-repo', { y: 30, opacity: 0 }],
+    ['.now-grid > *', { y: 30, opacity: 0 }],
+    ['.connect-grid > *', { y: 44, opacity: 0 }],
+    ['.foot-brand, .foot-nav > div, .foot-main > .wx', { y: 24, opacity: 0 }],
   ];
   for (const [selector, from] of groups) {
     const items = gsap.utils.toArray<HTMLElement>(selector).filter((el) => !el.hidden);
