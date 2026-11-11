@@ -791,8 +791,9 @@ html.js .hero .meta { display: none; }
 
 .hero-badge { display: none; position: relative; align-self: stretch; margin: -96px 0 -64px; }
 .lanyard { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-.lanyard path { fill: none; stroke: #6c5ce7; stroke-width: 13; }
-.lanyard path + path { stroke: #4a3fb5; }
+.lanyard path { fill: none; stroke: #5b4bd6; stroke-width: 17; }
+.lanyard path + path { stroke: #4336a8; }
+.strap-text { font: 700 8.5px var(--cond); letter-spacing: 0.22em; fill: rgb(255 255 255 / 0.82); dominant-baseline: central; }
 .lanyard, .badge-hang { opacity: 0; transition: opacity 0.35s; }
 .hero-badge.on .lanyard, .hero-badge.on .badge-hang { opacity: 1; }
 .badge-hang { position: absolute; left: 0; top: 0; width: 290px; margin-left: -145px; transform-origin: 50% 0; perspective: 1100px; will-change: transform; }
@@ -807,27 +808,38 @@ html.js .hero .meta { display: none; }
 .badge-card:focus-visible { outline: 2px solid var(--glow); outline-offset: 6px; }
 .badge-face { position: absolute; inset: 0; display: flex; flex-direction: column; border-radius: 18px; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .badge-face > span { display: block; }
-.badge-front { background: #f3f1ff; color: #0b0a14; box-shadow: 0 40px 80px rgb(0 0 0 / 0.55); }
-.badge-front::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.3s;
-  background: radial-gradient(260px 220px at calc(var(--mx) * 1%) calc(var(--my) * 1%), rgb(255 255 255 / 0.9), transparent 70%); mix-blend-mode: soft-light; }
-.badge-card:hover .badge-front::after { opacity: 1; }
-.badge-front .badge-band { display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 18px; background: #6c5ce7; color: #fff; font: 600 12px var(--cond); letter-spacing: 0.2em; text-transform: uppercase; }
-.badge-slot { width: 48px; height: 10px; border-radius: 5px; background: #0b0a14; box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.6); }
-.badge-front .badge-mono { margin: 22px 20px 0; font: 800 116px/0.84 var(--display); letter-spacing: -0.07em; }
-.badge-front .badge-name { margin: 16px 22px 0; font: 700 22px/1.1 var(--display); letter-spacing: -0.02em; }
-.badge-front .badge-role { margin: 5px 22px 0; font: 500 12px var(--cond); letter-spacing: 0.16em; text-transform: uppercase; color: #5b5780; }
-.badge-front .badge-rows { margin: 14px 22px 0; border-top: 1px dashed rgb(11 10 20 / 0.28); font-size: 14px; line-height: 1.2; }
-.badge-rows > span { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px dashed rgb(11 10 20 / 0.28); }
-.badge-rows i { flex: none; width: 62px; font: 500 10.5px var(--cond); letter-spacing: 0.14em; text-transform: uppercase; color: #6b6790; }
-.badge-rows .status-dot { flex: none; background: #16a34a; box-shadow: none; }
-.badge-front .badge-foot { display: flex; align-items: flex-end; justify-content: space-between; margin-top: auto; padding: 0 22px 16px; }
-.badge-bars { display: block; width: 118px; height: 24px; background: repeating-linear-gradient(90deg, #0b0a14 0 2px, transparent 2px 4px, #0b0a14 4px 7px, transparent 7px 9px, #0b0a14 9px 10px, transparent 10px 13px); }
-.badge-flip { display: inline-flex; align-items: center; gap: 6px; font: 600 11px var(--cond); letter-spacing: 0.18em; text-transform: uppercase; color: #5b5780; }
+/* The card: a dark keycard with a holographic edge, a security-print rosette and a foil that shifts with the pointer. */
+.badge-face { color: #f3f1ff; background: linear-gradient(150deg, #1b1733 0%, #0d0b18 55%, #120f22 100%); box-shadow: 0 40px 80px rgb(0 0 0 / 0.6); }
+.badge-face::before { content: ''; position: absolute; inset: 0; z-index: 3; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: conic-gradient(from calc(var(--mx) * 3.6deg), #f472b6, #fbbf24, #34d399, #38bdf8, #a78bfa, #f472b6);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0.85; }
+.badge-pattern { position: absolute; right: -34%; bottom: -22%; width: 110%; height: auto; pointer-events: none; }
+.badge-pattern path { fill: none; stroke: rgb(167 155 255 / 0.2); stroke-width: 0.45; }
+.badge-face > span { position: relative; z-index: 1; }
+.badge-front { padding: 22px 22px 18px; }
+.badge-head { display: flex !important; align-items: center; gap: 11px; }
+.badge-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; background: #f3f1ff; color: #0b0a14; font: 800 15px var(--display); letter-spacing: -0.05em; }
+.badge-kind { font: 600 11px/1.35 var(--cond); letter-spacing: 0.2em; text-transform: uppercase; color: #f3f1ff; }
+.badge-kind b { display: block; font-weight: 500; letter-spacing: 0.16em; color: #8f8ab8; }
+.badge-holo { margin-left: auto; width: 34px; height: 34px; border-radius: 50%; background: conic-gradient(from calc(var(--my) * 3.6deg + 40deg), #f472b6, #fbbf24, #34d399, #38bdf8, #a78bfa, #f472b6); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.5), inset 0 0 10px rgb(255 255 255 / 0.55); }
+.badge-holo::after { content: ''; display: block; width: 100%; height: 100%; border-radius: 50%; background: repeating-conic-gradient(rgb(11 10 20 / 0.28) 0 6deg, transparent 6deg 12deg); }
+.badge-front .badge-name { margin-top: 44px; font: 700 46px/0.92 var(--display); letter-spacing: -0.045em; text-transform: uppercase; }
+.badge-front .badge-role { margin-top: 12px; font: 500 12px var(--cond); letter-spacing: 0.18em; text-transform: uppercase; color: #a79bff; }
+.badge-front .badge-rows { margin-top: 18px; border-top: 1px solid rgb(255 255 255 / 0.12); font-size: 13.5px; line-height: 1.2; color: #dcd8f5; }
+.badge-rows > span { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgb(255 255 255 / 0.12); }
+.badge-rows i { flex: none; width: 62px; font: 500 10.5px var(--cond); letter-spacing: 0.16em; text-transform: uppercase; color: #8f8ab8; }
+.badge-rows .status-dot { flex: none; }
+.badge-front .badge-foot { display: flex !important; align-items: flex-end; justify-content: space-between; margin-top: auto; }
+.badge-bars { display: block; width: 112px; height: 22px; opacity: 0.75; background: repeating-linear-gradient(90deg, #f3f1ff 0 2px, transparent 2px 4px, #f3f1ff 4px 7px, transparent 7px 9px, #f3f1ff 9px 10px, transparent 10px 13px); }
+.badge-flip { display: inline-flex; align-items: center; gap: 6px; font: 600 11px var(--cond); letter-spacing: 0.18em; text-transform: uppercase; color: #8f8ab8; }
 .badge-flip svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.badge-face .badge-foil { position: absolute; top: 52px; right: 0; bottom: 0; width: 9px;
-  background: linear-gradient(180deg, #f472b6, #fb923c, #facc15, #34d399, #38bdf8, #818cf8, #c084fc, #f472b6) 0 calc(var(--my) * 1%) / 100% 300%; }
-.badge-back { transform: rotateY(180deg); padding: 26px 24px 22px; background: #14112a; color: #f3f1ff; box-shadow: inset 0 0 0 1px rgb(167 155 255 / 0.35), 0 40px 80px rgb(0 0 0 / 0.55); }
-.badge-back .badge-foil { top: 0; right: auto; left: 0; }
+/* The foil: a band of rainbow light that slides across as the card tilts, plus a soft glare. */
+.badge-face .badge-foil { position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none; mix-blend-mode: screen; opacity: 0.5;
+  background: radial-gradient(240px 200px at calc(var(--mx) * 1%) calc(var(--my) * 1%), rgb(255 255 255 / 0.22), transparent 70%),
+    linear-gradient(115deg, transparent 20%, rgb(244 114 182 / 0.22) 36%, rgb(56 189 248 / 0.24) 48%, rgb(52 211 153 / 0.2) 60%, transparent 76%) calc(var(--mx) * 1%) 0 / 220% 100%;
+  transition: opacity 0.4s; }
+.badge-card:hover .badge-foil { opacity: 0.95; }
+.badge-back { transform: rotateY(180deg); padding: 26px 24px 22px; }
 .badge-back-h { font: 600 12px var(--cond); letter-spacing: 0.2em; text-transform: uppercase; color: #a79bff; }
 .badge-back .badge-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 14px; margin-top: 18px; }
 .badge-stats b { display: block; font: 700 30px/1 var(--display); letter-spacing: -0.03em; }
