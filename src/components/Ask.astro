@@ -57,10 +57,10 @@ const icons: Record<string, string> = {
   chart: 'M5 20v-8M12 20V4M19 20v-5',
   case: 'M4 8h16v11H4zM9 8V5h6v3M4 13h16',
 };
-const greeting = "Hi, I'm Aditya's stand-in. I've read this whole site, so ask me about his projects, open source work, problem solving, studies or the startup he co-founded.";
+const greeting = "Hi, I'm Aditya's assistant. I've read this whole site, so ask me about his projects, open source work, problem solving, studies or the startup he co-founded.";
 ---
 <section class="section ask-sec" data-reveal id="ask" aria-labelledby="ask-title">
-  <h2 id="ask-title" class="section-title">Ask my stand-in</h2>
+  <h2 id="ask-title" class="section-title">Ask my assistant</h2>
   <p class="ask-sum">Skip the screening call. It has read every page here, answers only from what it found, and shows you which page it came from.</p>
 
   <div class="ask" id="ask-panel"
@@ -69,13 +69,13 @@ const greeting = "Hi, I'm Aditya's stand-in. I've read this whole site, so ask m
 
     <div class="ask-stage">
       <div class="ask-id">
-        <b>The stand-in</b>
+        <b>The assistant</b>
         <span class="ask-status"><span class="ask-dot"></span><span id="ask-state">Has read this whole site</span></span>
       </div>
 
       <div class="si-wrap">
         <p class="si-quip" id="si-quip" aria-live="polite"></p>
-        <button type="button" class="si" id="standin" data-mood="idle" aria-label="Poke the stand-in">
+        <button type="button" class="si" id="standin" data-mood="idle" aria-label="Poke the assistant">
           <svg class="si-svg" viewBox="0 0 240 236" aria-hidden="true">
             <defs>
               <radialGradient id="si-body" cx="38%" cy="28%" r="82%">
