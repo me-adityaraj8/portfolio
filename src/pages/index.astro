@@ -87,20 +87,19 @@ const initials = (s: string) => s.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).m
         <div class="badge-tilt" id="badge-tilt">
           <button type="button" class="badge-card" id="badge-card" aria-pressed="false" aria-label="Aditya's ID badge. Press to flip it over, or drag it to swing it.">
             <span class="badge-face badge-front">
-              <svg class="badge-pattern" viewBox="-100 -100 200 200" aria-hidden="true">{rosette.map((d) => <path d={d} />)}</svg>
-              <span class="badge-head">
+              <span class="badge-slot" aria-hidden="true"></span>
+              <span class="badge-photo">
+                <img src={site.photo} alt="Aditya Raj" width="640" height="640" decoding="async" draggable="false" />
                 <span class="badge-mark" aria-hidden="true">AR</span>
-                <span class="badge-kind">Engineer pass<b>All access · 2026</b></span>
                 <span class="badge-holo" aria-hidden="true"></span>
               </span>
-              <span class="badge-name">Aditya<br />Raj</span>
-              <span class="badge-role">Software engineer · Co-founder</span>
+              <span class="badge-name">Aditya Raj</span>
+              <span class="badge-role">Software engineer · Co-founder, Kalaa SkillTech</span>
               <span class="badge-rows">
                 <span><i>School</i>IIIT Bhagalpur, CSE</span>
                 <span><i>Status</i><span class="status-dot"></span>{site.status}</span>
-                <span><i>Builds in</i>TypeScript · React · Node.js</span>
               </span>
-              <span class="badge-foot"><span class="badge-bars" aria-hidden="true"></span><span class="badge-flip">Flip<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.7-5.7L20 8.5M20 4v4.5h-4.5M20 12a8 8 0 0 1-13.7 5.7L4 15.5M4 20v-4.5h4.5" /></svg></span></span>
+              <span class="badge-foot"><span class="badge-handle"><Icon name="siGithub" />{site.github.replace('https://github.com/', '')}</span><span class="badge-flip">Flip<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.7-5.7L20 8.5M20 4v4.5h-4.5M20 12a8 8 0 0 1-13.7 5.7L4 15.5M4 20v-4.5h4.5" /></svg></span></span>
               <span class="badge-foil" aria-hidden="true"></span>
             </span>
             <span class="badge-face badge-back">
