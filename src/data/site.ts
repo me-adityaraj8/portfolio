@@ -2,8 +2,8 @@ export const site = {
   name: 'Aditya Raj',
   role: 'Software engineer',
   line: "Whether it's frontend, backend, full-stack or AI-powered, I work across the whole development lifecycle, from UI and UX to deployment to what users say afterwards. I care less about technology debates and more about shipping things people love using.",
-  /** Your photo for the LinkedIn card, e.g. '/me.jpg' in /public. Falls back to the GitHub avatar. */
-  photo: '',
+  /** My photo, in /public. It is on the hero's ID badge and the LinkedIn card. */
+  photo: '/me.webp',
   /** What the LinkedIn hover card shows. */
   linkedinCard: { name: 'K Aditya Raj Kumar Dora', headline: 'Software Engineer · Co-founder, Kalaa SkillTech', location: 'Bihar, India' },
   status: 'Open to SDE internships',
