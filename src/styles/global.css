@@ -592,6 +592,7 @@ html[data-theme='light'] .cd.l1 { background: #d9d2ff; } html[data-theme='light'
 /* ── Header controls: 30-second view and the theme switch. */
 .recruit-btn { padding: 7px 12px; border-radius: 999px; border: 1px solid rgb(167 155 255 / 0.5); color: var(--ink); letter-spacing: inherit; text-transform: inherit;
   background: linear-gradient(90deg, rgb(244 114 182 / 0.12), rgb(34 211 238 / 0.12)); }
+.recruit-btn .rb-short { display: none; }
 .recruit-btn:hover { box-shadow: 0 0 24px rgb(167 155 255 / 0.35); }
 .theme-btn { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--hair-2); }
 .theme-btn svg { width: 18px; height: 18px; overflow: visible; }
@@ -698,7 +699,9 @@ html[data-theme='dark'] .theme-btn .sun-core { r: 8px; }
 
 @media (max-width: 899px) {
   .gh-grid { grid-template-columns: 1fr; }
-  .recruit-btn { display: none; }
+  .recruit-btn { padding: 5px 10px; }
+  .recruit-btn .rb-full { display: none; }
+  .recruit-btn .rb-short { display: inline; }
   .contest-name { display: none; }
 }
 
