@@ -1,5 +1,6 @@
 import type Lenis from 'lenis';
 import { ago } from './music';
+import { SCENE_MS, clock, reelAt } from './reel';
 import { countdown, latestRepo, nextContest } from './live';
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -131,14 +132,76 @@ export async function guestbook() {
   });
 }
 
-/** The 30-second view: everything a recruiter needs on one screen. */
+/** The hero's colours, one per scene of the reel. */
+const REEL_COLOURS = ['#f472b6', '#c084fc', '#818cf8', '#38bdf8', '#2dd4bf'];
+
+/** The 30-second view: a reel of short scenes that plays itself against a clock, and can be paused or skipped. */
 export function recruiter(lenis: Lenis | null) {
   const dialog = $<HTMLDialogElement>('recruit');
-  const open = () => { dialog.showModal(); lenis?.stop(); };
+  const scenes = [...dialog.querySelectorAll<HTMLElement>('.reel-scene')];
+  const fills = [...dialog.querySelectorAll<HTMLElement>('.reel-seg i')];
+  const clockEl = $('reel-clock'), label = $('reel-label'), play = $('reel-play');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const total = scenes.length * SCENE_MS;
+  let elapsed = 0, last = 0, raf = 0, playing = false, shown = -1;
+
+  const countUp = (scene: HTMLElement) => scene.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => {
+    const to = Number(el.dataset.count);
+    if (reduced || !Number.isFinite(to)) return;
+    const t0 = performance.now();
+    const step = (now: number) => {
+      const k = Math.min(1, (now - t0) / 1100);
+      el.textContent = String(Math.round(to * (1 - (1 - k) ** 4)));
+      if (k < 1 && shown === scenes.indexOf(scene)) requestAnimationFrame(step); else el.textContent = String(to);
+    };
+    requestAnimationFrame(step);
+  });
+  const show = (i: number) => {
+    shown = i;
+    scenes.forEach((s, j) => { s.classList.toggle('on', j === i); s.inert = j !== i; });
+    dialog.style.setProperty('--acc', REEL_COLOURS[i % REEL_COLOURS.length]);
+    label.textContent = `${String(i + 1).padStart(2, '0')} / ${String(scenes.length).padStart(2, '0')} · ${scenes[i].dataset.name ?? ''}`;
+    countUp(scenes[i]);
+  };
+  const paint = () => {
+    const at = reelAt(elapsed, scenes.length);
+    fills.forEach((el, i) => { el.style.transform = `scaleX(${i < at.scene ? 1 : i === at.scene ? at.fill : 0})`; });
+    clockEl.textContent = clock(at.left);
+    if (at.scene !== shown) show(at.scene);
+    dialog.classList.toggle('done', at.done);
+    play.setAttribute('aria-label', at.done ? 'Play again' : playing ? 'Pause' : 'Play');
+  };
+  const setPlaying = (on: boolean) => {
+    cancelAnimationFrame(raf);
+    playing = on && elapsed < total;
+    dialog.classList.toggle('paused', !playing);
+    if (playing) { last = performance.now(); raf = requestAnimationFrame(tick); }
+    paint();
+  };
+  const tick = (now: number) => {
+    elapsed = Math.min(total, elapsed + (now - last));
+    last = now;
+    if (elapsed >= total) setPlaying(false); else { paint(); raf = requestAnimationFrame(tick); }
+  };
+  const go = (i: number) => {
+    elapsed = Math.max(0, Math.min(scenes.length - 1, i)) * SCENE_MS;
+    setPlaying(playing);
+  };
+  const open = () => { elapsed = 0; shown = -1; dialog.showModal(); lenis?.stop(); setPlaying(!reduced); };
   const close = () => { dialog.close(); };
+
   $('recruit-open').addEventListener('click', open);
   $('recruit-close').addEventListener('click', close);
-  dialog.addEventListener('close', () => lenis?.start());
+  $('reel-prev').addEventListener('click', () => go(shown - 1));
+  $('reel-next').addEventListener('click', () => go(shown + 1));
+  play.addEventListener('click', () => { if (elapsed >= total) { elapsed = 0; setPlaying(true); } else setPlaying(!playing); });
+  dialog.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') go(shown + 1);
+    else if (e.key === 'ArrowLeft') go(shown - 1);
+    else if (e.key === ' ' && !(e.target as HTMLElement).closest('a, button')) { e.preventDefault(); play.click(); }
+  });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && playing) setPlaying(false); });
+  dialog.addEventListener('close', () => { setPlaying(false); lenis?.start(); });
   dialog.addEventListener('click', (e) => { if (e.target === dialog) close(); });
   if (new URLSearchParams(location.search).has('recruiter')) open();
 }
