@@ -7,15 +7,15 @@ const colourAt = (t: number) => {
   return PALETTE[i].map((c, j) => Math.round(c + (PALETTE[i + 1][j] - c) * k));
 };
 
-/** The hero's dot grid as a still SVG, with two BFS waves caught mid-spread, for share images. */
-export function dotField(w: number, h: number, step = 15) {
+/** The hero's dot grid as a still SVG for share images. `waves` adds two BFS waves caught mid-spread. */
+export function dotField(w: number, h: number, step = 15, waves = true) {
   const cols = Math.ceil(w / step), rows = Math.ceil(h / step);
   const cx = Math.round(cols * 0.76), cy = Math.round(rows * 0.45);
   let out = '';
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
       const dx = x - cx, dy = y - cy;
-      const I = Math.max(ripple(dx, dy, 0.5, { speed: 26, life: 1.5, width: 3 }), ripple(dx, dy, 1.0, { speed: 26, life: 1.8, width: 3 }) * 0.9);
+      const I = !waves ? 0 : Math.max(ripple(dx, dy, 0.5, { speed: 26, life: 1.5, width: 3 }), ripple(dx, dy, 1.0, { speed: 26, life: 1.8, width: 3 }) * 0.9);
       const side = Math.min(1, Math.max(0.12, (x / cols - 0.12) * 1.5));
       const a = Math.min(1, (0.2 + 0.95 * I) * side);
       const [r, g, b] = colourAt((x / cols) * 0.75 + (y / rows) * 0.25 + I * 0.2);

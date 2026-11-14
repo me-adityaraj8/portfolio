@@ -20,4 +20,8 @@ describe('dotField', () => {
     expect(d.some((p) => p.size > 3)).toBe(true);
     expect(d.filter((p) => p.size > 3).length).toBeLessThan(d.length / 4);
   });
+  it('can leave the waves out: every dot is small', () => {
+    const d = dots(dotField(1200, 630, 15, false));
+    expect(d.every((p) => p.size === 2)).toBe(true);
+  });
 });
